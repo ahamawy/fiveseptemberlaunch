@@ -19,7 +19,7 @@ function StyleGuideContent() {
   const [inputValue, setInputValue] = useState('');
   const [selectedOption, setSelectedOption] = useState('option1');
   const [isLoading, setIsLoading] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, colorScheme, setColorScheme } = useTheme();
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
@@ -59,30 +59,80 @@ function StyleGuideContent() {
                   </p>
                 </div>
                 
-                {/* Theme Toggle */}
-                <div className="flex items-center gap-2 ml-8">
-                  <span className="text-sm text-text-secondary">Theme:</span>
-                  <div className="flex items-center p-1 bg-surface-elevated rounded-lg border border-surface-border">
-                    <button
-                      onClick={() => setTheme('dark')}
-                      className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                        theme === 'dark' 
-                          ? 'bg-primary-300 text-white shadow-sm' 
-                          : 'text-text-secondary hover:text-text-primary'
-                      }`}
-                    >
-                      Dark
-                    </button>
-                    <button
-                      onClick={() => setTheme('light')}
-                      className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                        theme === 'light' 
-                          ? 'bg-primary-300 text-white shadow-sm' 
-                          : 'text-text-secondary hover:text-text-primary'
-                      }`}
-                    >
-                      Light
-                    </button>
+                {/* Theme and Color Scheme Toggle */}
+                <div className="flex flex-col gap-3 ml-8">
+                  {/* Theme Toggle */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-text-secondary">Theme:</span>
+                    <div className="flex items-center p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                      <button
+                        onClick={() => setTheme('dark')}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                          theme === 'dark' 
+                            ? 'bg-primary-300 text-white shadow-sm' 
+                            : 'text-text-secondary hover:text-text-primary'
+                        }`}
+                      >
+                        Dark
+                      </button>
+                      <button
+                        onClick={() => setTheme('light')}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                          theme === 'light' 
+                            ? 'bg-primary-300 text-white shadow-sm' 
+                            : 'text-text-secondary hover:text-text-primary'
+                        }`}
+                      >
+                        Light
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Color Scheme Selector */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-text-secondary">Colors:</span>
+                    <div className="flex items-center gap-1 p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                      <button
+                        onClick={() => setColorScheme('purple')}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                          colorScheme === 'purple' 
+                            ? 'bg-purple-500 text-white shadow-sm' 
+                            : 'text-text-secondary hover:text-text-primary hover:bg-purple-500/10'
+                        }`}
+                      >
+                        Purple
+                      </button>
+                      <button
+                        onClick={() => setColorScheme('blue')}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                          colorScheme === 'blue' 
+                            ? 'bg-blue-500 text-white shadow-sm' 
+                            : 'text-text-secondary hover:text-text-primary hover:bg-blue-500/10'
+                        }`}
+                      >
+                        Blue
+                      </button>
+                      <button
+                        onClick={() => setColorScheme('green')}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                          colorScheme === 'green' 
+                            ? 'bg-green-500 text-white shadow-sm' 
+                            : 'text-text-secondary hover:text-text-primary hover:bg-green-500/10'
+                        }`}
+                      >
+                        Green
+                      </button>
+                      <button
+                        onClick={() => setColorScheme('monochrome')}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                          colorScheme === 'monochrome' 
+                            ? 'bg-gray-600 text-white shadow-sm' 
+                            : 'text-text-secondary hover:text-text-primary hover:bg-gray-500/10'
+                        }`}
+                      >
+                        Mono
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

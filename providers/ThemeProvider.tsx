@@ -1,13 +1,17 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { getColorSchemeVars, DEFAULT_COLOR_SCHEME } from '@/branding/tokens/color-schemes';
 
 type Theme = 'dark' | 'light';
+type ColorScheme = 'purple' | 'blue' | 'green' | 'monochrome';
 
 interface ThemeContextType {
   theme: Theme;
+  colorScheme: ColorScheme;
   toggleTheme: () => void;
   setTheme: (theme: Theme) => void;
+  setColorScheme: (scheme: ColorScheme) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -15,22 +19,31 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ 
   children,
   defaultTheme = 'dark',
-  storageKey = 'equitie-theme'
+  defaultColorScheme = DEFAULT_COLOR_SCHEME as ColorScheme,
+  storageKey = 'equitie-theme',
+  colorSchemeKey = 'equitie-color-scheme'
 }: { 
   children: React.ReactNode;
   defaultTheme?: Theme;
+  defaultColorScheme?: ColorScheme;
   storageKey?: string;
+  colorSchemeKey?: string;
 }) {
   const [theme, setThemeState] = useState<Theme>(defaultTheme);
+  const [colorScheme, setColorSchemeState] = useState<ColorScheme>(defaultColorScheme);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem(storageKey) as Theme;
-    if (stored) {
-      setThemeState(stored);
+    const storedTheme = localStorage.getItem(storageKey) as Theme;
+    const storedScheme = localStorage.getItem(colorSchemeKey) as ColorScheme;
+    if (storedTheme) {
+      setThemeState(storedTheme);
     }
-  }, [storageKey]);
+    if (storedScheme) {
+      setColorSchemeState(storedScheme);
+    }
+  }, [storageKey, colorSchemeKey]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -41,6 +54,20 @@ export function ThemeProvider({
     localStorage.setItem(storageKey, theme);
   }, [theme, storageKey, mounted]);
 
+  useEffect(() => {
+    if (!mounted) return;
+
+    const root = document.documentElement;
+    const colorVars = getColorSchemeVars(colorScheme);
+    
+    // Apply color scheme CSS variables to root
+    Object.entries(colorVars).forEach(([key, value]) => {
+      root.style.setProperty(key, value);
+    });
+    
+    localStorage.setItem(colorSchemeKey, colorScheme);
+  }, [colorScheme, colorSchemeKey, mounted]);
+
   const toggleTheme = () => {
     setThemeState(prev => prev === 'dark' ? 'light' : 'dark');
   };
@@ -49,10 +76,16 @@ export function ThemeProvider({
     setThemeState(newTheme);
   };
 
+  const setColorScheme = (newScheme: ColorScheme) => {
+    setColorSchemeState(newScheme);
+  };
+
   const value = {
     theme,
+    colorScheme,
     toggleTheme,
-    setTheme
+    setTheme,
+    setColorScheme
   };
 
   // Prevent hydration mismatch
