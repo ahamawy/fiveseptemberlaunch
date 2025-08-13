@@ -1,25 +1,55 @@
+'use client';
+
 import { ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 interface InvestorPortalLayoutProps {
   children: ReactNode;
 }
 
 export default function InvestorPortalLayout({ children }: InvestorPortalLayoutProps) {
+  const pathname = usePathname();
+
+  const navLinks = [
+    { href: '/investor-portal/dashboard', label: 'Dashboard', icon: '📊' },
+    { href: '/investor-portal/deals', label: 'Deals', icon: '🤝' },
+    { href: '/investor-portal/portfolio', label: 'Portfolio', icon: '💼' },
+    { href: '/investor-portal/transactions', label: 'Transactions', icon: '💰' },
+    { href: '/investor-portal/documents', label: 'Documents', icon: '📄' },
+    { href: '/investor-portal/profile', label: 'Profile', icon: '👤' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen bg-background-deep">
+      <nav className="bg-background-surface/80 backdrop-blur-md shadow-glow-purple/10 border-b border-surface-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">Investor Portal</h1>
+              <h1 className="text-xl font-semibold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
+                Investor Portal
+              </h1>
             </div>
-            <div className="flex items-center space-x-8">
-              <a href="/investor-portal/dashboard" className="text-gray-700 hover:text-gray-900">Dashboard</a>
-              <a href="/investor-portal/deals" className="text-gray-700 hover:text-gray-900">Deals</a>
-              <a href="/investor-portal/portfolio" className="text-gray-700 hover:text-gray-900">Portfolio</a>
-              <a href="/investor-portal/transactions" className="text-gray-700 hover:text-gray-900">Transactions</a>
-              <a href="/investor-portal/documents" className="text-gray-700 hover:text-gray-900">Documents</a>
-              <a href="/investor-portal/profile" className="text-gray-700 hover:text-gray-900">Profile</a>
+            <div className="flex items-center space-x-6">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+                      isActive
+                        ? 'bg-primary-300/20 text-primary-300 shadow-glow-purple/20'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-background-surface'
+                    )}
+                  >
+                    <span className="hidden sm:inline">{link.icon}</span>
+                    <span className="ml-1">{link.label}</span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

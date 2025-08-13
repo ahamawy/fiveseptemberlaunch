@@ -1,51 +1,520 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { formatDate } from '@/lib/theme-utils';
+
+interface ProfileData {
+  personalInfo: {
+    fullName: string;
+    email: string;
+    phone: string;
+    dateOfBirth: string;
+    nationality: string;
+    residenceCountry: string;
+    taxId: string;
+  };
+  investorInfo: {
+    type: 'Individual' | 'Institutional' | 'Family Office' | 'Fund';
+    accreditationStatus: 'Accredited' | 'Qualified' | 'Sophisticated' | 'Retail';
+    investorSince: string;
+    totalInvested: number;
+    activeInvestments: number;
+    preferredSectors: string[];
+    riskProfile: 'Conservative' | 'Moderate' | 'Aggressive';
+  };
+  kycStatus: {
+    status: 'Not Started' | 'In Progress' | 'Under Review' | 'Approved' | 'Expired';
+    lastUpdated: string;
+    expiryDate: string | null;
+    documents: Array<{
+      type: string;
+      status: 'Pending' | 'Verified' | 'Rejected';
+      uploadDate: string;
+    }>;
+  };
+  bankDetails: {
+    accountName: string;
+    bankName: string;
+    accountNumber: string;
+    routingNumber: string;
+    swiftCode: string;
+    currency: string;
+  };
+  preferences: {
+    emailNotifications: boolean;
+    smsNotifications: boolean;
+    marketingEmails: boolean;
+    quarterlyReports: boolean;
+    language: string;
+    timezone: string;
+  };
+}
+
+const mockProfileData: ProfileData = {
+  personalInfo: {
+    fullName: 'John Smith',
+    email: 'john.smith@example.com',
+    phone: '+1 (555) 123-4567',
+    dateOfBirth: '1980-05-15',
+    nationality: 'USA',
+    residenceCountry: 'USA',
+    taxId: '***-**-6789',
+  },
+  investorInfo: {
+    type: 'Individual',
+    accreditationStatus: 'Accredited',
+    investorSince: '2021-03-10',
+    totalInvested: 5000000,
+    activeInvestments: 12,
+    preferredSectors: ['Technology', 'Healthcare', 'FinTech'],
+    riskProfile: 'Moderate',
+  },
+  kycStatus: {
+    status: 'Approved',
+    lastUpdated: '2024-09-15',
+    expiryDate: '2025-09-15',
+    documents: [
+      { type: 'Passport', status: 'Verified', uploadDate: '2024-09-10' },
+      { type: 'Proof of Address', status: 'Verified', uploadDate: '2024-09-11' },
+      { type: 'Tax Returns', status: 'Verified', uploadDate: '2024-09-12' },
+      { type: 'Bank Statement', status: 'Verified', uploadDate: '2024-09-13' },
+    ],
+  },
+  bankDetails: {
+    accountName: 'John Smith',
+    bankName: 'Chase Bank',
+    accountNumber: '****1234',
+    routingNumber: '****5678',
+    swiftCode: 'CHASUS33',
+    currency: 'USD',
+  },
+  preferences: {
+    emailNotifications: true,
+    smsNotifications: false,
+    marketingEmails: true,
+    quarterlyReports: true,
+    language: 'English',
+    timezone: 'America/New_York',
+  },
+};
+
 export default function ProfilePage() {
+  const [data, setData] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'personal' | 'investor' | 'kyc' | 'banking' | 'preferences'>('personal');
+
+  useEffect(() => {
+    // Simulate data fetching
+    setTimeout(() => {
+      setData(mockProfileData);
+      setLoading(false);
+    }, 500);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-text-secondary">
+          <svg className="animate-spin h-8 w-8 text-primary-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Loading profile...
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Card variant="glass">
+        <CardContent className="text-center py-12">
+          <div className="text-error">Error loading profile data</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const getKYCStatusBadge = (status: string) => {
+    const variants: Record<string, 'success' | 'warning' | 'error' | 'info' | 'neutral'> = {
+      'Not Started': 'neutral',
+      'In Progress': 'warning',
+      'Under Review': 'info',
+      'Approved': 'success',
+      'Expired': 'error',
+    };
+    return variants[status] || 'neutral';
+  };
+
+  const getRiskProfileBadge = (profile: string) => {
+    const variants: Record<string, 'success' | 'warning' | 'error'> = {
+      'Conservative': 'success',
+      'Moderate': 'warning',
+      'Aggressive': 'error',
+    };
+    return variants[profile] || 'neutral';
+  };
+
+  const tabs = [
+    { id: 'personal', label: 'Personal Info', icon: '👤' },
+    { id: 'investor', label: 'Investor Profile', icon: '💼' },
+    { id: 'kyc', label: 'KYC & Compliance', icon: '✅' },
+    { id: 'banking', label: 'Banking', icon: '🏦' },
+    { id: 'preferences', label: 'Preferences', icon: '⚙️' },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="pb-5 border-b border-gray-200">
-        <h2 className="text-3xl font-bold text-gray-900">Profile & KYC</h2>
-        <p className="mt-2 text-sm text-gray-600">Manage your profile and compliance information</p>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="pb-6 border-b border-surface-border">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
+          Profile & Settings
+        </h1>
+        <p className="mt-2 text-text-secondary">
+          Manage your account information and preferences
+        </p>
       </div>
 
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Information</h3>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Full Name</label>
-              <p className="mt-1 text-sm text-gray-900">John Smith</p>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card variant="gradient" hover>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-text-secondary">Investor Type</p>
+                <p className="text-lg font-semibold text-text-primary mt-1">
+                  {data.investorInfo.type}
+                </p>
+              </div>
+              <span className="text-2xl">💼</span>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
-              <p className="mt-1 text-sm text-gray-900">john.smith@example.com</p>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-text-secondary">KYC Status</p>
+                <Badge variant={getKYCStatusBadge(data.kycStatus.status)} className="mt-1">
+                  {data.kycStatus.status}
+                </Badge>
+              </div>
+              <span className="text-2xl">✅</span>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Investor Type</label>
-              <p className="mt-1 text-sm text-gray-900">Individual</p>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-text-secondary">Active Investments</p>
+                <p className="text-2xl font-bold text-primary-300 mt-1">
+                  {data.investorInfo.activeInvestments}
+                </p>
+              </div>
+              <span className="text-2xl">📊</span>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Country</label>
-              <p className="mt-1 text-sm text-gray-900">USA</p>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-text-secondary">Member Since</p>
+                <p className="text-lg font-semibold text-text-primary mt-1">
+                  {new Date(data.investorInfo.investorSince).getFullYear()}
+                </p>
+              </div>
+              <span className="text-2xl">📅</span>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">KYC Status</h3>
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">KYC Approved</p>
-              <p className="text-sm text-gray-500">Your identity verification is complete</p>
-            </div>
-          </div>
-        </div>
+      {/* Tab Navigation */}
+      <div className="flex gap-2 flex-wrap">
+        {tabs.map(tab => (
+          <Button
+            key={tab.id}
+            variant={activeTab === tab.id ? 'primary' : 'glass'}
+            size="sm"
+            onClick={() => setActiveTab(tab.id as any)}
+          >
+            <span className="mr-2">{tab.icon}</span>
+            {tab.label}
+          </Button>
+        ))}
       </div>
+
+      {/* Tab Content */}
+      <Card variant="glass" hover>
+        <CardContent className="p-6">
+          {/* Personal Information Tab */}
+          {activeTab === 'personal' && (
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-text-primary mb-4">Personal Information</h3>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">Full Name</label>
+                  <p className="text-text-primary">{data.personalInfo.fullName}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">Email Address</label>
+                  <p className="text-text-primary">{data.personalInfo.email}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">Phone Number</label>
+                  <p className="text-text-primary">{data.personalInfo.phone}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">Date of Birth</label>
+                  <p className="text-text-primary">{formatDate(data.personalInfo.dateOfBirth)}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">Nationality</label>
+                  <p className="text-text-primary">{data.personalInfo.nationality}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">Country of Residence</label>
+                  <p className="text-text-primary">{data.personalInfo.residenceCountry}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">Tax ID</label>
+                  <p className="text-text-primary font-mono">{data.personalInfo.taxId}</p>
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <Button variant="primary" size="sm">Edit Information</Button>
+                <Button variant="glass" size="sm">Change Password</Button>
+              </div>
+            </div>
+          )}
+
+          {/* Investor Profile Tab */}
+          {activeTab === 'investor' && (
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-text-primary mb-4">Investor Profile</h3>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">Investor Type</label>
+                  <p className="text-text-primary">{data.investorInfo.type}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">Accreditation Status</label>
+                  <Badge variant="success">{data.investorInfo.accreditationStatus}</Badge>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">Risk Profile</label>
+                  <Badge variant={getRiskProfileBadge(data.investorInfo.riskProfile) as any}>
+                    {data.investorInfo.riskProfile}
+                  </Badge>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">Investor Since</label>
+                  <p className="text-text-primary">{formatDate(data.investorInfo.investorSince)}</p>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-2">Preferred Sectors</label>
+                <div className="flex gap-2 flex-wrap">
+                  {data.investorInfo.preferredSectors.map(sector => (
+                    <Badge key={sector} variant="primary">{sector}</Badge>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <Button variant="primary" size="sm">Update Preferences</Button>
+                <Button variant="glass" size="sm">Risk Assessment</Button>
+              </div>
+            </div>
+          )}
+
+          {/* KYC & Compliance Tab */}
+          {activeTab === 'kyc' && (
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-text-primary mb-4">KYC & Compliance</h3>
+              
+              {/* KYC Status Card */}
+              <Card variant={data.kycStatus.status === 'Approved' ? 'gradient' : 'glass'}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-full ${
+                        data.kycStatus.status === 'Approved' ? 'bg-success/20' : 'bg-warning/20'
+                      }`}>
+                        <svg className={`h-6 w-6 ${
+                          data.kycStatus.status === 'Approved' ? 'text-success' : 'text-warning'
+                        }`} fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-text-primary">KYC Status</p>
+                        <p className="text-sm text-text-secondary">
+                          Last updated: {formatDate(data.kycStatus.lastUpdated)}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant={getKYCStatusBadge(data.kycStatus.status)} size="lg">
+                      {data.kycStatus.status}
+                    </Badge>
+                  </div>
+                  {data.kycStatus.expiryDate && (
+                    <p className="text-sm text-text-muted mt-3">
+                      Expires: {formatDate(data.kycStatus.expiryDate)}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Documents List */}
+              <div>
+                <h4 className="text-lg font-medium text-text-primary mb-3">Verification Documents</h4>
+                <div className="space-y-2">
+                  {data.kycStatus.documents.map((doc, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-background-surface rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <svg className="h-5 w-5 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <div>
+                          <p className="text-sm font-medium text-text-primary">{doc.type}</p>
+                          <p className="text-xs text-text-muted">Uploaded: {formatDate(doc.uploadDate)}</p>
+                        </div>
+                      </div>
+                      <Badge variant={doc.status === 'Verified' ? 'success' : doc.status === 'Rejected' ? 'error' : 'warning'}>
+                        {doc.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <Button variant="primary" size="sm">Upload Documents</Button>
+                <Button variant="glass" size="sm">Request Review</Button>
+              </div>
+            </div>
+          )}
+
+          {/* Banking Tab */}
+          {activeTab === 'banking' && (
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-text-primary mb-4">Banking Information</h3>
+              <Card variant="glass">
+                <CardContent className="p-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-text-secondary mb-1">Account Name</label>
+                      <p className="text-text-primary">{data.bankDetails.accountName}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-text-secondary mb-1">Bank Name</label>
+                      <p className="text-text-primary">{data.bankDetails.bankName}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-text-secondary mb-1">Account Number</label>
+                      <p className="text-text-primary font-mono">{data.bankDetails.accountNumber}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-text-secondary mb-1">Routing Number</label>
+                      <p className="text-text-primary font-mono">{data.bankDetails.routingNumber}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-text-secondary mb-1">SWIFT Code</label>
+                      <p className="text-text-primary font-mono">{data.bankDetails.swiftCode}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-text-secondary mb-1">Currency</label>
+                      <Badge variant="info">{data.bankDetails.currency}</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <div className="flex gap-3">
+                <Button variant="primary" size="sm">Update Banking Details</Button>
+                <Button variant="glass" size="sm">Add Another Account</Button>
+              </div>
+            </div>
+          )}
+
+          {/* Preferences Tab */}
+          {activeTab === 'preferences' && (
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-text-primary mb-4">Preferences</h3>
+              
+              {/* Notification Settings */}
+              <div>
+                <h4 className="text-lg font-medium text-text-primary mb-3">Notifications</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-background-surface rounded-lg">
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">Email Notifications</p>
+                      <p className="text-xs text-text-muted">Receive updates via email</p>
+                    </div>
+                    <Badge variant={data.preferences.emailNotifications ? 'success' : 'neutral'}>
+                      {data.preferences.emailNotifications ? 'Enabled' : 'Disabled'}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-background-surface rounded-lg">
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">SMS Notifications</p>
+                      <p className="text-xs text-text-muted">Receive updates via SMS</p>
+                    </div>
+                    <Badge variant={data.preferences.smsNotifications ? 'success' : 'neutral'}>
+                      {data.preferences.smsNotifications ? 'Enabled' : 'Disabled'}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-background-surface rounded-lg">
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">Marketing Emails</p>
+                      <p className="text-xs text-text-muted">Receive promotional content</p>
+                    </div>
+                    <Badge variant={data.preferences.marketingEmails ? 'success' : 'neutral'}>
+                      {data.preferences.marketingEmails ? 'Enabled' : 'Disabled'}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-background-surface rounded-lg">
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">Quarterly Reports</p>
+                      <p className="text-xs text-text-muted">Receive performance reports</p>
+                    </div>
+                    <Badge variant={data.preferences.quarterlyReports ? 'success' : 'neutral'}>
+                      {data.preferences.quarterlyReports ? 'Enabled' : 'Disabled'}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Regional Settings */}
+              <div>
+                <h4 className="text-lg font-medium text-text-primary mb-3">Regional Settings</h4>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-text-secondary mb-1">Language</label>
+                    <p className="text-text-primary">{data.preferences.language}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-text-secondary mb-1">Timezone</label>
+                    <p className="text-text-primary">{data.preferences.timezone}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button variant="primary" size="sm">Save Preferences</Button>
+                <Button variant="glass" size="sm">Reset to Default</Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

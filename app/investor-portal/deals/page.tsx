@@ -1,6 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
+import { formatCurrency, formatPercentage } from '@/lib/theme-utils';
 
 interface Commitment {
   id: number;
@@ -66,38 +71,46 @@ export default function DealsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading deals...</div>
+        <div className="text-text-secondary">
+          <svg className="animate-spin h-8 w-8 text-primary-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Loading deals...
+        </div>
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-red-500">Error loading deals data</div>
-      </div>
+      <Card variant="glass">
+        <CardContent className="text-center py-12">
+          <div className="text-error">Error loading deals data</div>
+        </CardContent>
+      </Card>
     );
   }
 
-  const formatCurrency = (value: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
+  const getStageBadge = (stage: string) => {
+    const variants: Record<string, 'warning' | 'info' | 'success' | 'error' | 'neutral' | 'primary'> = {
+      sourcing: 'warning',
+      due_diligence: 'info',
+      closing: 'primary',
+      active: 'success',
+      exited: 'neutral',
+      cancelled: 'error',
+    };
+    return variants[stage] || 'neutral';
   };
 
-  const getStageBadge = (stage: string) => {
-    const styles: Record<string, string> = {
-      sourcing: 'bg-yellow-100 text-yellow-800',
-      due_diligence: 'bg-orange-100 text-orange-800',
-      closing: 'bg-blue-100 text-blue-800',
-      active: 'bg-green-100 text-green-800',
-      exited: 'bg-purple-100 text-purple-800',
-      cancelled: 'bg-red-100 text-red-800',
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, 'success' | 'warning' | 'error'> = {
+      signed: 'success',
+      draft: 'warning',
+      cancelled: 'error',
     };
-    return styles[stage] || 'bg-gray-100 text-gray-800';
+    return variants[status] || 'neutral';
   };
 
   const filteredCommitments = filterStage === 'all'
@@ -107,216 +120,219 @@ export default function DealsPage() {
   const uniqueStages = Array.from(new Set(data.commitments.map(c => c.dealStage)));
 
   return (
-    <div className="space-y-6">
-      <div className="pb-5 border-b border-gray-200">
-        <h2 className="text-3xl font-bold text-gray-900">Deals & Commitments</h2>
-        <p className="mt-2 text-sm text-gray-600">Manage your investment commitments</p>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="pb-6 border-b border-surface-border">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
+          Deals & Commitments
+        </h1>
+        <p className="mt-2 text-text-secondary">
+          Manage your investment commitments and track deal progress
+        </p>
       </div>
 
       {/* Summary Statistics */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-6">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500">Total Committed</dt>
-            <dd className="mt-1 text-2xl font-semibold text-gray-900">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
+        <Card variant="gradient" hover>
+          <CardContent className="p-4">
+            <p className="text-sm text-text-secondary">Total Committed</p>
+            <p className="text-2xl font-bold text-text-primary mt-1">
               {formatCurrency(data.summary.totalCommitted)}
-            </dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500">Capital Called</dt>
-            <dd className="mt-1 text-2xl font-semibold text-gray-900">
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <p className="text-sm text-text-secondary">Capital Called</p>
+            <p className="text-2xl font-bold text-text-primary mt-1">
               {formatCurrency(data.summary.totalCalled)}
-            </dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500">Distributed</dt>
-            <dd className="mt-1 text-2xl font-semibold text-gray-900">
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <p className="text-sm text-text-secondary">Distributed</p>
+            <p className="text-2xl font-bold text-accent-green mt-1">
               {formatCurrency(data.summary.totalDistributed)}
-            </dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500">Remaining</dt>
-            <dd className="mt-1 text-2xl font-semibold text-gray-900">
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <p className="text-sm text-text-secondary">Remaining</p>
+            <p className="text-2xl font-bold text-text-primary mt-1">
               {formatCurrency(data.summary.totalRemaining)}
-            </dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500">Active Deals</dt>
-            <dd className="mt-1 text-2xl font-semibold text-gray-900">
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <p className="text-sm text-text-secondary">Active Deals</p>
+            <p className="text-2xl font-bold text-primary-300 mt-1">
               {data.summary.activeCommitments}
-            </dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500">Avg Called %</dt>
-            <dd className="mt-1 text-2xl font-semibold text-gray-900">
-              {data.summary.averageCallPercentage.toFixed(1)}%
-            </dd>
-          </div>
-        </div>
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <p className="text-sm text-text-secondary">Avg Called %</p>
+            <p className="text-2xl font-bold text-text-primary mt-1">
+              {formatPercentage(data.summary.averageCallPercentage)}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Upcoming Capital Calls */}
       {data.upcomingCalls.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">📅 Upcoming Capital Calls</h3>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {data.upcomingCalls.slice(0, 3).map((call, idx) => (
-              <div key={idx} className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="text-sm text-gray-600">{call.dealName}</div>
-                <div className="text-lg font-semibold text-gray-900 mt-1">
-                  {formatCurrency(call.amount, call.currency)}
-                </div>
-                <div className="text-xs text-gray-500 mt-1">
-                  Expected: {call.date ? new Date(call.date).toLocaleDateString() : 'TBD'}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Card variant="glass" className="border-accent-yellow/30 bg-accent-yellow/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <span className="text-2xl">📅</span>
+              Upcoming Capital Calls
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {data.upcomingCalls.slice(0, 3).map((call, idx) => (
+                <Card key={idx} variant="glass" hover>
+                  <CardContent className="p-4">
+                    <p className="text-sm text-text-secondary">{call.dealName}</p>
+                    <p className="text-lg font-bold text-text-primary mt-1">
+                      {formatCurrency(call.amount, call.currency)}
+                    </p>
+                    <p className="text-xs text-text-muted mt-1">
+                      Expected: {call.date ? new Date(call.date).toLocaleDateString() : 'TBD'}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Deals Filter and List */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-medium text-gray-900">All Commitments</h3>
-            <div className="flex space-x-2">
-              <button
+      <Card variant="glass" hover>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>All Commitments</CardTitle>
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant={filterStage === 'all' ? 'primary' : 'glass'}
+                size="sm"
                 onClick={() => setFilterStage('all')}
-                className={`px-3 py-1 rounded text-sm ${
-                  filterStage === 'all'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
               >
                 All
-              </button>
+              </Button>
               {uniqueStages.map(stage => (
-                <button
+                <Button
                   key={stage}
+                  variant={filterStage === stage ? 'primary' : 'glass'}
+                  size="sm"
                   onClick={() => setFilterStage(stage)}
-                  className={`px-3 py-1 rounded text-sm capitalize ${
-                    filterStage === stage
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-700'
-                  }`}
+                  className="capitalize"
                 >
                   {stage.replace('_', ' ')}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
-
+        </CardHeader>
+        <CardContent>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Deal
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Company
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Stage
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Committed
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Called
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Remaining
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Called %
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Distributed
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Deal</TableHead>
+                  <TableHead>Company</TableHead>
+                  <TableHead>Stage</TableHead>
+                  <TableHead>Committed</TableHead>
+                  <TableHead>Called</TableHead>
+                  <TableHead>Remaining</TableHead>
+                  <TableHead>Called %</TableHead>
+                  <TableHead>Distributed</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {filteredCommitments.map((commitment) => (
-                  <tr key={commitment.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                  <TableRow key={commitment.id}>
+                    <TableCell>
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="font-medium text-text-primary">
                           {commitment.dealName}
                         </div>
-                        <div className="text-xs text-gray-500">{commitment.dealCode}</div>
+                        <div className="text-xs text-text-muted">{commitment.dealCode}</div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    </TableCell>
+                    <TableCell>
                       <div>
-                        <div className="text-sm text-gray-900">{commitment.companyName}</div>
-                        <div className="text-xs text-gray-500">{commitment.companySector}</div>
+                        <div className="text-sm text-text-primary">{commitment.companyName}</div>
+                        <div className="text-xs text-text-muted">{commitment.companySector}</div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStageBadge(commitment.dealStage)}`}>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStageBadge(commitment.dealStage)}>
                         {commitment.dealStage.replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-text-primary">
                       {formatCurrency(commitment.committedAmount, commitment.currency)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    </TableCell>
+                    <TableCell className="text-text-primary">
                       {formatCurrency(commitment.capitalCalled, commitment.currency)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    </TableCell>
+                    <TableCell className="text-text-primary">
                       {formatCurrency(commitment.capitalRemaining, commitment.currency)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-1 mr-2">
-                          <div className="bg-gray-200 rounded-full h-2">
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                          <div className="bg-background-surface rounded-full h-2 overflow-hidden">
                             <div
-                              className="bg-blue-500 h-2 rounded-full"
+                              className="bg-primary-300 h-2 transition-all duration-300"
                               style={{ width: `${commitment.percentageCalled}%` }}
                             />
                           </div>
                         </div>
-                        <span className="text-sm text-gray-900">
+                        <span className="text-sm text-text-primary min-w-[3ch]">
                           {commitment.percentageCalled.toFixed(0)}%
                         </span>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    </TableCell>
+                    <TableCell className="text-accent-green">
                       {formatCurrency(commitment.capitalDistributed, commitment.currency)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        commitment.status === 'signed' 
-                          ? 'bg-green-100 text-green-800'
-                          : commitment.status === 'draft'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusBadge(commitment.status) as any}>
                         {commitment.status}
-                      </span>
-                    </td>
-                  </tr>
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
-        </div>
-      </div>
+
+          {filteredCommitments.length === 0 && (
+            <div className="text-center py-12">
+              <svg className="mx-auto h-12 w-12 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+              <h3 className="mt-2 text-sm font-medium text-text-primary">No deals found</h3>
+              <p className="mt-1 text-sm text-text-muted">
+                Try adjusting your filters or check back later for new deals.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

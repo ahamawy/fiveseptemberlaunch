@@ -1,6 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
+import { formatCurrency, formatDate } from '@/lib/theme-utils';
 
 interface Transaction {
   id: number;
@@ -70,47 +75,46 @@ export default function TransactionsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading transactions...</div>
+        <div className="text-text-secondary">
+          <svg className="animate-spin h-8 w-8 text-primary-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Loading transactions...
+        </div>
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-red-500">Error loading transactions data</div>
-      </div>
+      <Card variant="glass">
+        <CardContent className="text-center py-12">
+          <div className="text-error">Error loading transactions data</div>
+        </CardContent>
+      </Card>
     );
   }
 
-  const formatCurrency = (value: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   const getTypeBadge = (type: string) => {
-    const styles: Record<string, string> = {
-      capital_call: 'bg-red-100 text-red-800',
-      distribution: 'bg-green-100 text-green-800',
-      fee: 'bg-yellow-100 text-yellow-800',
-      refund: 'bg-blue-100 text-blue-800',
-      adjustment: 'bg-gray-100 text-gray-800',
+    const variants: Record<string, 'error' | 'success' | 'warning' | 'info' | 'neutral'> = {
+      capital_call: 'error',
+      distribution: 'success',
+      fee: 'warning',
+      refund: 'info',
+      adjustment: 'neutral',
     };
-    return styles[type] || 'bg-gray-100 text-gray-800';
+    return variants[type] || 'neutral';
   };
 
   const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      completed: 'bg-green-100 text-green-800',
-      failed: 'bg-red-100 text-red-800',
-      cancelled: 'bg-gray-100 text-gray-800',
+    const variants: Record<string, 'warning' | 'success' | 'error' | 'neutral'> = {
+      pending: 'warning',
+      completed: 'success',
+      failed: 'error',
+      cancelled: 'neutral',
     };
-    return styles[status] || 'bg-gray-100 text-gray-800';
+    return variants[status] || 'neutral';
   };
 
   const getTypeIcon = (type: string) => {
@@ -125,70 +129,82 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="pb-5 border-b border-gray-200">
-        <h2 className="text-3xl font-bold text-gray-900">Transaction History</h2>
-        <p className="mt-2 text-sm text-gray-600">View all your investment transactions</p>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="pb-6 border-b border-surface-border">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
+          Transaction History
+        </h1>
+        <p className="mt-2 text-text-secondary">
+          View all your investment transactions and cash flows
+        </p>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500">Total Capital Calls</dt>
-            <dd className="mt-1 text-2xl font-semibold text-red-600">
-              {formatCurrency(data.summary.totalCapitalCalls)}
-            </dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500">Total Distributions</dt>
-            <dd className="mt-1 text-2xl font-semibold text-green-600">
-              {formatCurrency(data.summary.totalDistributions)}
-            </dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500">Total Fees</dt>
-            <dd className="mt-1 text-2xl font-semibold text-yellow-600">
-              {formatCurrency(data.summary.totalFees)}
-            </dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500">Pending</dt>
-            <dd className="mt-1 text-2xl font-semibold text-gray-900">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <p className="text-sm text-text-secondary">Capital Calls</p>
+            <p className="text-2xl font-bold text-error mt-1">
+              -{formatCurrency(data.summary.totalCapitalCalls)}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <p className="text-sm text-text-secondary">Distributions</p>
+            <p className="text-2xl font-bold text-success mt-1">
+              +{formatCurrency(data.summary.totalDistributions)}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <p className="text-sm text-text-secondary">Total Fees</p>
+            <p className="text-2xl font-bold text-warning mt-1">
+              -{formatCurrency(data.summary.totalFees)}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" hover>
+          <CardContent className="p-4">
+            <p className="text-sm text-text-secondary">Pending</p>
+            <p className="text-2xl font-bold text-accent-yellow mt-1">
               {data.summary.pendingTransactions}
-            </dd>
-          </div>
-        </div>
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium text-gray-500">Completed</dt>
-            <dd className="mt-1 text-2xl font-semibold text-gray-900">
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card variant="gradient" hover>
+          <CardContent className="p-4">
+            <p className="text-sm text-text-secondary">Completed</p>
+            <p className="text-2xl font-bold text-text-primary mt-1">
               {data.summary.completedTransactions}
-            </dd>
-          </div>
-        </div>
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters and Transactions Table */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
+      <Card variant="glass" hover>
+        <CardHeader>
+          <CardTitle>All Transactions</CardTitle>
+        </CardHeader>
+        <CardContent>
           {/* Filters */}
           <div className="flex flex-wrap gap-4 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+              <label className="block text-sm font-medium text-text-secondary mb-1">Type</label>
               <select
                 value={filterType}
                 onChange={(e) => {
                   setFilterType(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="block w-full px-3 py-2 bg-background-surface border border-surface-border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300/50 focus:border-primary-300 text-text-primary"
               >
                 <option value="">All Types</option>
                 <option value="capital_call">Capital Call</option>
@@ -199,14 +215,14 @@ export default function TransactionsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <label className="block text-sm font-medium text-text-secondary mb-1">Status</label>
               <select
                 value={filterStatus}
                 onChange={(e) => {
                   setFilterStatus(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="block w-full px-3 py-2 bg-background-surface border border-surface-border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300/50 focus:border-primary-300 text-text-primary"
               >
                 <option value="">All Status</option>
                 <option value="pending">Pending</option>
@@ -219,109 +235,105 @@ export default function TransactionsPage() {
 
           {/* Transactions Table */}
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Type
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Description
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Deal
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Reference
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Deal</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Reference</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {data.transactions.map((transaction) => (
-                  <tr key={transaction.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(transaction.occurredOn).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getTypeBadge(transaction.type)}`}>
+                  <TableRow key={transaction.id}>
+                    <TableCell className="text-text-primary">
+                      {formatDate(transaction.occurredOn)}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getTypeBadge(transaction.type)}>
                         <span className="mr-1">{getTypeIcon(transaction.type)}</span>
                         {transaction.type.replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-text-primary">
                       {transaction.description}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    </TableCell>
+                    <TableCell>
                       {transaction.dealName ? (
                         <div>
-                          <div className="text-sm text-gray-900">{transaction.dealName}</div>
-                          <div className="text-xs text-gray-500">{transaction.companyName}</div>
+                          <div className="text-sm text-text-primary">{transaction.dealName}</div>
+                          <div className="text-xs text-text-muted">{transaction.companyName}</div>
                         </div>
                       ) : (
-                        <span className="text-sm text-gray-500">N/A</span>
+                        <span className="text-sm text-text-muted">N/A</span>
                       )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      <span className={transaction.type === 'capital_call' || transaction.type === 'fee' ? 'text-red-600' : 'text-green-600'}>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      <span className={transaction.type === 'capital_call' || transaction.type === 'fee' ? 'text-error' : 'text-success'}>
                         {transaction.type === 'capital_call' || transaction.type === 'fee' ? '-' : '+'}
                         {formatCurrency(transaction.amount, transaction.currency)}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    </TableCell>
+                    <TableCell className="text-text-secondary text-sm">
                       {transaction.reference}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(transaction.status)}`}>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusBadge(transaction.status)}>
                         {transaction.status}
-                      </span>
-                    </td>
-                  </tr>
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
 
+          {data.transactions.length === 0 && (
+            <div className="text-center py-12">
+              <svg className="mx-auto h-12 w-12 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              <h3 className="mt-2 text-sm font-medium text-text-primary">No transactions found</h3>
+              <p className="mt-1 text-sm text-text-muted">
+                {filterType || filterStatus
+                  ? 'Try adjusting your filters'
+                  : 'Transactions will appear here when available'}
+              </p>
+            </div>
+          )}
+
           {/* Pagination */}
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-sm text-gray-700">
-              Showing page {data.pagination.page} of {data.pagination.totalPages} ({data.pagination.totalCount} total transactions)
+          {data.transactions.length > 0 && (
+            <div className="mt-6 flex items-center justify-between">
+              <div className="text-sm text-text-secondary">
+                Showing page {data.pagination.page} of {data.pagination.totalPages} ({data.pagination.totalCount} total transactions)
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={!data.pagination.hasPreviousPage}
+                  variant={data.pagination.hasPreviousPage ? 'glass' : 'ghost'}
+                  size="sm"
+                >
+                  Previous
+                </Button>
+                <Button
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={!data.pagination.hasNextPage}
+                  variant={data.pagination.hasNextPage ? 'primary' : 'ghost'}
+                  size="sm"
+                >
+                  Next
+                </Button>
+              </div>
             </div>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={!data.pagination.hasPreviousPage}
-                className={`px-3 py-1 rounded ${
-                  data.pagination.hasPreviousPage
-                    ? 'bg-blue-500 text-white hover:bg-blue-600'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                }`}
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={!data.pagination.hasNextPage}
-                className={`px-3 py-1 rounded ${
-                  data.pagination.hasNextPage
-                    ? 'bg-blue-500 text-white hover:bg-blue-600'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                }`}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
