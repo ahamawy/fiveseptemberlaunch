@@ -77,14 +77,14 @@
   /* Light Theme */
   .light {
     /* Background Colors */
-    --bg-deep: 255 255 255;          /* #FFFFFF */
-    --bg-main: 250 250 250;          /* #FAFAFA */
-    --bg-surface: 255 255 255;       /* #FFFFFF */
-    --bg-card: 255 255 255;          /* #FFFFFF */
-    --bg-elevated: 255 255 255;      /* #FFFFFF */
-    --bg-overlay: 255 255 255;       /* #FFFFFF */
-    --bg-hover: 245 245 245;         /* #F5F5F5 */
-    --bg-active: 235 235 235;        /* #EBEBEB */
+    --bg-deep: 249 250 251;          /* #F9FAFB - Light gray background */
+    --bg-main: 255 255 255;          /* #FFFFFF - Pure white main */
+    --bg-surface: 255 255 255;       /* #FFFFFF - White surfaces */
+    --bg-card: 255 255 255;          /* #FFFFFF - White cards */
+    --bg-elevated: 255 255 255;      /* #FFFFFF - White elevated */
+    --bg-overlay: 255 255 255;       /* #FFFFFF - White overlay */
+    --bg-hover: 243 244 246;         /* #F3F4F6 - Light gray hover */
+    --bg-active: 229 231 235;        /* #E5E7EB - Gray active */
     
     /* Primary Colors - adjusted for light theme */
     --primary-50: 245 240 255;       /* #F5F0FF */
@@ -99,13 +99,13 @@
     --primary-900: 78 0 165;         /* #4E00A5 */
     
     /* Text Colors */
-    --text-primary: 26 26 26;        /* #1A1A1A */
-    --text-secondary: 77 77 77;      /* #4D4D4D */
-    --text-tertiary: 128 128 128;    /* #808080 */
-    --text-muted: 153 153 153;       /* #999999 */
-    --text-disabled: 179 179 179;    /* #B3B3B3 */
-    --text-inverse: 255 255 255;     /* #FFFFFF */
-    --text-link: 37 99 235;          /* #2563EB */
+    --text-primary: 17 24 39;        /* #111827 - Almost black */
+    --text-secondary: 75 85 99;      /* #4B5563 - Dark gray */
+    --text-tertiary: 107 114 128;    /* #6B7280 - Medium gray */
+    --text-muted: 156 163 175;       /* #9CA3AF - Light gray */
+    --text-disabled: 209 213 219;    /* #D1D5DB - Very light gray */
+    --text-inverse: 255 255 255;     /* #FFFFFF - White */
+    --text-link: 59 130 246;         /* #3B82F6 - Blue */
     
     /* Accent Colors - adjusted for light theme */
     --accent-blue: 14 165 233;       /* #0EA5E9 */
@@ -132,17 +132,17 @@
     --info-dark: 30 64 175;          /* #1E40AF */
     
     /* Surface Colors */
-    --surface-border: 0 0 0;         /* For rgba(0,0,0,0.08) */
-    --surface-border-opacity: 0.08;
-    --surface-divider-opacity: 0.06;
-    --surface-hover-opacity: 0.08;
-    --surface-active-opacity: 0.15;
-    --surface-disabled-opacity: 0.04;
+    --surface-border: 0 0 0;         /* For rgba(0,0,0,0.12) */
+    --surface-border-opacity: 0.12;  /* More visible borders */
+    --surface-divider-opacity: 0.08;
+    --surface-hover-opacity: 0.05;
+    --surface-active-opacity: 0.1;
+    --surface-disabled-opacity: 0.02;
     
     /* Glass Effect - adjusted for light theme */
-    --glass-bg-opacity: 0.7;
-    --glass-border-opacity: 0.08;
-    --glass-blur: 16px;
+    --glass-bg-opacity: 0.95;        /* Almost opaque white */
+    --glass-border-opacity: 0.15;    /* More visible borders */
+    --glass-blur: 12px;
   }
   
   /* Apply default styles */

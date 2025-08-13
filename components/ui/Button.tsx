@@ -33,8 +33,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     const variants = {
       primary: `
-        bg-primary-300 text-background-deep
-        hover:bg-primary-400 hover:shadow-buttonHover
+        bg-primary-500 text-white dark:bg-primary-300 dark:text-background-deep
+        hover:bg-primary-600 dark:hover:bg-primary-400 hover:shadow-buttonHover
         active:scale-[0.98]
       `,
       secondary: `
@@ -43,19 +43,23 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         active:scale-[0.98]
       `,
       outline: `
-        border-2 border-primary-300/50 text-primary-300
-        hover:bg-primary-300/10 hover:border-primary-300
+        border-2 border-primary-500 dark:border-primary-300/50 
+        text-primary-600 dark:text-primary-300
+        hover:bg-primary-50 dark:hover:bg-primary-300/10 
+        hover:border-primary-600 dark:hover:border-primary-300
         active:scale-[0.98]
       `,
       ghost: `
-        text-text-secondary
-        hover:text-text-primary hover:bg-surface-hover
-        active:bg-surface-active
+        text-gray-600 dark:text-text-secondary
+        hover:text-gray-900 dark:hover:text-text-primary 
+        hover:bg-gray-100 dark:hover:bg-surface-hover
+        active:bg-gray-200 dark:active:bg-surface-active
       `,
       glass: `
-        glass-dark text-text-primary
-        hover:bg-white/10 hover:shadow-buttonHover
+        glass-adaptive text-gray-700 dark:text-text-primary
+        hover:bg-gray-50 dark:hover:bg-white/10 hover:shadow-buttonHover
         active:scale-[0.98]
+        border border-gray-200 dark:border-transparent
       `,
       gradient: `
         bg-gradient-primary text-white

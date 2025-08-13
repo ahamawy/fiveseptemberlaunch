@@ -23,7 +23,7 @@ export default function InvestorPortalLayout({ children }: InvestorPortalLayoutP
 
   return (
     <div className="min-h-screen bg-background-deep">
-      <nav className="bg-background-surface/80 backdrop-blur-md shadow-glow-purple/10 border-b border-surface-border">
+      <nav className="bg-white dark:bg-background-surface/80 backdrop-blur-md shadow-md dark:shadow-glow-purple/10 border-b border-gray-200 dark:border-surface-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -41,8 +41,8 @@ export default function InvestorPortalLayout({ children }: InvestorPortalLayoutP
                     className={cn(
                       'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
                       isActive
-                        ? 'bg-primary-300/20 text-primary-300 shadow-glow-purple/20'
-                        : 'text-text-secondary hover:text-text-primary hover:bg-background-surface'
+                        ? 'bg-primary-500 text-white dark:bg-primary-300/20 dark:text-primary-300 shadow-lg dark:shadow-glow-purple/20'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-text-secondary dark:hover:text-text-primary dark:hover:bg-background-surface'
                     )}
                   >
                     <span>{link.label}</span>

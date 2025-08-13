@@ -15,7 +15,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     
     const variants = {
       default: 'bg-background-card border border-surface-border',
-      glass: 'glass-dark',
+      glass: 'glass-adaptive',
       outline: 'border-2 border-primary-300/20 bg-background-surface/50',
       gradient: 'bg-gradient-to-br from-primary-300/10 to-primary-500/5 border border-primary-300/20',
       elevated: 'bg-background-card shadow-card',

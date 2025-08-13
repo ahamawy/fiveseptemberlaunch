@@ -171,22 +171,48 @@ module.exports = {
     // Custom plugin for glass morphism utilities
     function({ addUtilities }) {
       const newUtilities = {
+        // Default glass (adapts to theme)
         '.glass': {
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'rgba(255, 255, 255, var(--glass-bg-opacity))',
+          backdropFilter: 'blur(var(--glass-blur))',
+          WebkitBackdropFilter: 'blur(var(--glass-blur))',
+          border: '1px solid rgba(200, 152, 255, var(--glass-border-opacity))',
         },
+        // Dark-specific glass (always dark)
         '.glass-dark': {
           background: 'rgba(13, 10, 34, 0.8)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           border: '1px solid rgba(200, 152, 255, 0.1)',
         },
+        // Light-specific glass (always light)
+        '.glass-light': {
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(0, 0, 0, 0.1)',
+        },
         '.text-gradient': {
           backgroundClip: 'text',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
+        },
+        // Theme-aware glass adaptive
+        '.glass-adaptive': {
+          '@apply backdrop-blur-md': {},
+        },
+        '.dark .glass-adaptive': {
+          background: 'rgba(13, 10, 34, 0.8)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(200, 152, 255, 0.1)',
+        },
+        '.light .glass-adaptive': {
+          background: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          border: '1px solid rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
         },
       }
       addUtilities(newUtilities)
