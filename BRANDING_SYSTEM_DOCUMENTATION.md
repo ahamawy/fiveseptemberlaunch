@@ -3,6 +3,23 @@
 ## Overview
 The Equitie branding system provides a comprehensive, modular configuration framework for consistent visual identity across all platform frontends, features, and development teams. This system is designed to be both human-readable and agent-friendly, enabling rapid feature development while maintaining brand consistency.
 
+## CRITICAL BRANDING RULES
+
+### ⚠️ NO EMOJIS POLICY
+**ABSOLUTELY NO EMOJIS are allowed in the Equitie platform**. This is a professional financial platform requiring clean, modern iconography.
+
+**Required:**
+- Use SVG icons from Heroicons, Lucide, or custom SVG implementations
+- All icons must be monochrome and respect theme colors
+- Icons should use `currentColor` for automatic theme adaptation
+- Maintain consistent icon sizing (w-4 h-4 for small, w-5 h-5 for medium, w-6 h-6 for large)
+
+**Forbidden:**
+- No emoji characters (😀, 📊, 💼, etc.)
+- No Unicode symbols as icons
+- No colorful or playful iconography
+- No inconsistent icon styles
+
 ## Theme Support
 
 ### Dark and Light Modes

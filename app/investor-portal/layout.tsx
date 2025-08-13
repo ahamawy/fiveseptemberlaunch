@@ -13,12 +13,12 @@ export default function InvestorPortalLayout({ children }: InvestorPortalLayoutP
   const pathname = usePathname();
 
   const navLinks = [
-    { href: '/investor-portal/dashboard', label: 'Dashboard', icon: '📊' },
-    { href: '/investor-portal/deals', label: 'Deals', icon: '🤝' },
-    { href: '/investor-portal/portfolio', label: 'Portfolio', icon: '💼' },
-    { href: '/investor-portal/transactions', label: 'Transactions', icon: '💰' },
-    { href: '/investor-portal/documents', label: 'Documents', icon: '📄' },
-    { href: '/investor-portal/profile', label: 'Profile', icon: '👤' },
+    { href: '/investor-portal/dashboard', label: 'Dashboard' },
+    { href: '/investor-portal/deals', label: 'Deals' },
+    { href: '/investor-portal/portfolio', label: 'Portfolio' },
+    { href: '/investor-portal/transactions', label: 'Transactions' },
+    { href: '/investor-portal/documents', label: 'Documents' },
+    { href: '/investor-portal/profile', label: 'Profile' },
   ];
 
   return (
@@ -45,8 +45,7 @@ export default function InvestorPortalLayout({ children }: InvestorPortalLayoutP
                         : 'text-text-secondary hover:text-text-primary hover:bg-background-surface'
                     )}
                   >
-                    <span className="hidden sm:inline">{link.icon}</span>
-                    <span className="ml-1">{link.label}</span>
+                    <span>{link.label}</span>
                   </Link>
                 );
               })}

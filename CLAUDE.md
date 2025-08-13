@@ -150,6 +150,13 @@ Design tokens are automatically converted to Flutter theme in `lib/theme/figma/`
 
 ## Notes for Claude Code
 
+### ⚠️ CRITICAL BRANDING RULES - NO EMOJIS
+- **ABSOLUTELY NO EMOJIS** in any code or UI - this is a professional financial platform
+- **ALWAYS** use SVG icons from Heroicons or Lucide React libraries
+- **NEVER** use emoji characters (😀, 📊, 💼, etc.) anywhere in the codebase
+- All icons must be monochrome using `currentColor` for theme adaptation
+- Maintain consistent icon sizing: `w-4 h-4` (small), `w-5 h-5` (medium), `w-6 h-6` (large)
+
 ### Branding System Usage
 - **ALWAYS** import tokens from `/BRANDING/` instead of hardcoding values
 - Use `BRAND_CONFIG` for accessing all brand tokens

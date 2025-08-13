@@ -1344,31 +1344,41 @@ const spacing = designTokens.spacing.scale['4'];`}</code>
                       </h4>
                       <ul className="space-y-2">
                         <li className="flex items-start gap-2">
-                          <span className="text-[#22C55E]">✓</span>
+                          <svg className="w-4 h-4 inline text-[#22C55E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
                           <span style={{ color: currentTheme.text.secondary }}>
                             Use design tokens for all colors, spacing, and typography
                           </span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-[#22C55E]">✓</span>
+                          <svg className="w-4 h-4 inline text-[#22C55E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
                           <span style={{ color: currentTheme.text.secondary }}>
                             Follow the established component patterns for consistency
                           </span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-[#22C55E]">✓</span>
+                          <svg className="w-4 h-4 inline text-[#22C55E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
                           <span style={{ color: currentTheme.text.secondary }}>
                             Maintain accessibility standards (WCAG 2.1 AA)
                           </span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-[#EF4444]">✗</span>
+                          <svg className="w-4 h-4 inline text-[#EF4444]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
                           <span style={{ color: currentTheme.text.secondary }}>
                             Avoid hardcoding colors or measurements
                           </span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-[#EF4444]">✗</span>
+                          <svg className="w-4 h-4 inline text-[#EF4444]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
                           <span style={{ color: currentTheme.text.secondary }}>
                             Don't create one-off components without design review
                           </span>
