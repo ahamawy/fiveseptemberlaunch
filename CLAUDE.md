@@ -310,3 +310,192 @@ export async function GET(request, { params }) {
   return NextResponse.json(data);
 }
 ```
+
+## Database Schema Management
+
+### Schema Manager Configuration
+The project uses a dual-mode schema management system:
+- **Development**: MCP tools for schema changes and migrations
+- **Production**: Direct Supabase SQL for maximum performance
+
+### Complete Schema Overview (40+ Tables)
+
+#### Core Business Entities
+- `companies.company` - Company profiles with valuations
+- `companies` - Simplified company data for UI
+- `deals.deal` - Investment opportunities (primary/secondary/advisory)
+- `investors.investor` - Investor profiles with KYC
+- `valuations.valuation` - Company valuation history
+
+#### Transaction Tables
+- `transactions.transaction.primary` - Main investment transactions
+- `transactions.transaction.secondary` - Secondary market transactions
+- `transactions.transaction.advisory` - Advisory fee transactions
+- `transactions.transaction.subnominee` - Sub-nominee relationships
+- `investor_units` - Unit ownership tracking
+- `investment_snapshots` - Point-in-time investment records
+
+#### Analytics & Metrics
+- `portfolio_analytics` - Platform-wide analytics
+- `investor_analytics` - Per-investor analytics
+- `real_time_metrics` - Live metric tracking
+- `historical_metrics` - Time-series data
+- `deal_valuations` - Deal performance metrics
+- `deal_recommendations` - AI-powered recommendations
+- `investor_activity` - Activity tracking
+- `investor_patterns` - Behavioral patterns
+
+#### Document Management
+- `documents` - Document storage and metadata
+- `transaction_documents` - Transaction-document links
+- `legal_document_status` - Legal document workflow
+- `agreement_types` - Agreement type definitions
+
+#### Audit & Compliance
+- `audit_trail` - Complete audit logging
+- `data_quality_log` - Data validation tracking
+- `user_activity_log` - User action logging
+- `portfolio_events` - Portfolio change events
+- `user_profiles` - User access and permissions
+
+#### Data Enrichment
+- `docsend_views` - DocSend analytics integration
+- `company_enrichment` - Third-party company data
+- `growth_prospects` - Lead tracking
+
+#### Support Tables
+- `spvs` - Special purpose vehicles
+- `notifications` - User notifications
+- `company_002_assets` - Company media assets
+- `company_milestones` - Company achievements
+- `company_news` - News aggregation
+- `company_stories` - Company narratives
+- `company_tags` - Tagging system
+- `sheets_sync_jobs` - Google Sheets integration
+- `finance_glossary` - Financial term definitions
+
+### Using the Schema Manager
+
+```typescript
+import { schemaManager } from '@/lib/db/schema-manager';
+
+// Check current mode
+const mode = schemaManager.getMode(); // 'mcp' | 'direct' | 'mock'
+
+// Execute queries (auto-selects mode)
+const data = await schemaManager.executeQuery(
+  'SELECT * FROM deals.deal WHERE deal_status = $1',
+  ['ACTIVE']
+);
+
+// Get table schema
+const dealSchema = schemaManager.getTableSchema('deals.deal');
+
+// Validate data before insert
+const isValid = schemaManager.validateData('investors.investor', {
+  full_name: 'John Doe',
+  primary_email: 'john@example.com',
+  investor_type: 'individual'
+});
+```
+
+### Direct Supabase Client (Production)
+
+```typescript
+import { SupabaseDirectClient } from '@/lib/db/supabase/client';
+
+const client = new SupabaseDirectClient(config);
+
+// Direct SQL execution
+const deals = await client.executeSQL(`
+  SELECT d.*, c.company_name 
+  FROM deals.deal d
+  JOIN companies.company c ON d.underlying_company_id = c.company_id
+  WHERE d.deal_status = 'ACTIVE'
+`);
+
+// Using Supabase query builder
+const investors = await client
+  .from('investors.investor')
+  .select('*')
+  .eq('kyc_status', 'verified');
+
+// Cached queries for performance
+const portfolio = await client.queryCached(
+  'investor_portfolio_123',
+  () => client.getInvestorPortfolio(123),
+  60000 // 1 minute cache
+);
+```
+
+### MCP Development Tools
+
+```typescript
+// Only available in development with MCP
+import { MCPSchemaTools } from '@/lib/db/dev/mcp-schema-tools';
+
+const mcp = new MCPSchemaTools(config);
+
+// Apply migrations
+await mcp.applyMigration('add_new_column', sql);
+
+// Generate TypeScript types
+const types = await mcp.generateTypes();
+
+// List all tables
+const tables = await mcp.listTables(['public']);
+
+// Get security advisors
+const issues = await mcp.getSecurityAdvisors();
+```
+
+### Zero-Shot Prompts for Schema Operations
+
+For interns working with the database:
+
+```
+"Create a service to get all active deals with their company details and latest valuations"
+"Build a query to find investors who haven't completed KYC in the last 30 days"
+"Generate a report showing portfolio performance metrics by investor type"
+"Create an API endpoint to track document signing status for a transaction"
+```
+
+### Migration Management
+
+1. **Development**: Use MCP tools
+   ```bash
+   # Migrations applied automatically via MCP
+   ```
+
+2. **Production**: Use SQL migrations
+   ```bash
+   # Apply via CI/CD pipeline
+   psql $DATABASE_URL < migrations/001_complete_schema.sql
+   ```
+
+### Performance Considerations
+
+- All foreign keys are properly indexed
+- Composite indexes on frequently queried columns
+- JSONB columns for flexible metadata storage
+- Materialized views for complex aggregations (future)
+- Connection pooling via Supabase
+
+### Security Notes
+
+- Row Level Security (RLS) should be enabled on all tables
+- Use service role key only for server-side operations
+- Implement proper authentication before production
+- Audit trail captures all data modifications
+- KYC status tracking for compliance
+
+### Supabase Connection Keys
+
+For connecting to Supabase, you'll need:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_KEY=your-service-key  # Server-side only
+SUPABASE_PROJECT_ID=your-project-id    # For MCP tools
+SUPABASE_ORG_ID=your-org-id           # For MCP branch creation
+```
