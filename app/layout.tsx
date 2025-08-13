@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { DevTools } from '@/components/DevTools'
+import { DevToolbar } from '@/components/dev/DevToolbar'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -24,6 +25,7 @@ export default function RootLayout({
           <ErrorBoundary>
             {children}
             <DevTools />
+            <DevToolbar />
           </ErrorBoundary>
         </ThemeProvider>
       </body>

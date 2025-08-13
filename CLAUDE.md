@@ -184,6 +184,14 @@ Design tokens are automatically converted to Flutter theme in `lib/theme/figma/`
 - Theme Utils: `/lib/theme-utils.ts`
 - UI Components: `/components/ui/`
 - Documentation: `/BRANDING_SYSTEM_DOCUMENTATION.md`
+- DevToolbar: `/components/dev/DevToolbar.tsx`
+- DevToolbar Docs: `/DEVTOOLBAR_DOCS.md`
+
+### Development Navigation
+- **DevToolbar**: Fixed bottom-right development menu for quick page navigation
+- **Quick Access**: Categorized list of all app pages with theme controls
+- **Development Only**: Automatically hidden in production builds
+- **Theme Testing**: Built-in theme and color scheme switching
 
 ### Platform-Specific Notes
 
@@ -197,3 +205,108 @@ Design tokens are automatically converted to Flutter theme in `lib/theme/figma/`
 - Design tokens extracted from Figma
 - Theme system supports gradients and neumorphic effects
 - All screens follow iOS design patterns
+
+## Data Layer Architecture
+
+### Service Layer Pattern
+The project uses a service layer pattern for all data operations:
+
+```typescript
+// Import services
+import { dealsService, investorsService } from '@/lib/services';
+
+// Use in components or API routes
+const deals = await dealsService.getDeals({ stage: 'active' });
+const dashboard = await investorsService.getDashboardData();
+```
+
+### Available Services
+
+#### DealsService (`lib/services/deals.service.ts`)
+- `getDeals(options)` - List deals with filters and pagination
+- `getDealById(id)` - Get single deal with details
+- `getDealBySlug(slug)` - Get deal by URL slug
+- `getDealsByInvestor(investorId)` - Get investor's deals
+- `getActiveDeals()` - Get active deals only
+- `getFeaturedDeals()` - Get top 3 featured deals
+- `getDealMetrics(dealId)` - Calculate deal metrics
+- `searchDeals(query)` - Search deals by name
+
+#### InvestorsService (`lib/services/investors.service.ts`)
+- `getCurrentInvestor()` - Get logged-in investor
+- `getInvestorById(id)` - Get investor profile
+- `getDashboardData(investorId?)` - Get dashboard metrics
+- `getPortfolioData(investorId?)` - Get portfolio holdings
+- `getCommitments(investorId?)` - Get investor commitments
+- `getTransactions(investorId?, options)` - Get transactions
+- `getSummaryStats(investorId?)` - Get summary statistics
+
+### Database Abstraction
+The data layer switches between mock data and Supabase:
+
+```typescript
+// Controlled by environment variables
+NEXT_PUBLIC_USE_MOCK_DATA=true  // Use mock data
+NEXT_PUBLIC_ENABLE_SUPABASE=false  // Use Supabase when true
+```
+
+### Type Safety
+All entities have TypeScript types in `lib/db/types.ts`:
+- `Deal`, `Company`, `Investor`, `Commitment`
+- `Transaction`, `Document`, `Portfolio`
+- Filter types for queries
+- Response types for API calls
+
+### Mock Data Location
+- `lib/mock-data/deals.ts` - Deals, companies, commitments
+- `lib/mock-data/investors.ts` - Investor profiles
+- `lib/mock-data/transactions.ts` - Transaction records
+- `lib/mock-data/performance.ts` - Performance metrics
+
+## Quick Setup
+
+1. **Initial Setup**: Run `npm run setup`
+2. **Start Dev**: Run `npm run dev`
+3. **Default User**: John Doe (ID: 1) in mock mode
+
+## API Routes Available
+
+- `GET /api/deals` - List all deals with filters
+- `GET /api/investors/[id]` - Get investor profile
+- `GET /api/investors/[id]/dashboard` - Dashboard data
+- `GET /api/investors/[id]/commitments` - Commitments
+- `GET /api/investors/[id]/portfolio` - Portfolio
+- `GET /api/investors/[id]/transactions` - Transactions
+- `GET /api/transactions` - All transactions
+- `GET /api/documents` - All documents
+
+## Service Usage Examples
+
+### In React Components
+```typescript
+import { useEffect, useState } from 'react';
+import { dealsService } from '@/lib/services';
+
+export function DealsPage() {
+  const [deals, setDeals] = useState([]);
+  
+  useEffect(() => {
+    dealsService.getActiveDeals().then(result => {
+      setDeals(result.data);
+    });
+  }, []);
+  
+  return <DealsList deals={deals} />;
+}
+```
+
+### In API Routes
+```typescript
+import { NextResponse } from 'next/server';
+import { investorsService } from '@/lib/services';
+
+export async function GET(request, { params }) {
+  const data = await investorsService.getDashboardData(params.id);
+  return NextResponse.json(data);
+}
+```
