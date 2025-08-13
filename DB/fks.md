@@ -1,0 +1,39 @@
+# DB/fks.md — Key Foreign Keys (selected)
+
+- `deals.deal.company_id` → `companies.company.id`
+- `deals.identifier.deal_id` → `deals.deal.id`
+- `deals.status_history.deal_id` → `deals.deal.id`
+- `fees.link_deal.deal_id` → `deals.deal.id`
+- `fees.link_deal.schedule_id` → `fees.schedule.id`
+- `fees.schedule_version.schedule_id` → `fees.schedule.id`
+- `fees.schedule_component.schedule_version_id` → `fees.schedule_version.id`
+- `fees.preview_cache.deal_id` → `deals.deal.id`
+- `fees.ledger.deal_id` → `deals.deal.id`
+- `fees.ledger.investor_id` → `investors.investor.id`
+- `fees.posting.fee_ledger_id` → `fees.ledger.id`
+- `fees.posting.transaction_id` → `transactions.transaction.id`
+- `documents.version.document_id` → `documents.document.id`
+- `documents.link.document_id` → `documents.document.id`
+- `documents.link.(entity_type, entity_id)` → app-level constraint to deals/investors/companies/transactions
+- `documents.classification.document_id` → `documents.document.id`
+- `documents.extraction.document_id` → `documents.document.id`
+- `documents.ocr_job.document_id` → `documents.document.id`
+- `investors.commitment.(investor_id, deal_id)` → investors/deals
+- `payments.method.investor_id` → `investors.investor.id`
+- `payments.inbound.investor_id` → `investors.investor.id`
+- `payments.inbound.deal_id` → `deals.deal.id`
+- `payments.outbound.investor_id` → `investors.investor.id`
+- `transactions.transaction.deal_id` → `deals.deal.id`
+- `transactions.transaction.investor_id` → `investors.investor.id`
+- `transactions.journal.transaction_id` → `transactions.transaction.id`
+- `transactions.journal.account_id` → `transactions.account.id`
+- `reconcile.match.bank_line_id` → `reconcile.bank_line.id`
+- `reconcile.match.transaction_id` → `transactions.transaction.id`
+- `companies.round.company_id` → `companies.company.id`
+- `companies.metric.company_id` → `companies.company.id`
+- `secondary.listing.(deal_id, seller_id)` → `deals.deal.id`, `investors.investor.id`
+- `secondary.bid.listing_id` → `secondary.listing.id`
+- `secondary.match.(listing_id, bid_id)` → `secondary.listing.id`, `secondary.bid.id`
+- `secondary.transfer.match_id` → `secondary.match.id`
+- `tax.form.investor_id` → `investors.investor.id`
+- `tax.withholding_applied.transaction_id` → `transactions.transaction.id`
