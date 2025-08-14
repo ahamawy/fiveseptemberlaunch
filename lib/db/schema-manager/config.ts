@@ -28,10 +28,17 @@ export class SchemaConfig {
    * Check if Supabase credentials are available
    */
   hasSupabaseCredentials(): boolean {
-    return !!(
-      this.env.NEXT_PUBLIC_SUPABASE_URL &&
-      this.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    );
+    const url = this.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = this.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    // Check for placeholder values
+    const isPlaceholder = url === 'https://placeholder.supabase.co' || 
+                         anonKey === 'placeholder-anon-key';
+    
+    // Also check if Supabase is explicitly disabled
+    const isSupabaseEnabled = this.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true';
+    
+    return !!(url && anonKey && !isPlaceholder && isSupabaseEnabled);
   }
 
   /**
@@ -54,6 +61,10 @@ export class SchemaConfig {
   getSupabaseUrl(): string {
     const url = this.env.NEXT_PUBLIC_SUPABASE_URL;
     if (!url) throw new Error('Supabase URL not configured');
+    // Return placeholder if not enabled
+    if (url === 'https://placeholder.supabase.co' && this.env.NEXT_PUBLIC_ENABLE_SUPABASE !== 'true') {
+      return url; // Don't throw for placeholders in mock mode
+    }
     return url;
   }
 
@@ -63,6 +74,10 @@ export class SchemaConfig {
   getSupabaseAnonKey(): string {
     const key = this.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     if (!key) throw new Error('Supabase anon key not configured');
+    // Return placeholder if not enabled
+    if (key === 'placeholder-anon-key' && this.env.NEXT_PUBLIC_ENABLE_SUPABASE !== 'true') {
+      return key; // Don't throw for placeholders in mock mode
+    }
     return key;
   }
 
@@ -114,7 +129,7 @@ export class SchemaConfig {
   getSummary() {
     return {
       mode: this.isDevelopment() ? 'development' : 'production',
-      hasSupa baseCredentials: this.hasSupabaseCredentials(),
+      hasSupabaseCredentials: this.hasSupabaseCredentials(),
       isMCPEnabled: this.isMCPEnabled(),
       isUsingMockData: this.isUsingMockData(),
       logLevel: this.getLogLevel(),

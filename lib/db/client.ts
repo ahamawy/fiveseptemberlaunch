@@ -4,6 +4,7 @@
  */
 
 import { MockAdapter } from './mock-adapter';
+import { SupabaseAdapter } from './supabase-adapter';
 import type { 
   Deal, 
   Investor, 
@@ -59,84 +60,6 @@ export interface IDataClient {
   getPortfolioData(investorId: number): Promise<PortfolioData>;
 }
 
-/**
- * Supabase Client Implementation (Future)
- * Will be implemented when Supabase is enabled
- */
-class SupabaseClient implements IDataClient {
-  constructor() {
-    console.warn('Supabase client initialized but not yet implemented');
-  }
-
-  async getDeals(filters?: DealFilters): Promise<Deal[]> {
-    // TODO: Implement Supabase query
-    throw new Error('Supabase not yet implemented. Set NEXT_PUBLIC_USE_MOCK_DATA=true');
-  }
-
-  async getDealById(id: number): Promise<Deal | null> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getDealBySlug(slug: string): Promise<Deal | null> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getInvestors(): Promise<Investor[]> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getInvestorById(id: number): Promise<Investor | null> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getCurrentInvestor(): Promise<Investor | null> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getCompanies(): Promise<Company[]> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getCompanyById(id: number): Promise<Company | null> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getCommitments(investorId?: number): Promise<Commitment[]> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getCommitmentById(id: number): Promise<Commitment | null> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getCommitmentsByDealId(dealId: number): Promise<Commitment[]> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getTransactions(filters?: TransactionFilters): Promise<Transaction[]> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getTransactionById(id: number): Promise<Transaction | null> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getDocuments(filters?: DocumentFilters): Promise<Document[]> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getDocumentById(id: number): Promise<Document | null> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getDashboardData(investorId: number): Promise<DashboardData> {
-    throw new Error('Supabase not yet implemented');
-  }
-
-  async getPortfolioData(investorId: number): Promise<PortfolioData> {
-    throw new Error('Supabase not yet implemented');
-  }
-}
 
 /**
  * Database Client Factory
@@ -151,8 +74,8 @@ class DataClientFactory {
         console.log('🔧 Using Mock Data Adapter');
         this.instance = new MockAdapter();
       } else {
-        console.log('🔧 Using Supabase Client');
-        this.instance = new SupabaseClient();
+        console.log('🔧 Using Supabase Adapter');
+        this.instance = new SupabaseAdapter();
       }
     }
     return this.instance;

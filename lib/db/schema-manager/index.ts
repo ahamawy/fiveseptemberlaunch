@@ -31,6 +31,19 @@ export class SchemaManager {
    * Detect the appropriate mode based on environment and available tools
    */
   private detectMode(): SchemaMode {
+    console.log('Schema Manager Config:', {
+      USE_MOCK_DATA: process.env.NEXT_PUBLIC_USE_MOCK_DATA,
+      ENABLE_SUPABASE: process.env.NEXT_PUBLIC_ENABLE_SUPABASE,
+      isUsingMockData: this.config.isUsingMockData(),
+      hasSupabaseCredentials: this.config.hasSupabaseCredentials()
+    });
+    
+    // Check if mock data is explicitly enabled
+    if (this.config.isUsingMockData()) {
+      console.log('🎭 Schema Manager: Using mock data mode (NEXT_PUBLIC_USE_MOCK_DATA=true)');
+      return 'mock';
+    }
+    
     // Development: Prefer MCP if available
     if (this.config.isDevelopment() && this.hasMCPTools()) {
       console.log('🔧 Schema Manager: Using MCP mode for development');
@@ -44,7 +57,7 @@ export class SchemaManager {
     }
 
     // Fallback: Mock data
-    console.log('🎭 Schema Manager: Using mock data mode');
+    console.log('🎭 Schema Manager: Using mock data mode (fallback)');
     return 'mock';
   }
 
@@ -210,8 +223,30 @@ export class SchemaManager {
   }
 }
 
-// Export singleton instance
-export const schemaManager = new SchemaManager();
+// Lazy initialization to ensure environment variables are loaded
+let _schemaManager: SchemaManager | null = null;
+
+export function getSchemaManager(): SchemaManager {
+  if (!_schemaManager) {
+    _schemaManager = new SchemaManager();
+  }
+  return _schemaManager;
+}
+
+// Export for backward compatibility
+export const schemaManager = {
+  getMode: () => getSchemaManager().getMode(),
+  getRegistry: () => getSchemaManager().getRegistry(),
+  executeQuery: (query: string, params?: any) => getSchemaManager().executeQuery(query, params),
+  getTableSchema: (tableName: string) => getSchemaManager().getTableSchema(tableName),
+  getTableNames: () => getSchemaManager().getTableNames(),
+  getTableRelationships: (tableName: string) => getSchemaManager().getTableRelationships(tableName),
+  applyMigration: (name: string, sql: string) => getSchemaManager().applyMigration(name, sql),
+  generateTypes: () => getSchemaManager().generateTypes(),
+  validateData: (tableName: string, data: any) => getSchemaManager().validateData(tableName, data),
+  getClient: () => getSchemaManager().getClient(),
+  reset: () => getSchemaManager().reset()
+};
 
 // Export types
 export type { SchemaRegistry, SchemaConfig };

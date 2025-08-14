@@ -51,7 +51,7 @@ export function DevTools() {
           url: url.toString(),
           method: options?.method || 'GET',
           status: 'ERROR',
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
           timestamp: new Date().toISOString(),
         }]);
         throw error;

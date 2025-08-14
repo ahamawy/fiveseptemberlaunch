@@ -197,7 +197,7 @@ export function DevToolbar() {
   if (!isDev) return null;
 
   const navigateTo = (path: string) => {
-    window.location.href = `http://localhost:3002${path}`;
+    window.location.href = path;
     setIsOpen(false);
   };
 
@@ -337,8 +337,8 @@ export function DevToolbar() {
                     <span className="text-primary-300 font-mono">development</span>
                   </div>
                   <div className="flex items-center justify-between text-xs mt-1">
-                    <span className="text-text-tertiary">Port</span>
-                    <span className="text-primary-300 font-mono">3002</span>
+                    <span className="text-text-tertiary">Host</span>
+                    <span className="text-primary-300 font-mono">{typeof window !== 'undefined' ? window.location.host : 'localhost'}</span>
                   </div>
                 </div>
               </div>
@@ -349,7 +349,7 @@ export function DevToolbar() {
 
       {/* Additional Dev Tools Button */}
       <button
-        onClick={() => window.location.href = 'http://localhost:3002/style-guide'}
+        onClick={() => window.location.href = '/style-guide'}
         className="p-2.5 bg-surface-elevated border border-surface-border rounded-lg shadow-lg hover:bg-surface-hover transition-all duration-200 hover:scale-105 text-primary-300"
         title="Style Guide"
       >

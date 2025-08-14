@@ -50,7 +50,7 @@ export default function DocumentsPage() {
     switch (status) {
       case 'Available': return <Badge variant="success">Available</Badge>;
       case 'Processing': return <Badge variant="warning">Processing</Badge>;
-      case 'Archived': return <Badge variant="neutral">Archived</Badge>;
+      case 'Archived': return <Badge variant="default">Archived</Badge>;
       default: return null;
     }
   };

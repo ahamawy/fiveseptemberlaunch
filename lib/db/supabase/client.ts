@@ -4,11 +4,14 @@
  * No MCP overhead - maximum performance for feature shipping
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+// import { createClient, SupabaseClient } from '@supabase/supabase-js';
+// Placeholder types until @supabase/supabase-js is installed
+type SupabaseClient = any;
+const createClient = (url: string, key: string, options?: any) => null as any;
 import { SchemaConfig } from '../schema-manager/config';
 
 export class SupabaseDirectClient {
-  private client: SupabaseClient;
+  private client: SupabaseClient | null = null;
   private config: SchemaConfig;
   private queryCache: Map<string, { data: any; timestamp: number }>;
   private cacheTimeout: number = 60000; // 1 minute default cache

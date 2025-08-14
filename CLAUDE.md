@@ -269,6 +269,20 @@ All entities have TypeScript types in `lib/db/types.ts`:
 2. **Start Dev**: Run `npm run dev`
 3. **Default User**: John Doe (ID: 1) in mock mode
 
+## Feature Implementation Guide
+
+### Feature Numbering System
+All features follow the `domain.section.subsection` pattern. See `FEATURES/FEATURE_TREE.md` for the complete list.
+
+Current feature: **15.1.1 investor-portal-dashboard** (Investor App > Portal > Dashboard)
+
+### To Implement a New Feature
+1. Find feature code in `FEATURES/FEATURE_TREE.md`
+2. Create folder: `FEATURES/[code]-[name]/`
+3. Use service layer pattern (see examples in `lib/services/`)
+4. Connect to Supabase via existing adapters
+5. Apply brand tokens from `/BRANDING/`
+
 ## API Routes Available
 
 - `GET /api/deals` - List all deals with filters

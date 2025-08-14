@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getInvestorById } from '@/lib/mock-data/investors';
-import { getDealsByInvestorId, getCommitmentsByInvestorId, getDealById, getCompanyById } from '@/lib/mock-data/deals';
-import { getRecentTransactions } from '@/lib/mock-data/transactions';
-import { calculatePerformanceMetrics, getPortfolioSummary } from '@/lib/mock-data/performance';
+import { investorsService } from '@/lib/services';
 
 export async function GET(
   request: NextRequest,
@@ -10,79 +7,44 @@ export async function GET(
 ) {
   try {
     const investorId = parseInt(params.id);
-    const investor = getInvestorById(investorId);
     
-    if (!investor) {
+    if (isNaN(investorId)) {
       return NextResponse.json(
-        { error: 'Investor not found' },
+        { error: 'Invalid investor ID' },
+        { status: 400 }
+      );
+    }
+
+    // Use the service layer which handles mock vs Supabase
+    const dashboardData = await investorsService.getDashboardData(investorId);
+    
+    if (!dashboardData) {
+      return NextResponse.json(
+        { error: 'Failed to fetch dashboard data' },
         { status: 404 }
       );
     }
     
-    // Get portfolio summary
-    const portfolioSummary = getPortfolioSummary(investorId);
-    
-    // Get performance metrics
-    const performanceMetrics = calculatePerformanceMetrics(investorId);
-    
-    // Get recent activity
-    const recentTransactions = getRecentTransactions(investorId, 10);
-    const recentActivity = recentTransactions.map(transaction => {
-      let description = transaction.description;
-      
-      if (transaction.dealId) {
-        const deal = getDealById(transaction.dealId);
-        if (deal) {
-          const company = getCompanyById(deal.companyId);
-          description = `${transaction.description} - ${company?.name || deal.name}`;
-        }
-      }
-      
-      return {
-        id: transaction.publicId,
-        type: transaction.type,
-        description,
-        amount: transaction.amount,
-        date: transaction.occurredOn,
-      };
-    });
-    
-    // Get active deals count
-    const activeDeals = getDealsByInvestorId(investorId).filter(
-      deal => deal.stage === 'active' || deal.stage === 'closing'
-    ).length;
-    
-    // Prepare dashboard data
-    const dashboardData = {
-      investor: {
-        id: investor.id,
-        name: investor.fullName,
-        email: investor.primaryEmail,
-        type: investor.type,
-        kycStatus: investor.kycStatus,
-      },
+    // Map service result (summary/recentActivity) to UI shape (portfolio/performance/activeDeals)
+    const s = dashboardData.summary;
+    const ui = {
       portfolio: {
-        totalValue: portfolioSummary.totalValue,
-        totalCommitted: portfolioSummary.totalCommitted,
-        totalDistributed: portfolioSummary.totalDistributed,
-        unrealizedGain: portfolioSummary.unrealizedGain,
+        totalValue: s.currentValue,
+        totalCommitted: s.totalCommitted,
+        totalDistributed: s.totalDistributed,  
+        unrealizedGain: s.totalGains
       },
       performance: {
-        irr: performanceMetrics.irr,
-        moic: performanceMetrics.moic,
-        dpi: performanceMetrics.dpi,
-        tvpi: performanceMetrics.tvpi,
+        irr: s.portfolioIRR,
+        moic: s.portfolioMOIC,
+        dpi: s.totalDistributed / s.totalCalled || 0,
+        tvpi: s.currentValue / s.totalCalled || 0
       },
-      recentActivity,
-      activeDeals,
-      summary: {
-        totalDeals: portfolioSummary.totalDeals,
-        totalCalled: performanceMetrics.totalCalled,
-        realizedGain: performanceMetrics.realizedGain,
-      },
+      recentActivity: dashboardData.recentActivity,
+      activeDeals: s.activeDeals
     };
     
-    return NextResponse.json(dashboardData);
+    return NextResponse.json(ui);
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
     return NextResponse.json(

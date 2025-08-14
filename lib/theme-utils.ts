@@ -1,9 +1,9 @@
-import { colors } from '@/branding/tokens/colors';
-import { gradients } from '@/branding/tokens/gradients';
-import { shadows } from '@/branding/tokens/shadows';
-import { animations } from '@/branding/tokens/animations';
-import { typography } from '@/branding/tokens/typography';
-import { spacing } from '@/branding/tokens/spacing';
+import { colors } from '@/BRANDING/tokens/colors';
+import { gradients } from '@/BRANDING/tokens/gradients';
+import { shadows } from '@/BRANDING/tokens/shadows';
+import { animations } from '@/BRANDING/tokens/animations';
+import { typography } from '@/BRANDING/tokens/typography';
+import { spacing } from '@/BRANDING/tokens/spacing';
 
 /**
  * Get a color value from the token system
@@ -187,5 +187,9 @@ export function getTextStyle(style: keyof typeof typography.textStyles) {
  * Spacing utility for consistent spacing
  */
 export function getSpacing(size: keyof typeof spacing): string {
-  return spacing[size] || spacing.md;
+  const value = spacing[size];
+  if (typeof value === 'string') {
+    return value;
+  }
+  return spacing.md as string;
 }

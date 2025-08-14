@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getColorSchemeVars, DEFAULT_COLOR_SCHEME } from '@/branding/tokens/color-schemes';
+import { getColorSchemeVars, DEFAULT_COLOR_SCHEME } from '@/BRANDING/tokens/color-schemes';
 
 type Theme = 'dark' | 'light';
 type ColorScheme = 'purple' | 'blue' | 'green' | 'monochrome';

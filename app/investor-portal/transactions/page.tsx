@@ -97,24 +97,24 @@ export default function TransactionsPage() {
   }
 
   const getTypeBadge = (type: string) => {
-    const variants: Record<string, 'error' | 'success' | 'warning' | 'info' | 'neutral'> = {
+    const variants: Record<string, 'error' | 'success' | 'warning' | 'info' | 'default'> = {
       capital_call: 'error',
       distribution: 'success',
       fee: 'warning',
       refund: 'info',
-      adjustment: 'neutral',
+      adjustment: 'default',
     };
-    return variants[type] || 'neutral';
+    return variants[type] || 'default';
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'warning' | 'success' | 'error' | 'neutral'> = {
+    const variants: Record<string, 'warning' | 'success' | 'error' | 'default'> = {
       pending: 'warning',
       completed: 'success',
       failed: 'error',
-      cancelled: 'neutral',
+      cancelled: 'default',
     };
-    return variants[status] || 'neutral';
+    return variants[status] || 'default';
   };
 
   const getTypeIcon = (type: string) => {

@@ -1,0 +1,2 @@
+-- Example read models
+-- create view deals.deal_summary as select ...;

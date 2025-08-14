@@ -139,14 +139,14 @@ export default function ProfilePage() {
   }
 
   const getKYCStatusBadge = (status: string) => {
-    const variants: Record<string, 'success' | 'warning' | 'error' | 'info' | 'neutral'> = {
-      'Not Started': 'neutral',
+    const variants: Record<string, 'success' | 'warning' | 'error' | 'info' | 'default'> = {
+      'Not Started': 'default',
       'In Progress': 'warning',
       'Under Review': 'info',
       'Approved': 'success',
       'Expired': 'error',
     };
-    return variants[status] || 'neutral';
+    return variants[status] || 'default';
   };
 
   const getRiskProfileBadge = (profile: string) => {
@@ -331,7 +331,7 @@ export default function ProfilePage() {
                 <label className="block text-sm font-medium text-text-secondary mb-2">Preferred Sectors</label>
                 <div className="flex gap-2 flex-wrap">
                   {data.investorInfo.preferredSectors.map(sector => (
-                    <Badge key={sector} variant="primary">{sector}</Badge>
+                    <Badge key={sector} variant="gradient">{sector}</Badge>
                   ))}
                 </div>
               </div>
@@ -465,7 +465,7 @@ export default function ProfilePage() {
                       <p className="text-sm font-medium text-text-primary">Email Notifications</p>
                       <p className="text-xs text-text-muted">Receive updates via email</p>
                     </div>
-                    <Badge variant={data.preferences.emailNotifications ? 'success' : 'neutral'}>
+                    <Badge variant={data.preferences.emailNotifications ? 'success' : 'default'}>
                       {data.preferences.emailNotifications ? 'Enabled' : 'Disabled'}
                     </Badge>
                   </div>
@@ -474,7 +474,7 @@ export default function ProfilePage() {
                       <p className="text-sm font-medium text-text-primary">SMS Notifications</p>
                       <p className="text-xs text-text-muted">Receive updates via SMS</p>
                     </div>
-                    <Badge variant={data.preferences.smsNotifications ? 'success' : 'neutral'}>
+                    <Badge variant={data.preferences.smsNotifications ? 'success' : 'default'}>
                       {data.preferences.smsNotifications ? 'Enabled' : 'Disabled'}
                     </Badge>
                   </div>
@@ -483,7 +483,7 @@ export default function ProfilePage() {
                       <p className="text-sm font-medium text-text-primary">Marketing Emails</p>
                       <p className="text-xs text-text-muted">Receive promotional content</p>
                     </div>
-                    <Badge variant={data.preferences.marketingEmails ? 'success' : 'neutral'}>
+                    <Badge variant={data.preferences.marketingEmails ? 'success' : 'default'}>
                       {data.preferences.marketingEmails ? 'Enabled' : 'Disabled'}
                     </Badge>
                   </div>
@@ -492,7 +492,7 @@ export default function ProfilePage() {
                       <p className="text-sm font-medium text-text-primary">Quarterly Reports</p>
                       <p className="text-xs text-text-muted">Receive performance reports</p>
                     </div>
-                    <Badge variant={data.preferences.quarterlyReports ? 'success' : 'neutral'}>
+                    <Badge variant={data.preferences.quarterlyReports ? 'success' : 'default'}>
                       {data.preferences.quarterlyReports ? 'Enabled' : 'Disabled'}
                     </Badge>
                   </div>

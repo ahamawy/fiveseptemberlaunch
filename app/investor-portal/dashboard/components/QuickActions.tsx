@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 interface QuickActionsProps {
   activeDeals: number;
 }
@@ -56,7 +58,7 @@ export default function QuickActions({ activeDeals }: QuickActionsProps) {
         <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
         <div className="space-y-3">
           {actions.map((action) => (
-            <a
+            <Link
               key={action.title}
               href={action.href}
               className="block hover:bg-gray-50 rounded-lg p-3 transition-colors"
@@ -77,7 +79,7 @@ export default function QuickActions({ activeDeals }: QuickActionsProps) {
                   </svg>
                 </div>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

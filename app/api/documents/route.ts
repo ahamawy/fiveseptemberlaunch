@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dataClient } from '@/lib/db/client';
+import { documentsService } from '@/lib/services';
 import type { DocumentType } from '@/lib/db/types';
 
 export async function GET(request: NextRequest) {
@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    const documents = await dataClient.getDocuments({
+    // Use the service layer for consistency and caching
+    const result = await documentsService.getDocuments({
       deal_id: dealId ? parseInt(dealId) : undefined,
       investor_id: investorId ? parseInt(investorId) : undefined,
       type,
@@ -23,11 +24,7 @@ export async function GET(request: NextRequest) {
       offset
     });
 
-    return NextResponse.json({
-      success: true,
-      data: documents,
-      count: documents.length
-    });
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching documents:', error);
     return NextResponse.json(

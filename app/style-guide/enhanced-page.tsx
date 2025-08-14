@@ -6,11 +6,11 @@ import { Button, ButtonGroup, IconButton } from '@/components/ui/Button';
 import { Input, Textarea, Select } from '@/components/ui/Input';
 import { Badge, StatusDot } from '@/components/ui/Badge';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
-import { colors } from '@/branding/tokens/colors';
-import { gradients } from '@/branding/tokens/gradients';
-import { shadows } from '@/branding/tokens/shadows';
-import { typography } from '@/branding/tokens/typography';
-import { animations } from '@/branding/tokens/animations';
+import { colors } from '@/BRANDING/tokens/colors';
+import { gradients } from '@/BRANDING/tokens/gradients';
+import { shadows } from '@/BRANDING/tokens/shadows';
+import { typography } from '@/BRANDING/tokens/typography';
+import { animations } from '@/BRANDING/tokens/animations';
 
 // Enhanced Figma-based design tokens
 const designTokens = {

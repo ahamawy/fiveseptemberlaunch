@@ -93,24 +93,24 @@ export default function DealsPage() {
   }
 
   const getStageBadge = (stage: string) => {
-    const variants: Record<string, 'warning' | 'info' | 'success' | 'error' | 'neutral' | 'primary'> = {
+    const variants: Record<string, 'warning' | 'info' | 'success' | 'error' | 'default' | 'gradient'> = {
       sourcing: 'warning',
       due_diligence: 'info',
-      closing: 'primary',
+      closing: 'gradient',
       active: 'success',
-      exited: 'neutral',
+      exited: 'default',
       cancelled: 'error',
     };
-    return variants[stage] || 'neutral';
+    return variants[stage] || 'default';
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'success' | 'warning' | 'error'> = {
+    const variants: Record<string, 'success' | 'warning' | 'error' | 'default'> = {
       signed: 'success',
       draft: 'warning',
       cancelled: 'error',
     };
-    return variants[status] || 'neutral';
+    return variants[status] || 'default';
   };
 
   const filteredCommitments = filterStage === 'all'

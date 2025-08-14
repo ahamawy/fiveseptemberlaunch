@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dataClient } from '@/lib/db/client';
+import { investorsService } from '@/lib/services';
 import type { TransactionType, TransactionStatus } from '@/lib/db/types';
 
 export async function GET(request: NextRequest) {
@@ -8,20 +8,19 @@ export async function GET(request: NextRequest) {
     
     // Parse query parameters
     const investorId = searchParams.get('investor_id');
-    const dealId = searchParams.get('deal_id');
     const type = searchParams.get('type') as TransactionType | undefined;
     const status = searchParams.get('status') as TransactionStatus | undefined;
     const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
-
-    const transactions = await dataClient.getTransactions({
-      investor_id: investorId ? parseInt(investorId) : undefined,
-      deal_id: dealId ? parseInt(dealId) : undefined,
-      type,
-      status,
-      limit,
-      offset
-    });
+    
+    // Use the service layer for consistency and caching
+    const transactions = await investorsService.getTransactions(
+      investorId ? parseInt(investorId) : undefined,
+      {
+        type,
+        status,
+        limit
+      }
+    );
 
     return NextResponse.json({
       success: true,

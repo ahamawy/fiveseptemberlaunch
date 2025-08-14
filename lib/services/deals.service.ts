@@ -226,8 +226,8 @@ export class DealsService extends BaseService {
     });
 
     // Filter to only show deals in active or closing stage
-    if (result?.data) {
-      result.data = result.data.filter(d => 
+    if (result && 'data' in result && Array.isArray(result.data)) {
+      result.data = result.data.filter((d: any) => 
         d.stage === 'active' || d.stage === 'closing'
       );
     }
