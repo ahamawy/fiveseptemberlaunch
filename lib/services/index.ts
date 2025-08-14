@@ -22,6 +22,11 @@ export type {
   InvestorListOptions
 } from './investors.service';
 
+// Import services for factory
+import { DealsService } from './deals.service';
+import { InvestorsService } from './investors.service';
+import { DocumentsService } from './documents.service';
+
 // Service factory for creating new instances if needed
 export class ServiceFactory {
   static createDealsService() {
@@ -36,6 +41,11 @@ export class ServiceFactory {
     return new DocumentsService();
   }
 }
+
+// Import singleton instances for services object
+import { dealsService } from './deals.service';
+import { investorsService } from './investors.service';
+import { documentsService } from './documents.service';
 
 // Export default services object for easy access
 export const services = {
