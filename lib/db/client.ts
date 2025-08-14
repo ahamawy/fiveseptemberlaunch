@@ -19,9 +19,29 @@ import type {
   PortfolioData
 } from './types';
 
-// Check if we should use mock data
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
-const ENABLE_SUPABASE = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true';
+// Runtime check for data source - always check at runtime
+const checkUseMockData = () => {
+  // Server-side: always use env variable
+  if (typeof window === 'undefined') {
+    return process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
+  }
+  
+  // Client-side: check localStorage first, then env
+  const localStorageSetting = localStorage.getItem('equitie-use-mock-data');
+  if (localStorageSetting !== null) {
+    return localStorageSetting !== 'false';
+  }
+  
+  // Fall back to environment variable
+  return process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
+};
+
+// Check if Supabase is properly configured
+const checkSupabaseEnabled = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return !!(url && key && url !== 'https://placeholder.supabase.co');
+};
 
 /**
  * Database Client Interface
@@ -66,23 +86,41 @@ export interface IDataClient {
  * Returns appropriate client based on environment configuration
  */
 class DataClientFactory {
-  private static instance: IDataClient | null = null;
+  private static mockInstance: IDataClient | null = null;
+  private static supabaseInstance: IDataClient | null = null;
 
   static getClient(): IDataClient {
-    if (!this.instance) {
-      if (USE_MOCK_DATA || !ENABLE_SUPABASE) {
-        console.log('🔧 Using Mock Data Adapter');
-        this.instance = new MockAdapter();
-      } else {
-        console.log('🔧 Using Unified Supabase Adapter');
-        this.instance = new UnifiedSupabaseAdapter({ useViews: true });
+    // Always check at runtime
+    const useMockData = checkUseMockData();
+    const supabaseEnabled = checkSupabaseEnabled();
+    
+    // Use mock if explicitly set or if Supabase isn't configured
+    if (useMockData || !supabaseEnabled) {
+      if (!this.mockInstance) {
+        console.log('🔧 Creating Mock Data Adapter');
+        this.mockInstance = new MockAdapter();
       }
+      return this.mockInstance;
+    } else {
+      if (!this.supabaseInstance) {
+        console.log('🚀 Creating Supabase Adapter');
+        this.supabaseInstance = new UnifiedSupabaseAdapter({ useViews: true });
+      }
+      return this.supabaseInstance;
     }
-    return this.instance;
   }
 
   static resetClient(): void {
-    this.instance = null;
+    // Clear both instances to force recreation
+    this.mockInstance = null;
+    this.supabaseInstance = null;
+    console.log('🔄 Data clients reset');
+  }
+  
+  static getCurrentMode(): 'mock' | 'supabase' {
+    const useMockData = checkUseMockData();
+    const supabaseEnabled = checkSupabaseEnabled();
+    return (useMockData || !supabaseEnabled) ? 'mock' : 'supabase';
   }
 }
 
@@ -93,11 +131,15 @@ export const getDataClient = () => DataClientFactory.getClient();
 export const dataClient = getDataClient();
 
 // Helper function to check if using mock data
-export const isUsingMockData = () => USE_MOCK_DATA || !ENABLE_SUPABASE;
+export const isUsingMockData = () => checkUseMockData() || !checkSupabaseEnabled();
+
+// Export factory methods for external use
+export const resetDataClient = () => DataClientFactory.resetClient();
+export const getCurrentDataMode = () => DataClientFactory.getCurrentMode();
 
 // Helper function to simulate API delay in development
 export const simulateDelay = async (ms: number = 0) => {
-  if (process.env.NODE_ENV === 'development' && USE_MOCK_DATA) {
+  if (process.env.NODE_ENV === 'development' && checkUseMockData()) {
     const delay = parseInt(process.env.NEXT_PUBLIC_MOCK_DELAY_MS || '0');
     if (delay > 0) {
       await new Promise(resolve => setTimeout(resolve, ms || delay));

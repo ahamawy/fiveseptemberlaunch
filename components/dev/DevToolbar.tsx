@@ -118,41 +118,6 @@ const PAGE_ROUTES: PageRoute[] = [
         icon: Icons.palette,
         description: 'Component library and design system'
       },
-      { 
-        name: 'API Documentation', 
-        path: '/api-docs',
-        icon: Icons.code,
-        description: 'API endpoints documentation'
-      },
-      { 
-        name: 'Settings', 
-        path: '/settings',
-        icon: Icons.settings,
-        description: 'Application settings'
-      },
-    ]
-  },
-  {
-    category: 'Authentication',
-    pages: [
-      { 
-        name: 'Login', 
-        path: '/login',
-        icon: Icons.link,
-        description: 'User login page'
-      },
-      { 
-        name: 'Register', 
-        path: '/register',
-        icon: Icons.user,
-        description: 'New user registration'
-      },
-      { 
-        name: 'Forgot Password', 
-        path: '/forgot-password',
-        icon: Icons.link,
-        description: 'Password recovery'
-      },
     ]
   }
 ];
@@ -163,6 +128,7 @@ export function DevToolbar() {
   const [currentPath, setCurrentPath] = useState('');
   const [currentTheme, setCurrentTheme] = useState('dark');
   const [currentScheme, setCurrentScheme] = useState('purple');
+  const [useMockData, setUseMockData] = useState(true);
 
   useEffect(() => {
     // Only show in development
@@ -174,6 +140,10 @@ export function DevToolbar() {
     const storedScheme = localStorage.getItem('equitie-color-scheme') || 'purple';
     setCurrentTheme(storedTheme);
     setCurrentScheme(storedScheme);
+    
+    // Get current data source
+    const mockDataSetting = localStorage.getItem('equitie-use-mock-data');
+    setUseMockData(mockDataSetting !== 'false');
   }, []);
 
   const handleThemeChange = (theme: string) => {
@@ -191,6 +161,22 @@ export function DevToolbar() {
     localStorage.setItem('equitie-color-scheme', scheme);
     
     // Trigger a page reload to apply the new scheme
+    window.location.reload();
+  };
+
+  const handleDataSourceChange = async (useMock: boolean) => {
+    setUseMockData(useMock);
+    localStorage.setItem('equitie-use-mock-data', useMock ? 'true' : 'false');
+    
+    // Clear all caches before switching
+    try {
+      // Clear service layer caches via API
+      await fetch('/api/cache/clear', { method: 'POST' });
+    } catch (e) {
+      console.log('Cache clear failed:', e);
+    }
+    
+    // Trigger a page reload to apply the new data source
     window.location.reload();
   };
 
@@ -330,11 +316,44 @@ export function DevToolbar() {
                   </div>
                 </div>
 
+                {/* Data Source Toggle */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-text-secondary">Data Source</span>
+                  <div className="flex items-center gap-1 p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                    <button
+                      onClick={() => handleDataSourceChange(true)}
+                      className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                        useMockData 
+                          ? 'bg-primary-300 text-white' 
+                          : 'text-text-secondary hover:text-text-primary'
+                      }`}
+                    >
+                      Mock
+                    </button>
+                    <button
+                      onClick={() => handleDataSourceChange(false)}
+                      className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                        !useMockData 
+                          ? 'bg-primary-300 text-white' 
+                          : 'text-text-secondary hover:text-text-primary'
+                      }`}
+                    >
+                      Supabase
+                    </button>
+                  </div>
+                </div>
+
                 {/* Environment Info */}
                 <div className="pt-2 border-t border-surface-border">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-text-tertiary">Environment</span>
                     <span className="text-primary-300 font-mono">development</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs mt-1">
+                    <span className="text-text-tertiary">Data Mode</span>
+                    <span className={`font-mono ${useMockData ? 'text-yellow-400' : 'text-green-400'}`}>
+                      {useMockData ? '🔧 Mock' : '🚀 Supabase'}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs mt-1">
                     <span className="text-text-tertiary">Host</span>

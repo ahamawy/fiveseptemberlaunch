@@ -249,19 +249,23 @@ export class InvestorsService extends BaseService {
     type?: Transaction['type'];
     status?: Transaction['status'];
     limit?: number;
-  } = {}): Promise<Transaction[]> {
+    page?: number;
+    deal_id?: number;
+    from_date?: string;
+    to_date?: string;
+  } = {}) {
     try {
       // Use provided ID or get current investor
       let id = investorId;
       if (!id) {
         const currentInvestor = await this.getCurrentInvestor();
-        if (!currentInvestor) return [];
+        if (!currentInvestor) return this.formatResponse([], false, 'No investor found');
         id = currentInvestor.id;
       }
 
       const cacheKey = `transactions:${id}:${JSON.stringify(options)}`;
       const cached = this.getCached<Transaction[]>(cacheKey);
-      if (cached) return cached;
+      if (cached) return this.formatResponse(cached);
 
       this.log('getTransactions', { investorId: id, options });
       await this.delay();
@@ -274,9 +278,10 @@ export class InvestorsService extends BaseService {
       });
 
       this.setCache(cacheKey, transactions);
-      return transactions;
+      return this.formatResponse(transactions);
     } catch (error) {
       this.handleError(error, 'getTransactions');
+      return this.formatResponse([], false, 'Failed to fetch transactions');
     }
   }
 
