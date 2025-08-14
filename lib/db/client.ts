@@ -4,7 +4,7 @@
  */
 
 import { MockAdapter } from './mock-adapter';
-import { SupabaseAdapter } from './supabase-adapter';
+import { UnifiedSupabaseAdapter } from './supabase-unified';
 import type { 
   Deal, 
   Investor, 
@@ -74,8 +74,8 @@ class DataClientFactory {
         console.log('🔧 Using Mock Data Adapter');
         this.instance = new MockAdapter();
       } else {
-        console.log('🔧 Using Supabase Adapter');
-        this.instance = new SupabaseAdapter();
+        console.log('🔧 Using Unified Supabase Adapter');
+        this.instance = new UnifiedSupabaseAdapter({ useViews: true });
       }
     }
     return this.instance;

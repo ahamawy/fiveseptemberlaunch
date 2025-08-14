@@ -9,6 +9,7 @@ coverage
 
 # Next.js
 .next
+.next/cache
 out
 build
 dist
@@ -56,6 +57,7 @@ Thumbs.db
 # Logs
 logs
 *.log
+dev-server.log
 
 # Runtime data
 pids
@@ -64,9 +66,12 @@ pids
 *.pid.lock
 
 # Playwright
-test-results
-playwright-report
+test-results/
+playwright-report/
 playwright/.cache
+*.webm
+screenshots/
+videos/
 
 # Temporary files
 tmp
@@ -81,3 +86,8 @@ temp
 # Supabase
 supabase/.branches
 supabase/.temp
+
+# Flutter/Dart files (not needed in Next.js)
+*.dart
+*.flutter
+*.dartanalyzer
