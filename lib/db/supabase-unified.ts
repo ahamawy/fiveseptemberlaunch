@@ -186,11 +186,24 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCompanies(): Promise<Company[]> {
     try {
-      const tableName = this.useViews ? 'companies_view' : 'companies';
-      const { data, error } = await this.client
+      // Try views first, fall back to direct table if view doesn't exist
+      let tableName = this.useViews ? 'companies_view' : 'companies';
+      let { data, error } = await this.client
         .from(tableName)
         .select('*')
         .order('id');
+
+      // If view doesn't exist, try direct table
+      if (error && error.code === '42P01' && this.useViews) {
+        console.log('View not found, falling back to direct table: companies');
+        tableName = 'companies';
+        const result = await this.client
+          .from(tableName)
+          .select('*')
+          .order('id');
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) {
         console.error('Error fetching companies:', error);
@@ -206,12 +219,25 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCompanyById(id: number): Promise<Company | null> {
     try {
-      const tableName = this.useViews ? 'companies_view' : 'companies';
-      const { data, error } = await this.client
+      let tableName = this.useViews ? 'companies_view' : 'companies';
+      let { data, error } = await this.client
         .from(tableName)
         .select('*')
         .eq('id', id)
         .single();
+
+      // If view doesn't exist, try direct table
+      if (error && error.code === '42P01' && this.useViews) {
+        console.log('View not found, falling back to direct table: companies');
+        tableName = 'companies';
+        const result = await this.client
+          .from(tableName)
+          .select('*')
+          .eq('id', id)
+          .single();
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) {
         console.error('Error fetching company:', error);
