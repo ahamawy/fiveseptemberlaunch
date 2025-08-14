@@ -206,6 +206,36 @@ Design tokens are automatically converted to Flutter theme in `lib/theme/figma/`
 - Theme system supports gradients and neumorphic effects
 - All screens follow iOS design patterns
 
+## Configuration System
+
+### Centralized Configuration
+The project uses a modular configuration system with live Supabase connectivity monitoring:
+
+```typescript
+import { config } from '@/lib/config';
+
+// Check data source mode
+const mode = config.getDataMode(); // 'mock' | 'supabase' | 'mcp'
+
+// Validate Supabase connection
+const hasSupabase = config.hasSupabase();
+
+// Get full diagnostics
+const diagnostics = config.getDiagnostics();
+```
+
+### Supabase Status Monitoring
+- **Health Endpoint**: `GET /api/health/supabase` - Returns detailed connection status
+- **DevToolbar**: Shows live Supabase status (✅ Connected | ⚙️ Configured | ❌ Missing)
+- **Status Module**: `lib/db/supabase/status.ts` - Connection validation utilities
+
+### Configuration Files
+- `/lib/config/` - Central configuration module
+- `/lib/db/schema-manager/config.ts` - Enhanced with validation methods
+- `/lib/db/supabase/status.ts` - Supabase connectivity checker
+
+See `/lib/config/README.md` for detailed configuration documentation.
+
 ## Data Layer Architecture
 
 ### Service Layer Pattern

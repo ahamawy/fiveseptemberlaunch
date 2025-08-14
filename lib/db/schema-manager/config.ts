@@ -136,4 +136,101 @@ export class SchemaConfig {
       mockDelay: this.getMockDelay()
     };
   }
+
+  /**
+   * Validate Node.js version (Supabase JS requires Node >= 20)
+   */
+  validateNodeVersion(): { ok: boolean; version: string; required: string } {
+    const nodeVersion = process.version;
+    const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0]);
+    const requiredVersion = 20;
+    
+    return {
+      ok: majorVersion >= requiredVersion,
+      version: nodeVersion,
+      required: `v${requiredVersion}.0.0`
+    };
+  }
+
+  /**
+   * Get Supabase project info from URL
+   */
+  getSupabaseProjectInfo(): { projectId: string | null; region: string | null } {
+    const url = this.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!url || url === 'https://placeholder.supabase.co') {
+      return { projectId: null, region: null };
+    }
+    
+    // Extract from URL pattern: https://[projectId].supabase.co
+    const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
+    if (match) {
+      return {
+        projectId: match[1],
+        region: null // Region not in URL, would need API call
+      };
+    }
+    
+    return { projectId: null, region: null };
+  }
+
+  /**
+   * Check if Supabase credentials are valid (not just present)
+   */
+  hasValidSupabaseCredentials(): boolean {
+    if (!this.hasSupabaseCredentials()) return false;
+    
+    const url = this.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = this.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    // Check URL format
+    if (!url?.startsWith('https://') || !url?.includes('.supabase.co')) {
+      return false;
+    }
+    
+    // Check key format (basic JWT structure check)
+    if (!key?.includes('.') || key.split('.').length !== 3) {
+      return false;
+    }
+    
+    return true;
+  }
+
+  /**
+   * Get data source mode
+   */
+  getDataSourceMode(): 'mock' | 'supabase' | 'mcp' {
+    if (this.isUsingMockData()) return 'mock';
+    if (this.isMCPEnabled() && this.isDevelopment()) return 'mcp';
+    if (this.hasValidSupabaseCredentials()) return 'supabase';
+    return 'mock'; // fallback
+  }
+
+  /**
+   * Get all environment diagnostics
+   */
+  getDiagnostics() {
+    const nodeValidation = this.validateNodeVersion();
+    const projectInfo = this.getSupabaseProjectInfo();
+    
+    return {
+      environment: {
+        mode: this.isDevelopment() ? 'development' : 'production',
+        nodeVersion: nodeValidation,
+        dataSource: this.getDataSourceMode()
+      },
+      supabase: {
+        configured: this.hasSupabaseCredentials(),
+        valid: this.hasValidSupabaseCredentials(),
+        enabled: this.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true',
+        projectId: projectInfo.projectId,
+        url: this.env.NEXT_PUBLIC_SUPABASE_URL || null
+      },
+      features: {
+        mockData: this.isUsingMockData(),
+        mcp: this.isMCPEnabled(),
+        devTools: this.env.NEXT_PUBLIC_ENABLE_DEVTOOLS === 'true',
+        logging: this.shouldLogQueries()
+      }
+    };
+  }
 }

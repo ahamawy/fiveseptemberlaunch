@@ -4,10 +4,7 @@
  * No MCP overhead - maximum performance for feature shipping
  */
 
-// import { createClient, SupabaseClient } from '@supabase/supabase-js';
-// Placeholder types until @supabase/supabase-js is installed
-type SupabaseClient = any;
-const createClient = (url: string, key: string, options?: any) => null as any;
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { SchemaConfig } from '../schema-manager/config';
 
 export class SupabaseDirectClient {

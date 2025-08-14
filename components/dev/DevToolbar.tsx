@@ -129,6 +129,7 @@ export function DevToolbar() {
   const [currentTheme, setCurrentTheme] = useState('dark');
   const [currentScheme, setCurrentScheme] = useState('purple');
   const [useMockData, setUseMockData] = useState(true);
+  const [supabaseStatus, setSupabaseStatus] = useState<string>('Checking...');
 
   useEffect(() => {
     // Only show in development
@@ -144,7 +145,27 @@ export function DevToolbar() {
     // Get current data source
     const mockDataSetting = localStorage.getItem('equitie-use-mock-data');
     setUseMockData(mockDataSetting !== 'false');
+    
+    // Check Supabase status
+    checkSupabaseStatus();
   }, []);
+
+  const checkSupabaseStatus = async () => {
+    try {
+      const response = await fetch('/api/health/supabase');
+      const data = await response.json();
+      
+      if (data.connection.connected) {
+        setSupabaseStatus('✅ Connected');
+      } else if (data.connection.configured) {
+        setSupabaseStatus('⚙️ Configured');
+      } else {
+        setSupabaseStatus('❌ Missing');
+      }
+    } catch (error) {
+      setSupabaseStatus('❌ Error');
+    }
+  };
 
   const handleThemeChange = (theme: string) => {
     setCurrentTheme(theme);
@@ -175,6 +196,9 @@ export function DevToolbar() {
     } catch (e) {
       console.log('Cache clear failed:', e);
     }
+    
+    // Update Supabase status after toggle
+    setTimeout(() => checkSupabaseStatus(), 100);
     
     // Trigger a page reload to apply the new data source
     window.location.reload();
@@ -354,6 +378,10 @@ export function DevToolbar() {
                     <span className={`font-mono ${useMockData ? 'text-yellow-400' : 'text-green-400'}`}>
                       {useMockData ? '🔧 Mock' : '🚀 Supabase'}
                     </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs mt-1">
+                    <span className="text-text-tertiary">Supabase</span>
+                    <span className="font-mono text-sm">{supabaseStatus}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs mt-1">
                     <span className="text-text-tertiary">Host</span>
