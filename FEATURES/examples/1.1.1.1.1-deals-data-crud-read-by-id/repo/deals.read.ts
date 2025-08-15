@@ -36,7 +36,7 @@ export class DealsRepository {
             name: dealDetails.company.name
           } : undefined,
           slug: dealDetails.slug,
-          code: dealDetails.deal_code,
+          code: (dealDetails as any).deal_code || (dealDetails as any).code,
           aliases: []
         });
       }

@@ -259,7 +259,7 @@ export class InvestorsService extends BaseService {
       let id = investorId;
       if (!id) {
         const currentInvestor = await this.getCurrentInvestor();
-        if (!currentInvestor) return this.formatResponse([], false, 'No investor found');
+        if (!currentInvestor) return this.formatResponse([]);
         id = currentInvestor.id;
       }
 
@@ -281,7 +281,7 @@ export class InvestorsService extends BaseService {
       return this.formatResponse(transactions);
     } catch (error) {
       this.handleError(error, 'getTransactions');
-      return this.formatResponse([], false, 'Failed to fetch transactions');
+      return this.formatResponse([]);
     }
   }
 

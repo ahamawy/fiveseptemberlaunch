@@ -8,7 +8,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { SchemaConfig } from '../schema-manager/config';
 
 export class SupabaseDirectClient {
-  private client: SupabaseClient | null = null;
+  private client: SupabaseClient;
   private config: SchemaConfig;
   private queryCache: Map<string, { data: any; timestamp: number }>;
   private cacheTimeout: number = 60000; // 1 minute default cache
@@ -38,9 +38,7 @@ export class SupabaseDirectClient {
   /**
    * Get the raw Supabase client
    */
-  getClient(): SupabaseClient {
-    return this.client;
-  }
+  getClient(): SupabaseClient { return this.client; }
 
   /**
    * Execute raw SQL query

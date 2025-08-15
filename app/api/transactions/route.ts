@@ -22,11 +22,7 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    return NextResponse.json({
-      success: true,
-      data: transactions,
-      count: transactions.length
-    });
+    return NextResponse.json(transactions);
   } catch (error) {
     console.error('Error fetching transactions:', error);
     return NextResponse.json(

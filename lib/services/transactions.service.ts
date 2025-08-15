@@ -54,7 +54,7 @@ export class TransactionsService extends BaseService {
     const cached = this.getCached(cacheKey);
     if (cached) return cached;
 
-    const list = await this.dataClient.getTransactions({ dealId });
+    const list = await this.dataClient.getTransactions({ deal_id: dealId });
     this.setCache(cacheKey, list);
     return list;
   }
@@ -64,7 +64,7 @@ export class TransactionsService extends BaseService {
     const cached = this.getCached(cacheKey);
     if (cached) return cached;
 
-    const list = await this.dataClient.getTransactions({ investorId });
+    const list = await this.dataClient.getTransactions({ investor_id: investorId });
     this.setCache(cacheKey, list);
     return list;
   }

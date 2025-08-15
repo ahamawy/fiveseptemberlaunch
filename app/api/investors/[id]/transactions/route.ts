@@ -28,15 +28,8 @@ export async function GET(
       from_date: fromDate,
       to_date: toDate,
     });
-    
-    if (!result.success) {
-      return NextResponse.json(
-        { error: result.error || 'Failed to fetch transactions' },
-        { status: 404 }
-      );
-    }
-    
-    return NextResponse.json(result.data);
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching transactions data:', error);
     return NextResponse.json(

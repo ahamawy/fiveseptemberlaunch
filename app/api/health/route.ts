@@ -16,7 +16,7 @@ export async function GET() {
       dataAccessOk = !!investor;
       testData = investor ? {
         id: investor.id,
-        name: investor.full_name || investor.name
+        name: investor.name
       } : null;
     } catch (e) {
       console.error('Health check data access failed:', e);
