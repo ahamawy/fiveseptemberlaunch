@@ -33,3 +33,20 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    // Minimal ingest shape; real implementation would write to public.documents
+    // For now, return accepted payload for upstream wiring.
+    const required = ['name', 'document_category'];
+    const missing = required.filter((k) => !body?.[k]);
+    if (missing.length) {
+      return NextResponse.json({ error: `Missing: ${missing.join(', ')}` }, { status: 400 });
+    }
+    return NextResponse.json({ success: true, data: body }, { status: 202 });
+  } catch (error) {
+    console.error('Error ingesting document:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { investorsService } from '@/lib/services';
+import { investorsService, transactionsService } from '@/lib/services';
 import type { TransactionType, TransactionStatus } from '@/lib/db/types';
 
 export async function GET(request: NextRequest) {
@@ -33,5 +33,30 @@ export async function GET(request: NextRequest) {
       { error: 'Internal server error' },
       { status: 500 }
     );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { deal_id, investor_id, units, unit_price, transaction_date, status } = body || {};
+
+    if (!deal_id || !investor_id || !units || !unit_price) {
+      return NextResponse.json({ error: 'deal_id, investor_id, units, unit_price are required' }, { status: 400 });
+    }
+
+    const created = await transactionsService.createPrimaryTx({
+      deal_id: Number(deal_id),
+      investor_id: Number(investor_id),
+      units: Number(units),
+      unit_price: Number(unit_price),
+      transaction_date,
+      status
+    });
+
+    return NextResponse.json({ success: true, data: created }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating transaction:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -51,9 +51,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDeals(filters?: DealFilters): Promise<Deal[]> {
     try {
-      const tableName = this.useViews ? 'deals_view' : 'deals';
-      let query = this.client
-        .from(tableName)
+      let query = (this.useViews ? this.client.schema('analytics').from('v_deals') : this.client.from('deals'))
         .select('*')
         .order('id', { ascending: false });
 
@@ -89,9 +87,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDealById(id: number): Promise<Deal | null> {
     try {
-      const tableName = this.useViews ? 'deals_view' : 'deals';
-      const { data, error } = await this.client
-        .from(tableName)
+      const { data, error } = await (this.useViews ? this.client.schema('analytics').from('v_deals') : this.client.from('deals'))
         .select('*')
         .eq('id', id)
         .single();
@@ -110,9 +106,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDealBySlug(slug: string): Promise<Deal | null> {
     try {
-      const tableName = this.useViews ? 'deals_view' : 'deals';
-      const { data, error } = await this.client
-        .from(tableName)
+      const { data, error } = await (this.useViews ? this.client.schema('analytics').from('v_deals') : this.client.from('deals'))
         .select('*')
         .eq('slug', slug)
         .single();
@@ -135,9 +129,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getInvestors(): Promise<Investor[]> {
     try {
-      const tableName = this.useViews ? 'investors_view' : 'investors';
-      const { data, error } = await this.client
-        .from(tableName)
+      const { data, error } = await (this.useViews ? this.client.schema('analytics').from('v_investors') : this.client.from('investors'))
         .select('*')
         .order('id');
 
@@ -155,9 +147,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getInvestorById(id: number): Promise<Investor | null> {
     try {
-      const tableName = this.useViews ? 'investors_view' : 'investors';
-      const { data, error } = await this.client
-        .from(tableName)
+      const { data, error } = await (this.useViews ? this.client.schema('analytics').from('v_investors') : this.client.from('investors'))
         .select('*')
         .eq('id', id)
         .single();
@@ -186,24 +176,9 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCompanies(): Promise<Company[]> {
     try {
-      // Try views first, fall back to direct table if view doesn't exist
-      let tableName = this.useViews ? 'companies_view' : 'companies';
-      let { data, error } = await this.client
-        .from(tableName)
+      const { data, error } = await (this.useViews ? this.client.schema('analytics').from('v_companies') : this.client.from('companies'))
         .select('*')
         .order('id');
-
-      // If view doesn't exist, try direct table
-      if (error && error.code === '42P01' && this.useViews) {
-        console.log('View not found, falling back to direct table: companies');
-        tableName = 'companies';
-        const result = await this.client
-          .from(tableName)
-          .select('*')
-          .order('id');
-        data = result.data;
-        error = result.error;
-      }
 
       if (error) {
         console.error('Error fetching companies:', error);
@@ -219,25 +194,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCompanyById(id: number): Promise<Company | null> {
     try {
-      let tableName = this.useViews ? 'companies_view' : 'companies';
-      let { data, error } = await this.client
-        .from(tableName)
+      const { data, error } = await (this.useViews ? this.client.schema('analytics').from('v_companies') : this.client.from('companies'))
         .select('*')
         .eq('id', id)
         .single();
-
-      // If view doesn't exist, try direct table
-      if (error && error.code === '42P01' && this.useViews) {
-        console.log('View not found, falling back to direct table: companies');
-        tableName = 'companies';
-        const result = await this.client
-          .from(tableName)
-          .select('*')
-          .eq('id', id)
-          .single();
-        data = result.data;
-        error = result.error;
-      }
 
       if (error) {
         console.error('Error fetching company:', error);
@@ -285,7 +245,6 @@ export class UnifiedSupabaseAdapter implements IDataClient {
     try {
       const tableName = this.useViews ? 'commitments_view' : 'commitments';
       const { data, error } = await this.client
-        .from(tableName)
         .select('*')
         .eq('id', id)
         .single();
@@ -306,7 +265,6 @@ export class UnifiedSupabaseAdapter implements IDataClient {
     try {
       const tableName = this.useViews ? 'commitments_view' : 'commitments';
       const { data, error } = await this.client
-        .from(tableName)
         .select('*')
         .eq('deal_id', dealId)
         .order('commitment_date', { ascending: false });
@@ -329,9 +287,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getTransactions(filters?: TransactionFilters): Promise<Transaction[]> {
     try {
-      const tableName = this.useViews ? 'transactions_view' : 'transactions';
-      let query = this.client
-        .from(tableName)
+      let query = (this.useViews ? this.client.schema('analytics').from('v_transactions') : this.client.from('transactions'))
         .select('*')
         .order('transaction_date', { ascending: false });
 
