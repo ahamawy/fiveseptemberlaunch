@@ -28,6 +28,7 @@ NEXT_PUBLIC_SUPABASE_URL=your-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
 NEXT_PUBLIC_USE_MOCK_DATA=false  # true for mock mode
 OPENROUTER_API_KEY=your-openrouter-api-key  # required for AI ingestion
+OPENROUTER_MODEL=openai/gpt-5                # optional; defaults to openrouter/auto
 ```
 
 ## Testing

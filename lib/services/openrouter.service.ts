@@ -29,7 +29,7 @@ export type ExtractedDealData = {
   }>;
 };
 
-const DEFAULT_MODEL = 'openrouter/auto';
+const DEFAULT_MODEL = process.env.OPENROUTER_MODEL || 'openrouter/auto';
 
 function buildPrompt(docText: string): string {
   return [
@@ -73,6 +73,8 @@ export async function extractDealDataWithOpenRouter(params: {
       { role: 'user', content: buildPrompt(docText) }
     ],
     temperature: 0,
+    top_p: 0.1,
+    max_tokens: 4000,
     response_format: { type: 'json_object' }
   } as any;
 
