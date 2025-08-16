@@ -38,8 +38,7 @@ function buildPrompt(docText: string): string {
     '{"deal":{"deal_id":number?,"name":string?,"unit_price_usd":number?,"valuation":{"pre_money_purchase":number?,"pre_money_sell":number?},"premium_percent":number?,"premium_formula":string?},',
     ' "partner":{"management_fee_percent":number?,"admin_fee_amount":number?,"subscription_fee_percent":number?,"performance_fee_percent":number?},',
     ' "profile":object?,',
-    ' "investor_fee_lines":[{"investor_name":string?,"investor_id":number?,"gross_capital_usd":number,"discount_structuring_pct":number?,"discount_management_pct":number?,"discount_admin_pct":number?}]}
-    ',
+    ' "investor_fee_lines":[{"investor_name":string?,"investor_id":number?,"gross_capital_usd":number,"discount_structuring_pct":number?,"discount_management_pct":number?,"discount_admin_pct":number?}]}',
     'Document:\n',
     docText
   ].join('\n');

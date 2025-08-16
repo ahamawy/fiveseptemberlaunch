@@ -113,6 +113,12 @@ const PAGE_ROUTES: PageRoute[] = [
     category: 'Admin Tools',
     pages: [
       { 
+        name: 'EQUITIE Bot Chat', 
+        path: '/admin/chat',
+        icon: Icons.code,
+        description: 'AI assistant for document analysis'
+      },
+      { 
         name: 'Fee Profiles', 
         path: '/admin/fees/profiles',
         icon: Icons.settings,
