@@ -51,18 +51,18 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDeals(filters?: DealFilters): Promise<Deal[]> {
     try {
-      let query = (this.useViews ? (this.client as any).schema('analytics').from('v_deals') : this.client.from('deals'))
+      // Use dotted table names directly
+      const tableName = 'deals.deal';
+      let query = this.client.from(tableName)
         .select('*')
-        .order('id', { ascending: false });
+        .order('deal_id', { ascending: false });
 
       // Apply filters
       if (filters?.stage) {
-        const columnName = this.useViews ? 'stage' : 'deal_stage';
-        query = query.eq(columnName, filters.stage);
+        query = query.eq('deal_status', filters.stage);
       }
-      // status/investor filters not in DealFilters; keep stage/search only
       if (filters?.search) {
-        query = query.ilike('name', `%${filters.search}%`);
+        query = query.ilike('deal_name', `%${filters.search}%`);
       }
 
       const { data, error } = await query;
@@ -72,7 +72,8 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         return [];
       }
 
-      return data || [];
+      // Map database fields to TypeScript fields
+      return (data || []).map(this.mapDealFromDb);
     } catch (error) {
       console.error('Error in getDeals:', error);
       return [];
@@ -81,9 +82,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDealById(id: number): Promise<Deal | null> {
     try {
-      const { data, error } = await (this.useViews ? (this.client as any).schema('analytics').from('v_deals') : this.client.from('deals'))
+      const tableName = 'deals.deal';
+      const { data, error } = await this.client.from(tableName)
         .select('*')
-        .eq('id', id)
+        .eq('deal_id', id)
         .single();
 
       if (error) {
@@ -91,7 +93,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         return null;
       }
 
-      return data;
+      return data ? this.mapDealFromDb(data) : null;
     } catch (error) {
       console.error('Error in getDealById:', error);
       return null;
@@ -100,9 +102,11 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDealBySlug(slug: string): Promise<Deal | null> {
     try {
-      const { data, error } = await (this.useViews ? (this.client as any).schema('analytics').from('v_deals') : this.client.from('deals'))
+      const tableName = 'deals.deal';
+      // First try to find by slug if column exists, otherwise by name
+      const { data, error } = await this.client.from(tableName)
         .select('*')
-        .eq('slug', slug)
+        .ilike('deal_name', slug.replace(/-/g, ' '))
         .single();
 
       if (error) {
@@ -110,7 +114,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         return null;
       }
 
-      return data;
+      return data ? this.mapDealFromDb(data) : null;
     } catch (error) {
       console.error('Error in getDealBySlug:', error);
       return null;
@@ -123,16 +127,17 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getInvestors(): Promise<Investor[]> {
     try {
-      const { data, error } = await (this.useViews ? (this.client as any).schema('analytics').from('v_investors') : this.client.from('investors'))
+      const tableName = 'investors.investor';
+      const { data, error } = await this.client.from(tableName)
         .select('*')
-        .order('id');
+        .order('investor_id');
 
       if (error) {
         console.error('Error fetching investors:', error);
         return [];
       }
 
-      return data || [];
+      return (data || []).map(this.mapInvestorFromDb);
     } catch (error) {
       console.error('Error in getInvestors:', error);
       return [];
@@ -141,9 +146,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getInvestorById(id: number): Promise<Investor | null> {
     try {
-      const { data, error } = await (this.useViews ? (this.client as any).schema('analytics').from('v_investors') : this.client.from('investors'))
+      const tableName = 'investors.investor';
+      const { data, error } = await this.client.from(tableName)
         .select('*')
-        .eq('id', id)
+        .eq('investor_id', id)
         .single();
 
       if (error) {
@@ -151,7 +157,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         return null;
       }
 
-      return data;
+      return data ? this.mapInvestorFromDb(data) : null;
     } catch (error) {
       console.error('Error in getInvestorById:', error);
       return null;
@@ -170,16 +176,17 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCompanies(): Promise<Company[]> {
     try {
-      const { data, error } = await (this.useViews ? (this.client as any).schema('analytics').from('v_companies') : this.client.from('companies'))
+      const tableName = 'companies.company';
+      const { data, error } = await this.client.from(tableName)
         .select('*')
-        .order('id');
+        .order('company_id');
 
       if (error) {
         console.error('Error fetching companies:', error);
         return [];
       }
 
-      return data || [];
+      return (data || []).map(this.mapCompanyFromDb);
     } catch (error) {
       console.error('Error in getCompanies:', error);
       return [];
@@ -188,9 +195,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCompanyById(id: number): Promise<Company | null> {
     try {
-      const { data, error } = await (this.useViews ? (this.client as any).schema('analytics').from('v_companies') : this.client.from('companies'))
+      const tableName = 'companies.company';
+      const { data, error } = await this.client.from(tableName)
         .select('*')
-        .eq('id', id)
+        .eq('company_id', id)
         .single();
 
       if (error) {
@@ -198,7 +206,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         return null;
       }
 
-      return data;
+      return data ? this.mapCompanyFromDb(data) : null;
     } catch (error) {
       console.error('Error in getCompanyById:', error);
       return null;
@@ -283,7 +291,8 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getTransactions(filters?: TransactionFilters): Promise<Transaction[]> {
     try {
-      let query = (this.useViews ? (this.client as any).schema('analytics').from('v_transactions') : this.client.from('transactions'))
+      const tableName = 'transactions.transaction.primary';
+      let query = this.client.from(tableName)
         .select('*')
         .order('transaction_date', { ascending: false });
 
@@ -294,7 +303,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         query = query.eq('deal_id', filters.deal_id);
       }
       if (filters?.type) {
-        query = query.eq('type', filters.type);
+        query = query.eq('transaction_type', filters.type);
       }
       if (filters?.from_date) {
         query = query.gte('transaction_date', filters.from_date);
@@ -310,7 +319,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         return [];
       }
 
-      return data || [];
+      return (data || []).map(this.mapTransactionFromDb);
     } catch (error) {
       console.error('Error in getTransactions:', error);
       return [];
@@ -319,11 +328,11 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getTransactionById(id: number): Promise<Transaction | null> {
     try {
-      const tableName = this.useViews ? 'transactions_view' : 'transactions';
+      const tableName = 'transactions.transaction.primary';
       const { data, error } = await this.client
         .from(tableName)
         .select('*')
-        .eq('id', id)
+        .eq('transaction_id', id)
         .single();
 
       if (error) {
@@ -331,7 +340,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         return null;
       }
 
-      return data;
+      return data ? this.mapTransactionFromDb(data) : null;
     } catch (error) {
       console.error('Error in getTransactionById:', error);
       return null;
@@ -344,7 +353,8 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDocuments(filters?: DocumentFilters): Promise<Document[]> {
     try {
-      const tableName = this.useViews ? 'documents_view' : 'documents';
+      // Note: v_documents view doesn't exist, using documents table directly
+      const tableName = 'documents';
       let query = this.client
         .from(tableName)
         .select('*')
@@ -376,7 +386,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDocumentById(id: number): Promise<Document | null> {
     try {
-      const tableName = this.useViews ? 'documents_view' : 'documents';
+      const tableName = 'documents';
       const { data, error } = await this.client
         .from(tableName)
         .select('*')
@@ -401,28 +411,97 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDashboardData(investorId: number): Promise<DashboardData> {
     try {
-      // For views mode, use pre-aggregated view
-      if (this.useViews) {
-        const { data, error } = await this.client
-          .from('dashboard_view')
-          .select('*')
-          .eq('investor_id', investorId)
-          .single();
-
-        if (error || !data) {
-          console.error('Error fetching dashboard data:', error);
-          return this.getEmptyDashboard();
-        }
-
-        return data as unknown as DashboardData;
+      // Get investor details
+      const investor = await this.getInvestorById(investorId);
+      if (!investor) {
+        return this.getEmptyDashboard();
       }
 
-      // Fallback: return empty dashboard shape
-      return this.getEmptyDashboard();
+      // Get investor units for portfolio data
+      const units = await this.getInvestorUnits(investorId);
+      
+      // Get transactions for the investor
+      const transactions = await this.getTransactions({ investor_id: investorId });
+      
+      // Calculate summary metrics
+      const totalCommitted = units.reduce((sum: number, u: any) => 
+        sum + parseFloat(u.investment_amount || '0'), 0);
+      
+      const totalCalled = units.reduce((sum: number, u: any) => 
+        sum + parseFloat(u.net_capital || '0'), 0);
+      
+      const totalDistributed = units.reduce((sum: number, u: any) => 
+        sum + parseFloat(u.realized_gain_loss || '0'), 0);
+      
+      const currentValue = units.reduce((sum: number, u: any) => 
+        sum + parseFloat(u.current_value || '0'), 0);
+      
+      const totalGains = units.reduce((sum: number, u: any) => 
+        sum + parseFloat(u.unrealized_gain_loss || '0') + parseFloat(u.realized_gain_loss || '0'), 0);
+      
+      // Count active deals
+      const activeDeals = units.filter((u: any) => u.status === 'Active').length;
+      
+      // Calculate portfolio IRR and MOIC
+      const portfolioMOIC = totalCalled > 0 ? currentValue / totalCalled : 0;
+      const portfolioIRR = this.calculatePortfolioIRR(units);
+      
+      // Get recent activity (last 5 transactions)
+      const recentActivity = transactions.slice(0, 5).map((t: any) => ({
+        id: t.id.toString(),
+        type: t.type,
+        description: `${t.type} - Deal #${t.deal_id}`,
+        amount: t.amount,
+        date: t.transaction_date
+      }));
+      
+      // Upcoming calls (mock for now)
+      const upcomingCalls: any[] = [];
+
+      return {
+        investor,
+        summary: {
+          totalCommitted,
+          totalCalled,
+          totalDistributed,
+          currentValue,
+          totalGains,
+          portfolioIRR,
+          portfolioMOIC,
+          activeDeals
+        },
+        recentActivity,
+        upcomingCalls
+      };
     } catch (error) {
       console.error('Error in getDashboardData:', error);
       return this.getEmptyDashboard();
     }
+  }
+  
+  private calculatePortfolioIRR(units: any[]): number {
+    // Simplified portfolio IRR calculation
+    if (units.length === 0) return 0;
+    
+    let totalWeightedIRR = 0;
+    let totalWeight = 0;
+    
+    for (const unit of units) {
+      const investmentAmount = parseFloat(unit.net_capital || '0');
+      const currentValue = parseFloat(unit.current_value || '0');
+      const purchaseDate = new Date(unit.purchase_date);
+      const now = new Date();
+      const years = (now.getTime() - purchaseDate.getTime()) / (365 * 24 * 60 * 60 * 1000);
+      
+      if (years > 0 && investmentAmount > 0) {
+        const totalReturn = currentValue / investmentAmount;
+        const irr = (Math.pow(totalReturn, 1 / years) - 1) * 100;
+        totalWeightedIRR += irr * investmentAmount;
+        totalWeight += investmentAmount;
+      }
+    }
+    
+    return totalWeight > 0 ? Math.round((totalWeightedIRR / totalWeight) * 10) / 10 : 0;
   }
 
   async getPortfolioData(investorId: number): Promise<PortfolioData> {
@@ -450,6 +529,50 @@ export class UnifiedSupabaseAdapter implements IDataClient {
           averageMOIC: 0
         }
       };
+    }
+  }
+
+  // ==========================================
+  // INVESTOR UNITS & PORTFOLIO
+  // ==========================================
+
+  async getInvestorUnits(investorId: number): Promise<any[]> {
+    try {
+      const { data, error } = await this.client
+        .from('investor_units')
+        .select('*')
+        .eq('investor_id', investorId)
+        .order('purchase_date', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching investor units:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getInvestorUnits:', error);
+      return [];
+    }
+  }
+
+  async getInvestmentSnapshots(investorId: number): Promise<any[]> {
+    try {
+      const { data, error } = await this.client
+        .from('investment_snapshots')
+        .select('*')
+        .eq('investor_id', investorId)
+        .order('snapshot_date', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching investment snapshots:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getInvestmentSnapshots:', error);
+      return [];
     }
   }
 
@@ -485,6 +608,77 @@ export class UnifiedSupabaseAdapter implements IDataClient {
       },
       recentActivity: [],
       upcomingCalls: []
+    };
+  }
+
+  private mapDealFromDb(dbDeal: any): Deal {
+    return {
+      id: dbDeal.deal_id,
+      name: dbDeal.deal_name,
+      slug: dbDeal.deal_name?.toLowerCase().replace(/\s+/g, '-') || '',
+      company_id: dbDeal.underlying_company_id,
+      type: dbDeal.deal_type || 'primary',
+      stage: dbDeal.deal_status || 'active',
+      opening_date: dbDeal.deal_date,
+      closing_date: dbDeal.exit_date,
+      target_raise: dbDeal.gross_capital,
+      current_raise: dbDeal.initial_net_capital || 0,
+      minimum_investment: 50000, // Default value
+      currency: dbDeal.deal_currency || 'USD',
+      description: null,
+      highlights: [],
+      documents: [],
+      created_at: dbDeal.created_at || new Date().toISOString(),
+      updated_at: dbDeal.updated_at || new Date().toISOString()
+    };
+  }
+
+  private mapInvestorFromDb(dbInvestor: any): Investor {
+    return {
+      id: dbInvestor.investor_id,
+      public_id: dbInvestor.public_id || '',
+      user_id: dbInvestor.user_id,
+      type: dbInvestor.investor_type || 'individual',
+      name: dbInvestor.full_name,
+      email: dbInvestor.primary_email,
+      phone: dbInvestor.primary_phone,
+      country: dbInvestor.country_of_residence,
+      kyc_status: dbInvestor.kyc_status || 'pending',
+      accredited: dbInvestor.is_accredited || false,
+      created_at: dbInvestor.created_at,
+      updated_at: dbInvestor.updated_at
+    };
+  }
+
+  private mapCompanyFromDb(dbCompany: any): Company {
+    return {
+      id: dbCompany.company_id,
+      name: dbCompany.company_name,
+      description: dbCompany.company_description,
+      industry: dbCompany.company_sector,
+      founded: dbCompany.founding_year?.toString(),
+      website: dbCompany.company_website,
+      logo: dbCompany.company_logo_url,
+      valuation: dbCompany.latest_valuation_mil ? dbCompany.latest_valuation_mil * 1000000 : null,
+      employees: dbCompany.employee_count,
+      headquarters: dbCompany.headquarters_location,
+      created_at: dbCompany.created_at,
+      updated_at: dbCompany.updated_at
+    };
+  }
+
+  private mapTransactionFromDb(dbTx: any): Transaction {
+    return {
+      id: dbTx.transaction_id,
+      investor_id: dbTx.investor_id,
+      deal_id: dbTx.deal_id,
+      type: dbTx.transaction_type || 'investment',
+      amount: dbTx.gross_capital || dbTx.amount,
+      currency: dbTx.currency || 'USD',
+      transaction_date: dbTx.transaction_date,
+      status: dbTx.status || 'completed',
+      created_at: dbTx.created_at,
+      updated_at: dbTx.updated_at
     };
   }
 

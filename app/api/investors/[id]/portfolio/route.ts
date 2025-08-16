@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getInvestorById } from '@/lib/mock-data/investors';
-import { getDealPerformance, getHistoricalPerformance } from '@/lib/mock-data/performance';
-import { getDealById, getCompanyById } from '@/lib/mock-data/deals';
+import { investorsService } from '@/lib/services';
 
 export async function GET(
   request: NextRequest,
@@ -9,103 +7,122 @@ export async function GET(
 ) {
   try {
     const investorId = parseInt(params.id);
-    const investor = getInvestorById(investorId);
     
-    if (!investor) {
-      return NextResponse.json(
-        { error: 'Investor not found' },
-        { status: 404 }
-      );
+    // Get portfolio holdings from investor_units
+    const holdings = await investorsService.getPortfolioHoldings(investorId);
+    
+    if (!holdings?.data) {
+      return NextResponse.json({
+        deals: [],
+        historicalPerformance: [],
+        allocation: { bySector: [], byType: [] },
+        summary: {
+          totalDeals: 0,
+          activeDeals: 0,
+          exitedDeals: 0,
+          totalValue: 0
+        }
+      });
     }
-    
-    // Get deal-level performance
-    const dealPerformance = getDealPerformance(investorId);
-    
-    // Enrich with deal and company information
-    const enrichedDealPerformance = dealPerformance.map(perf => {
-      const deal = getDealById(perf.dealId);
-      const company = deal ? getCompanyById(deal.companyId) : null;
-      
-      return {
-        ...perf,
-        dealName: deal?.name || `Deal ${perf.dealId}`,
-        companyName: company?.name || 'Unknown Company',
-        dealType: deal?.type || 'unknown',
-        sector: deal?.sector || company?.sector || 'Unknown',
-        stage: deal?.stage || 'unknown',
-        currency: deal?.currency || 'USD',
-      };
-    });
-    
-    // Get historical performance
-    const historicalPerformance = getHistoricalPerformance(investorId);
-    
+
+    const deals = holdings.data;
+
     // Calculate portfolio allocation by sector
-    const sectorAllocation = enrichedDealPerformance.reduce((acc, deal) => {
+    const sectorAllocation = deals.reduce((acc: any, deal: any) => {
       const sector = deal.sector;
       if (!acc[sector]) {
         acc[sector] = {
           sector,
           value: 0,
           percentage: 0,
-          dealCount: 0,
+          dealCount: 0
         };
       }
       acc[sector].value += deal.currentValue;
       acc[sector].dealCount += 1;
       return acc;
-    }, {} as Record<string, any>);
-    
-    const totalValue = Object.values(sectorAllocation).reduce(
-      (sum: number, item: any) => sum + item.value,
-      0
-    );
-    
-    Object.values(sectorAllocation).forEach((item: any) => {
-      item.percentage = totalValue > 0 ? (item.value / totalValue) * 100 : 0;
-    });
-    
-    // Calculate portfolio allocation by deal type
-    const typeAllocation = enrichedDealPerformance.reduce((acc, deal) => {
+    }, {});
+
+    // Calculate portfolio allocation by type
+    const typeAllocation = deals.reduce((acc: any, deal: any) => {
       const type = deal.dealType;
       if (!acc[type]) {
         acc[type] = {
           type,
           value: 0,
           percentage: 0,
-          dealCount: 0,
+          dealCount: 0
         };
       }
       acc[type].value += deal.currentValue;
       acc[type].dealCount += 1;
       return acc;
-    }, {} as Record<string, any>);
+    }, {});
+
+    // Convert to arrays and calculate percentages
+    const totalValue = deals.reduce((sum: number, d: any) => sum + d.currentValue, 0);
     
-    Object.values(typeAllocation).forEach((item: any) => {
-      item.percentage = totalValue > 0 ? (item.value / totalValue) * 100 : 0;
-    });
-    
-    const portfolioData = {
-      deals: enrichedDealPerformance,
+    const bySector = Object.values(sectorAllocation).map((s: any) => ({
+      ...s,
+      percentage: totalValue > 0 ? (s.value / totalValue) * 100 : 0
+    }));
+
+    const byType = Object.values(typeAllocation).map((t: any) => ({
+      ...t,
+      percentage: totalValue > 0 ? (t.value / totalValue) * 100 : 0
+    }));
+
+    // Generate historical performance (mock for now, could use investment_snapshots)
+    const historicalPerformance = generateHistoricalPerformance(totalValue);
+
+    // Calculate summary
+    const summary = {
+      totalDeals: deals.length,
+      activeDeals: deals.filter((d: any) => d.status === 'active').length,
+      exitedDeals: deals.filter((d: any) => d.status === 'exited').length,
+      totalValue
+    };
+
+    return NextResponse.json({
+      deals,
       historicalPerformance,
       allocation: {
-        bySector: Object.values(sectorAllocation),
-        byType: Object.values(typeAllocation),
+        bySector,
+        byType
       },
-      summary: {
-        totalDeals: enrichedDealPerformance.length,
-        activeDeals: enrichedDealPerformance.filter(d => d.status === 'active').length,
-        exitedDeals: enrichedDealPerformance.filter(d => d.status === 'exited').length,
-        totalValue,
-      },
-    };
-    
-    return NextResponse.json(portfolioData);
+      summary
+    });
   } catch (error) {
     console.error('Error fetching portfolio data:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to fetch portfolio data' },
       { status: 500 }
     );
   }
+}
+
+function generateHistoricalPerformance(currentValue: number) {
+  // Generate 12 months of historical data
+  const months = 12;
+  const data = [];
+  const baseValue = currentValue * 0.85; // Start at 85% of current value
+  
+  for (let i = 0; i < months; i++) {
+    const date = new Date();
+    date.setMonth(date.getMonth() - (months - i - 1));
+    
+    const progress = i / (months - 1);
+    const value = baseValue + (currentValue - baseValue) * progress;
+    const moic = value / baseValue;
+    const irr = 10 + progress * 7; // IRR from 10% to 17%
+    
+    data.push({
+      date: date.toISOString().split('T')[0],
+      nav: Math.round(value),
+      irr: Math.round(irr * 10) / 10,
+      moic: Math.round(moic * 100) / 100
+    });
+  }
+  
+  return data;
 }

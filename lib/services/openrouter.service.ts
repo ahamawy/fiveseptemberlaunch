@@ -56,10 +56,21 @@ export async function extractDealDataWithOpenRouter(params: {
     throw new Error('Missing OpenRouter API key. Set OPENROUTER_API_KEY.');
   }
 
+  // Provide project context to improve extractions
+  let context = '';
+  try {
+    // Dynamically import to avoid bundling issues
+    const res = await import('fs/promises');
+    const path = await import('path');
+    const ctxPath = path.resolve(process.cwd(), 'DOCS', 'EQUITIE_BOT_CONTEXT.md');
+    context = await res.readFile(ctxPath, 'utf8');
+  } catch {}
+
   const body = {
     model: model || DEFAULT_MODEL,
     messages: [
       { role: 'system', content: 'You are a precise extraction engine that outputs only JSON.' },
+      context ? { role: 'system', content: `PROJECT CONTEXT:\n${context}` } : undefined,
       { role: 'user', content: buildPrompt(docText) }
     ],
     temperature: 0,

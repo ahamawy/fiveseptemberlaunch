@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('DevToolbar Basic Functionality', () => {
   test('DevToolbar appears and color scheme switching works', async ({ page }) => {
     // Navigate to style guide page
-    await page.goto('http://localhost:3002/style-guide');
+    await page.goto('/style-guide');
     await page.waitForLoadState('networkidle');
     
     // Verify DevToolbar button is visible
@@ -48,7 +48,7 @@ test.describe('DevToolbar Basic Functionality', () => {
   });
   
   test('Style guide theme controls work independently', async ({ page }) => {
-    await page.goto('http://localhost:3002/style-guide');
+    await page.goto('/style-guide');
     await page.waitForLoadState('networkidle');
     
     // Test theme switching in style guide
@@ -73,7 +73,7 @@ test.describe('DevToolbar Basic Functionality', () => {
   });
   
   test('Navigation between pages works', async ({ page }) => {
-    await page.goto('http://localhost:3002/style-guide');
+    await page.goto('/style-guide');
     await page.waitForLoadState('networkidle');
     
     // Open DevToolbar

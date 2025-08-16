@@ -334,6 +334,142 @@ export class InvestorsService extends BaseService {
       this.handleError(error, 'getSummaryStats');
     }
   }
+
+  /**
+   * Get investor portfolio holdings from investor_units table
+   */
+  async getPortfolioHoldings(investorId?: number) {
+    const cacheKey = `portfolio:${investorId || 'current'}`;
+    const cached = this.getCached(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const id = investorId || (await this.getCurrentInvestor())?.id || 1;
+      
+      // Get investor units from Supabase
+      const adapter = this.dataClient as any;
+      const units = await adapter.getInvestorUnits(id);
+      
+      // Get deals and companies to enrich the data
+      const dealIds = [...new Set(units.map((u: any) => u.deal_id))];
+      const deals = await Promise.all(
+        dealIds.map(dealId => this.dataClient.getDealById(dealId))
+      );
+      
+      // Map units to portfolio format
+      const holdings = units.map((unit: any) => {
+        const deal = deals.find(d => d?.id === unit.deal_id);
+        
+        return {
+          dealId: unit.deal_id,
+          dealName: deal?.name || `Deal ${unit.deal_id}`,
+          companyName: deal?.company?.name || 'Unknown Company',
+          sector: deal?.company?.industry || 'Unknown',
+          dealType: deal?.type || 'primary',
+          committed: parseFloat(unit.investment_amount),
+          called: parseFloat(unit.net_capital),
+          distributed: parseFloat(unit.realized_gain_loss || '0'),
+          currentValue: parseFloat(unit.current_value),
+          irr: this.calculateIRR(unit),
+          moic: parseFloat(unit.current_value) / parseFloat(unit.net_capital || '1'),
+          status: unit.status === 'Active' ? 'active' : 'exited',
+          currency: deal?.currency || 'USD',
+          stage: deal?.stage || 'active',
+          unrealizedGain: parseFloat(unit.unrealized_gain_loss || '0'),
+          purchaseDate: unit.purchase_date,
+          units: parseFloat(unit.units_purchased),
+          unitPrice: parseFloat(unit.unit_price_at_purchase),
+          currentUnitPrice: parseFloat(unit.current_unit_price)
+        };
+      });
+
+      const result = this.formatResponse(holdings);
+      this.setCache(cacheKey, result);
+      return result;
+    } catch (error) {
+      this.handleError(error, 'getPortfolioHoldings');
+    }
+  }
+
+  /**
+   * Calculate IRR for a holding
+   */
+  private calculateIRR(unit: any): number {
+    // Simplified IRR calculation
+    const investmentAmount = parseFloat(unit.net_capital || '0');
+    const currentValue = parseFloat(unit.current_value || '0');
+    const purchaseDate = new Date(unit.purchase_date);
+    const now = new Date();
+    const years = (now.getTime() - purchaseDate.getTime()) / (365 * 24 * 60 * 60 * 1000);
+    
+    if (years <= 0 || investmentAmount <= 0) return 0;
+    
+    const totalReturn = currentValue / investmentAmount;
+    const irr = (Math.pow(totalReturn, 1 / years) - 1) * 100;
+    
+    return Math.round(irr * 10) / 10; // Round to 1 decimal
+  }
+
+  /**
+   * Get investor commitments (from investor_units)
+   */
+  async getInvestorCommitments(investorId?: number) {
+    const cacheKey = `commitments:${investorId || 'current'}`;
+    const cached = this.getCached(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const holdings = await this.getPortfolioHoldings(investorId);
+      if (!holdings?.data) return this.formatResponse([]);
+
+      // Transform holdings to commitments format
+      const commitments = holdings.data.map((holding: any, index: number) => ({
+        id: index + 1,
+        dealId: holding.dealId,
+        dealName: holding.dealName,
+        dealCode: `DEAL-${holding.dealId}`,
+        dealStage: holding.stage,
+        companyName: holding.companyName,
+        companySector: holding.sector,
+        currency: holding.currency,
+        committedAmount: holding.committed,
+        capitalCalled: holding.called,
+        capitalDistributed: holding.distributed,
+        capitalRemaining: holding.committed - holding.called,
+        percentageCalled: (holding.called / holding.committed) * 100,
+        nextCallAmount: 0,
+        nextCallDate: null,
+        status: holding.status === 'active' ? 'signed' : 'completed',
+        dealOpeningDate: holding.purchaseDate,
+        dealClosingDate: null,
+        createdAt: holding.purchaseDate
+      }));
+
+      // Calculate summary
+      const summary = {
+        totalCommitments: commitments.length,
+        activeCommitments: commitments.filter((c: any) => c.status === 'signed').length,
+        totalCommitted: commitments.reduce((sum: number, c: any) => sum + c.committedAmount, 0),
+        totalCalled: commitments.reduce((sum: number, c: any) => sum + c.capitalCalled, 0),
+        totalDistributed: commitments.reduce((sum: number, c: any) => sum + c.capitalDistributed, 0),
+        totalRemaining: commitments.reduce((sum: number, c: any) => sum + c.capitalRemaining, 0),
+        averageCallPercentage: commitments.length > 0 
+          ? commitments.reduce((sum: number, c: any) => sum + c.percentageCalled, 0) / commitments.length
+          : 0
+      };
+
+      const result = {
+        commitments,
+        summary,
+        upcomingCalls: []
+      };
+
+      this.setCache(cacheKey, result);
+      return result;
+    } catch (error) {
+      this.handleError(error, 'getInvestorCommitments');
+    }
+  }
 }
 
 // Export singleton instance

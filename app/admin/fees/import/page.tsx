@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Card } from '@/components/ui/card';
+import { FileUploadZone } from '@/components/ui/FileUploadZone';
 import { BRAND_CONFIG } from '@/BRANDING/brand.config';
 import { formatCurrency } from '@/lib/theme-utils';
 import { ArrowUpTrayIcon, ArrowPathIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
@@ -118,13 +119,39 @@ export default function FeesImportPage() {
           <div className="space-y-4">
             <details className="border border-surface-border rounded p-3 bg-surface/50">
               <summary className="cursor-pointer font-medium text-white">Parse document with AI and stage</summary>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
                 <div>
                   <label className="block text-sm text-gray-300">Deal ID</label>
                   <input className="w-full p-2 rounded bg-surface border border-surface-border text-white" type="number" value={dealId} onChange={(e) => setDealId(Number(e.target.value))} />
                 </div>
               </div>
-              <textarea className="mt-2 w-full p-2 rounded-lg bg-surface border border-surface-border text-white font-mono text-xs" rows={6} value={docText} onChange={(e) => setDocText(e.target.value)} placeholder="Paste term sheet / subscription text here" />
+              
+              {/* File Upload Option */}
+              <div className="mt-4">
+                <p className="text-sm text-gray-400 mb-3">Option 1: Upload a file (Excel, PDF, Image)</p>
+                <FileUploadZone
+                  onFileSelect={(file) => setMessage(`Processing ${file.name}...`)}
+                  onTextExtracted={(text) => {
+                    setDocText(text);
+                    setMessage('File processed. Click Parse & Stage to import data.');
+                  }}
+                  purpose="import"
+                />
+              </div>
+              
+              {/* Text Input Option */}
+              <div className="mt-4 pt-4 border-t border-surface-border">
+                <p className="text-sm text-gray-400 mb-3">Option 2: Paste text or CSV directly</p>
+                <textarea 
+                  className="w-full p-2 rounded-lg bg-surface border border-surface-border text-white font-mono text-xs" 
+                  rows={6} 
+                  value={docText} 
+                  onChange={(e) => setDocText(e.target.value)} 
+                  placeholder="Paste term sheet / subscription text / CSV data here" 
+                />
+              </div>
+              
               <div className="mt-2">
                 <button onClick={parseAndStage} className="px-3 py-2 rounded bg-indigo-600 text-white">Parse & Stage</button>
               </div>

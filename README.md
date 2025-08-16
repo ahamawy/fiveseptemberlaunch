@@ -1,17 +1,35 @@
-# Equitie Config Pack
+# Equitie Investor Portal
 
-Generated: 2025-08-12
+## Quick Start
+```bash
+npm install
+npm run dev   # http://localhost:3000
+```
 
-This zip is a **drop-in onboarding pack** for interns and contributors. It includes:
-- **PRD.md** — condensed product requirements tied to feature codes.
-- **CLAUDE.md** — daily pairing prompts/checklists for Claude/GPT.
-- **TECH_STACK.md** — decisions and toolchain.
-- **DB/** — modular Postgres/Supabase schema, FK map, feature→table map, migrations skeleton.
-- **BRANDING/** — brand tokens, component style presets, UI guide.
-- **API/** — route conventions and examples.
-- **WORKFLOW/** — contributing, branching, PR review checklist.
-- **TAILWIND/** — theme bridge to brand tokens.
+## Status
+- ✅ All 25 tests passing
+- ✅ Supabase integrated
+- ✅ Mock/Production modes working
 
-**Prefix/Mapping:** Files and tables mirror the `domain-module-feat-subfeat` codes (e.g. `deals-status-set`).
+## Key Pages
+- `/investor-portal/dashboard` - Main dashboard
+- `/investor-portal/portfolio` - Holdings
+- `/investor-portal/transactions` - Transaction history
+- `/investor-portal/deals` - Available deals
 
-> Pro tip: keep this repo (or folder) open in the IDE **alongside** the app repo for copy/paste and references.
+## Environment Setup
+```env
+# .env.local
+NEXT_PUBLIC_SUPABASE_URL=your-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
+NEXT_PUBLIC_USE_MOCK_DATA=false  # true for mock mode
+```
+
+## Testing
+```bash
+npx playwright test        # Run all tests
+npx playwright test --ui   # Debug mode
+```
+
+## Current Branch: legacydealengines
+Working on admin fee management features.

@@ -22,8 +22,8 @@ export class SupabaseDirectClient {
       config.getSupabaseAnonKey(),
       {
         auth: {
-          persistSession: true,
-          autoRefreshToken: true
+          persistSession: false,
+          autoRefreshToken: false
         },
         db: {
           schema: 'public'
@@ -44,26 +44,10 @@ export class SupabaseDirectClient {
    * Execute raw SQL query
    */
   async executeSQL<T = any>(query: string, params?: any): Promise<T> {
-    try {
-      if (this.config.shouldLogQueries()) {
-        console.log('Executing SQL:', query, params);
-      }
-
-      const { data, error } = await this.client.rpc('execute_sql', {
-        query,
-        params: params || {}
-      });
-
-      if (error) {
-        console.error('SQL execution error:', error);
-        throw error;
-      }
-
-      return data as T;
-    } catch (error) {
-      console.error('Direct SQL execution failed:', error);
-      throw error;
-    }
+    // Note: Direct SQL execution requires a custom RPC function
+    // For now, this is a placeholder that should use views or query builder
+    console.warn('executeSQL is deprecated. Use query builder or views instead.');
+    throw new Error('Direct SQL execution not available. Use query builder or views.');
   }
 
   /**
@@ -175,8 +159,9 @@ export class SupabaseDirectClient {
    */
   async getDealsWithDetails() {
     return this.queryCached('deals_with_details', async () => {
-      const { data, error } = await this.client
-        .from('deals.deal')
+      const { data, error } = await (this.client as any)
+        .schema('deals')
+        .from('deal')
         .select(`
           *,
           company:underlying_company_id (
@@ -188,11 +173,6 @@ export class SupabaseDirectClient {
             valuation_date,
             moic,
             irr
-          ),
-          transactions:transactions.transaction.primary (
-            investor_id,
-            gross_capital,
-            transaction_date
           )
         `)
         .eq('deal_status', 'ACTIVE')
@@ -228,8 +208,9 @@ export class SupabaseDirectClient {
   }
 
   async getTransactionHistory(filters: any = {}) {
-    const query = this.client
-      .from('transactions.transaction.primary')
+    const query = (this.client as any)
+      .schema('transactions')
+      .from('transaction')
       .select(`
         *,
         deal:deal_id (deal_name),

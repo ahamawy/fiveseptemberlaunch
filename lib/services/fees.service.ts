@@ -24,7 +24,7 @@ export class FeesService extends BaseService {
     this.validateRequired(params, ['transaction_id', 'component'], 'applyFeeLine');
     const client = this.direct.getClient();
     const { data, error } = await client
-      .from('fees.fee_application')
+      .from('fee_application_record')
       .insert({
         transaction_id: params.transaction_id,
         deal_id: params.deal_id ?? null,
@@ -44,7 +44,7 @@ export class FeesService extends BaseService {
   async listByTx(transaction_id: number){
     const client = this.direct.getClient();
     const { data, error } = await client
-      .from('fees.fee_application')
+      .from('fee_application_record')
       .select('*')
       .eq('transaction_id', transaction_id)
       .order('id', { ascending: true });

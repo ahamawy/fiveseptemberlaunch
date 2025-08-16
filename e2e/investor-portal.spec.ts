@@ -62,14 +62,17 @@ test.describe('Investor Portal Dashboard', () => {
   test('should display portfolio cards', async ({ page }) => {
     await page.goto('/investor-portal/dashboard');
     
-    // Wait for cards to load
-    await page.waitForSelector('[data-testid="portfolio-card"], .bg-white.shadow', { 
+    // Wait for dashboard to load
+    await page.waitForSelector('text=/Portfolio Value|Total Invested/i', { 
       timeout: 10000 
     });
     
-    // Check for portfolio value text
-    const portfolioCards = await page.$$('.bg-white.shadow');
+    // Check for portfolio cards with glass effect
+    const portfolioCards = await page.$$('[class*="glass"], [class*="backdrop-blur"]');
     expect(portfolioCards.length).toBeGreaterThan(0);
+    
+    // Verify key metrics are visible
+    await expect(page.getByText(/Portfolio Value/i)).toBeVisible();
   });
 
   test('should navigate between portal pages', async ({ page }) => {
@@ -102,10 +105,13 @@ test.describe('Investor Portal Dashboard', () => {
     
     await page.goto('/investor-portal/dashboard');
     
-    // Should show error state
-    await expect(page.getByText(/Error loading dashboard/i)).toBeVisible({ 
+    // Should show error state with the actual error message
+    await expect(page.getByText(/Failed to fetch dashboard: 500/i)).toBeVisible({ 
       timeout: 10000 
     });
+    
+    // Retry button should be visible
+    await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
   });
 
   test('should load portfolio page with data', async ({ page }) => {
@@ -139,12 +145,20 @@ test.describe('Investor Portal Dashboard', () => {
     const apiResponse = await page.waitForResponse('**/api/investors/1/transactions**');
     expect(apiResponse.status()).toBe(200);
     
-    // Test filtering
-    await page.selectOption('select:has-text("All Types")', 'capital_call');
+    // Wait for Transaction History heading to appear (page is loaded)
+    await page.waitForSelector('h1:has-text("Transaction History")', { timeout: 10000 });
+    
+    // Wait for page to render with select elements
+    await page.waitForSelector('select', { timeout: 10000 });
+    
+    // Test filtering - use the first select element (Type filter)
+    const selectElement = page.locator('select').first();
+    await selectElement.selectOption('capital_call');
     
     // Wait for filtered response
     const filteredResponse = await page.waitForResponse(
-      response => response.url().includes('type=capital_call')
+      response => response.url().includes('type=capital_call'),
+      { timeout: 10000 }
     );
     expect(filteredResponse.status()).toBe(200);
   });
@@ -189,13 +203,20 @@ test.describe('Error Handling and Edge Cases', () => {
     await page.route('**/api/**', route => {
       setTimeout(() => {
         route.continue();
-      }, 5000);
+      }, 10000); // 10 second delay
     });
     
-    page.goto('/investor-portal/dashboard');
+    // Navigate without waiting for load
+    const navigationPromise = page.goto('/investor-portal/dashboard', { 
+      waitUntil: 'domcontentloaded' 
+    });
     
-    // Should show loading state
-    await expect(page.getByText(/Loading dashboard/i)).toBeVisible();
+    // Should show loading state while waiting
+    await expect(page.getByText(/Loading|Fetching/i)).toBeVisible({ timeout: 5000 });
+    
+    // Clean up
+    await page.unroute('**/api/**');
+    await navigationPromise;
   });
 
   test('should be responsive on mobile', async ({ page }) => {

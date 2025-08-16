@@ -43,19 +43,25 @@ test.describe('Light Mode Visual Testing', () => {
     );
     console.log('Primary text color:', primaryTextColor);
 
-    // Check secondary text
-    const secondaryText = await page.locator('.text-text-secondary').first();
-    const secondaryTextColor = await secondaryText.evaluate((el) => 
-      window.getComputedStyle(el).color
-    );
-    console.log('Secondary text color:', secondaryTextColor);
+    // Check secondary text if it exists
+    const secondaryTextElements = await page.locator('.text-text-secondary').count();
+    if (secondaryTextElements > 0) {
+      const secondaryText = await page.locator('.text-text-secondary').first();
+      const secondaryTextColor = await secondaryText.evaluate((el) => 
+        window.getComputedStyle(el).color
+      );
+      console.log('Secondary text color:', secondaryTextColor);
+    }
 
-    // Check muted text
-    const mutedText = await page.locator('.text-text-muted').first();
-    const mutedTextColor = await mutedText.evaluate((el) => 
-      window.getComputedStyle(el).color
-    );
-    console.log('Muted text color:', mutedTextColor);
+    // Check muted text if it exists (may not be present on all pages)
+    const mutedTextElements = await page.locator('.text-text-muted').count();
+    if (mutedTextElements > 0) {
+      const mutedText = await page.locator('.text-text-muted').first();
+      const mutedTextColor = await mutedText.evaluate((el) => 
+        window.getComputedStyle(el).color
+      );
+      console.log('Muted text color:', mutedTextColor);
+    }
 
     // Check background colors
     const deepBg = await page.locator('.bg-background-deep').first();

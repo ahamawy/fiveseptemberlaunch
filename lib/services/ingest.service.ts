@@ -1,6 +1,7 @@
 import { extractDealDataWithOpenRouter, type ExtractedDealData } from './openrouter.service';
 import { SupabaseDirectClient } from '@/lib/db/supabase/client';
 import { SchemaConfig } from '@/lib/db/schema-manager/config';
+import { DocumentProcessor, type ProcessedDocument } from './document-processor.service';
 
 export type IngestParseResult = {
   mapping: ExtractedDealData;
@@ -12,6 +13,22 @@ export type IngestParseResult = {
 
 export async function parseDocumentWithAI(docText: string, apiKey?: string): Promise<ExtractedDealData> {
   return await extractDealDataWithOpenRouter({ docText, apiKey });
+}
+
+export async function parseFileWithAI(
+  buffer: Buffer,
+  filename: string,
+  mimeType: string,
+  apiKey?: string
+): Promise<ExtractedDealData> {
+  // Process the document to extract text
+  const processedDoc = await DocumentProcessor.processDocument(buffer, filename, mimeType);
+  
+  // Prepare text for AI with enhanced context
+  const aiText = DocumentProcessor.prepareForAI(processedDoc);
+  
+  // Send to AI for extraction
+  return await extractDealDataWithOpenRouter({ docText: aiText, apiKey });
 }
 
 export function buildLegacyProfileFromMapping(mapping: ExtractedDealData): any {

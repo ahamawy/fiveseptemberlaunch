@@ -110,6 +110,23 @@ const PAGE_ROUTES: PageRoute[] = [
     ]
   },
   {
+    category: 'Admin Tools',
+    pages: [
+      { 
+        name: 'Fee Profiles', 
+        path: '/admin/fees/profiles',
+        icon: Icons.settings,
+        description: 'Manage fee calculation profiles'
+      },
+      { 
+        name: 'Legacy Import', 
+        path: '/admin/fees/import',
+        icon: Icons.document,
+        description: 'Import legacy fee data'
+      },
+    ]
+  },
+  {
     category: 'Development',
     pages: [
       { 

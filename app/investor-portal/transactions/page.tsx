@@ -63,7 +63,46 @@ export default function TransactionsPage() {
       params.append('limit', '10');
 
       const response = await fetch(`/api/investors/1/transactions?${params.toString()}`);
-      const transactionsData = await response.json();
+      const result = await response.json();
+      
+      // Transform the API response to the expected structure
+      const transactionsData: TransactionsData = {
+        transactions: (result.data || []).map((t: any) => ({
+          id: t.id,
+          publicId: t.public_id || t.publicId,
+          dealId: t.deal_id || t.dealId,
+          dealName: t.dealName || null,
+          dealCode: t.dealCode || null,
+          companyName: t.companyName || null,
+          occurredOn: t.processed_at || t.created_at || t.occurredOn,
+          currency: t.currency || 'USD',
+          amount: t.amount || 0,
+          type: t.type,
+          status: t.status,
+          description: t.description || '',
+          reference: t.reference || '',
+          createdAt: t.created_at || t.createdAt
+        })),
+        pagination: {
+          page: currentPage,
+          limit: 10,
+          totalCount: result.data?.length || 0,
+          totalPages: Math.ceil((result.data?.length || 0) / 10),
+          hasNextPage: false,
+          hasPreviousPage: currentPage > 1
+        },
+        summary: {
+          totalCapitalCalls: result.data?.filter((t: any) => t.type === 'capital_call')
+            .reduce((sum: number, t: any) => sum + t.amount, 0) || 0,
+          totalDistributions: result.data?.filter((t: any) => t.type === 'distribution')
+            .reduce((sum: number, t: any) => sum + t.amount, 0) || 0,
+          totalFees: result.data?.filter((t: any) => t.type === 'fee')
+            .reduce((sum: number, t: any) => sum + t.amount, 0) || 0,
+          pendingTransactions: result.data?.filter((t: any) => t.status === 'pending').length || 0,
+          completedTransactions: result.data?.filter((t: any) => t.status === 'completed').length || 0
+        }
+      };
+      
       setData(transactionsData);
     } catch (error) {
       console.error('Error fetching transactions data:', error);
