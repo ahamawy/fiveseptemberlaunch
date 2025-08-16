@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/components/ui/Card';
 import { FileUploadZone } from '@/components/ui/FileUploadZone';
 import { BRAND_CONFIG } from '@/BRANDING/brand.config';
 import { formatCurrency } from '@/lib/theme-utils';
