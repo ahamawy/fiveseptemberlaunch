@@ -16,7 +16,7 @@ interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  timestamp: Date;
+  timestamp: string; // ISO string for deterministic hydration
   attachments?: { name: string; type: string }[];
   extractedData?: any;
 }
@@ -35,7 +35,7 @@ export default function EquitieBotChat() {
 • Process screenshots and PDFs with OCR
 
 Upload a document or ask me anything about fee calculations, investor management, or deal structures!`,
-      timestamp: new Date()
+      timestamp: new Date().toISOString()
     }
   ]);
   const [input, setInput] = useState('');
@@ -59,7 +59,7 @@ Upload a document or ask me anything about fee calculations, investor management
       id: Date.now().toString(),
       role: 'user',
       content: input,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       attachments: attachedFile ? [{ name: attachedFile.name, type: attachedFile.type }] : undefined
     };
 
@@ -85,7 +85,7 @@ Upload a document or ask me anything about fee calculations, investor management
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: data.response || 'I processed your request.',
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         extractedData: data.extractedData
       };
 
@@ -96,7 +96,7 @@ Upload a document or ask me anything about fee calculations, investor management
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please make sure your OpenRouter API key is configured in .env.local',
-        timestamp: new Date()
+        timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -122,6 +122,16 @@ Upload a document or ask me anything about fee calculations, investor management
     a.href = url;
     a.download = 'extracted-data.json';
     a.click();
+  };
+
+  const formatTimestamp = (ts: string) => {
+    const d = new Date(ts);
+    return new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'UTC'
+    }).format(d);
   };
 
   const formatContent = (content: string) => {
@@ -276,8 +286,8 @@ Upload a document or ask me anything about fee calculations, investor management
                   </div>
                   
                   {/* Timestamp */}
-                  <div className="text-xs text-gray-500 mt-1 px-1">
-                    {message.timestamp.toLocaleTimeString()}
+                  <div className="text-xs text-gray-500 mt-1 px-1" suppressHydrationWarning>
+                    {formatTimestamp(message.timestamp)}
                   </div>
                 </div>
               </div>
