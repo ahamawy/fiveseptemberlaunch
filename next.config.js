@@ -8,9 +8,10 @@ const nextConfig = {
     pagesBufferLength: 2,
   },
   // Add custom webpack config for better error messages
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config, { dev }) => {
     if (dev) {
-      config.devtool = 'source-map';
+      // Match Next.js default to avoid warnings
+      config.devtool = 'eval-source-map';
     }
     return config;
   },
@@ -20,10 +21,7 @@ const nextConfig = {
       fullUrl: true,
     },
   },
-  experimental: {
-    // Enable better error overlay
-    appDir: true,
-  },
+  // Remove deprecated experimental flags to avoid warnings
 }
 
 module.exports = nextConfig
