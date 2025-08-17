@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import { systemContext } from './system-context.service';
+import { knowledgeBase } from './knowledge-base.service';
 
 // Initialize Supabase client
 function getSupabaseClient() {
@@ -29,7 +31,150 @@ export function parseCSV(content: string): any[] {
   return data;
 }
 
-// Analyze CSV data and determine what it contains
+// Analyze CSV data using GPT-5 to understand what it contains
+export async function analyzeCSVDataWithAI(data: any[]): Promise<{
+  type: 'investors' | 'fees' | 'transactions' | 'allocations' | 'portfolio' | 'unknown';
+  columns: string[];
+  rowCount: number;
+  summary: string;
+  suggestions: string[];
+  interpretation?: string;
+}> {
+  if (!data || data.length === 0) {
+    return {
+      type: 'unknown',
+      columns: [],
+      rowCount: 0,
+      summary: 'No data found',
+      suggestions: []
+    };
+  }
+
+  const columns = Object.keys(data[0]);
+  const sampleData = data.slice(0, 3);
+  
+  // Use GPT-5 to understand the data with full system context
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const model = process.env.OPENROUTER_MODEL || 'openrouter/auto';
+  
+  // Get system context for intelligent analysis
+  const csvContext = systemContext.getCSVAnalysisContext(columns);
+  const mappingAnalysis = systemContext.analyzeCSVMapping(columns, 'investors');
+  
+  // Search knowledge base for relevant context
+  const kbSearch = await knowledgeBase.ragSearch({
+    query: `CSV import ${columns.slice(0, 3).join(' ')}`,
+    strategy: 'hybrid',
+    limit: 3
+  });
+  
+  if (apiKey) {
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [{
+            role: 'system',
+            content: csvContext
+          }, {
+            role: 'user',
+            content: `Analyze this CSV data for the EQUITIE platform:
+
+CSV COLUMNS: ${columns.join(', ')}
+
+SAMPLE DATA (first 3 rows):
+${JSON.stringify(sampleData, null, 2)}
+
+INITIAL MAPPING ANALYSIS:
+- Mapped columns: ${JSON.stringify(mappingAnalysis.mappings, null, 2)}
+- Unmapped columns: ${mappingAnalysis.unmapped.join(', ')}
+- Missing required fields: ${mappingAnalysis.missingRequired.join(', ')}
+
+KNOWLEDGE BASE CONTEXT:
+${kbSearch.context}
+
+RELEVANT SUGGESTIONS:
+${kbSearch.suggestions.join('\n')}
+
+Provide a comprehensive analysis with:
+1. Exact data type (investors, deals, transactions, fees, portfolio)
+2. Column mappings to Supabase schema
+3. Data validation issues
+4. SQL import statements
+5. Business insights
+
+Respond with JSON:
+{
+  "type": "investors|deals|transactions|fees|portfolio|unknown",
+  "interpretation": "detailed analysis of the data",
+  "columnMappings": {"csv_column": "db_table.db_column"},
+  "dataQuality": {
+    "issues": ["list of issues"],
+    "validationErrors": ["validation problems"],
+    "duplicates": 0
+  },
+  "importSQL": "INSERT INTO ... statement",
+  "businessInsights": ["key insights from the data"],
+  "suggestions": ["actionable next steps"],
+  "metrics": {
+    "totalRecords": 0,
+    "totalValue": 0,
+    "averageValue": 0
+  }
+}`
+          }],
+          temperature: 0.1,
+          max_tokens: 2000,
+          response_format: { type: 'json_object' }
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const analysis = JSON.parse(result?.choices?.[0]?.message?.content || '{}');
+        
+        // Calculate metrics if not provided by AI
+        let totalValue = 0;
+        if (analysis.type === 'investors' && data.length > 0) {
+          totalValue = data.reduce((sum, row) => {
+            const commitment = parseFloat(row['Commitment'] || row['commitment_amount'] || '0');
+            return sum + (isNaN(commitment) ? 0 : commitment);
+          }, 0);
+        }
+        
+        return {
+          type: analysis.type || 'unknown',
+          columns,
+          rowCount: data.length,
+          summary: analysis.interpretation || `Data with ${data.length} records`,
+          suggestions: analysis.suggestions || ['Import to Supabase', 'Analyze further'],
+          interpretation: analysis.interpretation,
+          columnMappings: analysis.columnMappings,
+          dataQuality: analysis.dataQuality,
+          importSQL: analysis.importSQL,
+          businessInsights: analysis.businessInsights,
+          metrics: analysis.metrics || {
+            totalRecords: data.length,
+            totalValue: totalValue,
+            averageValue: totalValue / data.length
+          }
+        };
+      }
+    } catch (error) {
+      console.error('GPT-5 analysis failed:', error);
+    }
+  }
+  
+  // Fallback to basic analysis if GPT-5 fails
+  return analyzeCSVData(data);
+}
+
+// Original pattern-based analysis (kept as fallback)
 export function analyzeCSVData(data: any[]): {
   type: 'investors' | 'fees' | 'transactions' | 'unknown';
   columns: string[];
@@ -125,7 +270,7 @@ export class EquitieAIAgent {
     try {
       // Parse CSV
       const parsedData = parseCSV(content);
-      const analysis = analyzeCSVData(parsedData);
+      const analysis = await analyzeCSVDataWithAI(parsedData);
       
       if (analysis.type === 'unknown') {
         return {

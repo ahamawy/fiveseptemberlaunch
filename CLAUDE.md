@@ -1,7 +1,7 @@
 # Claude Code Project Context
 
 ## Project Overview
-Equitie multi-platform investment portal with comprehensive branding system, Flutter mobile app, and Next.js web dashboard.
+Equitie multi-platform investment portal with comprehensive branding system, Flutter mobile app, Next.js web dashboard, and ARCHON Fee Engine for complex fee calculations.
 
 ## Tech Stack
 
@@ -326,6 +326,76 @@ Current feature: **15.1.1 investor-portal-dashboard** (Investor App > Portal > D
 - `GET /api/transactions` - All transactions
 - `GET /api/documents` - All documents
 
+## ARCHON Fee Engine
+
+### Overview
+The ARCHON Fee Engine is a deterministic, order-dependent system for calculating investor transfer amounts through precise fee applications.
+
+### Core Components
+
+#### Enhanced Fee Calculator (`lib/services/fee-engine/enhanced-calculator.ts`)
+- Precedence-based fee ordering
+- Basis calculations (GROSS, NET, NET_AFTER_PREMIUM)
+- Discount handling as negative amounts
+- Annual fee multipliers with audit notes
+- Full invariant validation
+
+#### Enhanced Fee Service (`lib/services/fee-engine/enhanced-service.ts`)
+- CSV import with preview
+- Fee schedule management
+- Partner fee exclusion
+- Comprehensive reporting
+- Batch processing
+
+### Fee Calculation Rules
+
+1. **Precedence Order**: Fees are applied in strict precedence order (lower = earlier)
+2. **PREMIUM First**: Premium fee always has precedence = 1
+3. **Basis Types**:
+   - `GROSS`: Original investment amount
+   - `NET`: Gross minus premium
+   - `NET_AFTER_PREMIUM`: Net amount for subsequent calculations
+4. **Discounts**: Stored as negative amounts in fee_application table
+5. **Partner Fees**: Excluded from investor analytics (prefixed with `PARTNER_`)
+
+### Usage Examples
+
+#### Calculate Fees
+```typescript
+import { enhancedFeeService } from '@/lib/services/fee-engine/enhanced-service';
+
+// Preview fee calculation
+const calculation = await enhancedFeeService.previewFees(
+  dealId,
+  grossCapital,
+  unitPrice,
+  {
+    discounts: [
+      { component: 'STRUCTURING_DISCOUNT', percent: 0.5 },
+      { component: 'ADMIN_DISCOUNT', percent: 1.0 }
+    ],
+    annualFees: [
+      { component: 'MANAGEMENT', years: 3 }
+    ]
+  }
+);
+
+// Apply to transaction
+await enhancedFeeService.applyTransactionFees(transactionId, calculation);
+```
+
+#### Chat Interface Commands
+- `"Calculate fees for deal 1 with $1M investment"`
+- `"Show fee schedule for deal 1"`
+- `"Validate fee configuration"`
+- `"Apply 50% structuring discount"`
+- `"Generate fee report"`
+
+### Documentation
+- **Context Document**: `ARCHON_FEE_ENGINE_CONTEXT.md` - Complete reasoning framework
+- **Tests**: `lib/services/fee-engine/__tests__/` - Comprehensive test suite
+- **Legacy Docs**: `LEGACY_DEAL_ENGINE_DOCS.md` - Historical reference
+
 ## Service Usage Examples
 
 ### In React Components
@@ -609,14 +679,36 @@ npx playwright test investor-portal.spec.ts:141
 
 ## Recent Updates (2025-08-16)
 
+### ✅ ARCHON Fee Engine Integration
+1. **Enhanced Fee Calculator**
+   - Precedence-based fee ordering (PREMIUM always first)
+   - Basis calculations (GROSS, NET, NET_AFTER_PREMIUM)
+   - Discounts stored as negative amounts
+   - Annual fee handling with audit notes
+   - Full invariant validation
+
+2. **EQUITIE Bot Integration**
+   - Unified chat interface for media ingestion and fee calculations
+   - CSV/PDF processing with automatic fee detection
+   - Real-time fee calculation preview
+   - Direct Supabase operations
+   - GPT-5 reasoning with fee context
+
+3. **Fee Service Features**
+   - Import from CSV with validation
+   - Fee schedule management with versions
+   - Partner fee exclusion from investor analytics
+   - Comprehensive reporting and audit trails
+   - Batch processing capabilities
+
 ### ✅ Fixed Critical UI Issues
 1. **Card Component Recursion Fix**
-   - Fixed infinite recursion in Card.tsx (was self-importing)
+   - Fixed infinite recursion in Card.tsx
    - Added missing CardDescription export
    - All pages now render correctly
 
 2. **Admin Features Working**
-   - EQUITIE Bot chat interface operational
+   - EQUITIE Bot chat interface with ARCHON Fee Engine
    - Fee profiles management UI functional
    - Legacy import system ready
    - OpenRouter API integration configured
@@ -631,11 +723,14 @@ npx playwright test investor-portal.spec.ts:141
 - OpenRouter API key configured in .env.local
 - Supabase connection active and verified
 - Development server stable on port 3000
+- ARCHON Fee Engine fully integrated
 
 ### Known Working Features
-- Document upload and AI processing
-- Fee profile extraction from PDFs
-- Investor data parsing from Excel/CSV
+- Document upload and AI processing with fee extraction
+- Fee profile extraction from PDFs and CSVs
+- Investor data parsing with fee calculations
 - Real-time Supabase data access
 - Theme switching (dark/light modes)
 - Color scheme selection
+- Fee calculation with precedence and basis rules
+- Discount handling as negative amounts

@@ -119,6 +119,12 @@ const PAGE_ROUTES: PageRoute[] = [
         description: 'AI assistant for document analysis'
       },
       { 
+        name: 'EQUITIE Fee Engine', 
+        path: '/admin/equitie-fee-engine',
+        icon: Icons.dollar,
+        description: 'Advanced fee calculation system'
+      },
+      { 
         name: 'Fee Profiles', 
         path: '/admin/fees/profiles',
         icon: Icons.settings,

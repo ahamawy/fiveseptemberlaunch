@@ -1,0 +1,108 @@
+# Cursor IDE Rules for EQUITIE Platform
+
+## Project Context
+You are working on the EQUITIE investment platform with integrated ARCHON Fee Engine. This is a Next.js 14 application with TypeScript, Tailwind CSS, and Supabase backend.
+
+## Key Components
+
+### ARCHON Fee Engine
+- **Location**: `lib/services/fee-engine/`
+- **Purpose**: Calculate complex investment fees with precedence ordering
+- **Key Files**:
+  - `enhanced-calculator.ts` - Core calculation logic
+  - `enhanced-service.ts` - Service orchestration
+  - `ARCHON_FEE_ENGINE_CONTEXT.md` - Complete documentation
+
+### EQUITIE Bot Chat Interface
+- **Location**: `app/api/admin/chat/route.ts`
+- **Purpose**: AI-powered chat with media ingestion and fee calculations
+- **Capabilities**:
+  - CSV/PDF processing
+  - Fee calculations with validation
+  - Supabase operations
+  - GPT-5 reasoning
+
+### Database Schema
+- **Fee Tables**: `fees.fee_schedule`, `fees.fee_application`, `fees.schedule_version`
+- **Key Rules**:
+  - Discounts stored as NEGATIVE amounts
+  - PREMIUM always has precedence = 1
+  - Basis types: GROSS, NET, NET_AFTER_PREMIUM
+  - Partner fees prefixed with `PARTNER_`
+
+## Coding Standards
+
+### TypeScript
+- Use strict typing, avoid `any`
+- Prefer interfaces over types for objects
+- Use enums for fixed sets of values
+
+### React/Next.js
+- Use functional components with hooks
+- Implement proper error boundaries
+- Use Next.js App Router patterns
+
+### Styling
+- Use Tailwind classes from brand tokens
+- Import from `/BRANDING/` for consistency
+- NO EMOJIS in production code (professional finance platform)
+- Use SVG icons from Heroicons or Lucide React
+
+### Fee Calculations
+- ALWAYS respect precedence ordering
+- Validate all invariants
+- Round money to 2 decimal places
+- Units are always integers (floor division)
+- Include audit trail in notes field
+
+## Import Patterns
+```typescript
+// Brand tokens
+import { BRAND_CONFIG } from '@/branding/brand.config';
+
+// Fee engine
+import { enhancedFeeService } from '@/lib/services/fee-engine/enhanced-service';
+
+// Services
+import { dealsService } from '@/lib/services';
+
+// Supabase
+import { SupabaseDirectClient } from '@/lib/db/supabase/client';
+```
+
+## Common Commands
+```bash
+# Development
+npm run dev
+
+# Testing
+npx playwright test
+npm run test:fees
+
+# Type checking
+npm run typecheck
+
+# Linting
+npm run lint
+```
+
+## Documentation References
+- Main docs: `CLAUDE.md`
+- Fee engine: `ARCHON_FEE_ENGINE_CONTEXT.md`
+- Legacy fees: `LEGACY_DEAL_ENGINE_DOCS.md`
+- Brand guidelines: `BRANDING_SYSTEM_DOCUMENTATION.md`
+
+## Critical Reminders
+1. **No Schema Changes** - Work within existing database tables
+2. **Discounts are Negative** - Always store as negative amounts
+3. **Precedence Matters** - Apply fees in order
+4. **Audit Everything** - Use notes field for calculations
+5. **Test Invariants** - Validate all calculations
+
+## AI Assistant Behavior
+When assisting with this codebase:
+1. Always check existing patterns before creating new ones
+2. Use the fee engine for all fee calculations
+3. Reference brand tokens for styling
+4. Validate data before database operations
+5. Include proper error handling and logging

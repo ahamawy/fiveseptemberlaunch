@@ -1,6 +1,6 @@
-# EquiTie Bot Context (Backend Reasoning Guide)
+# EQUITIE Bot Context (Backend Reasoning Guide with ARCHON Fee Engine)
 
-This document gives the AI agent a concise, authoritative overview of our data model, conventions, and flows so it can parse partner docs and produce valid, modular updates for Supabase.
+This document provides the AI agent with comprehensive context about our data model, conventions, flows, and the integrated ARCHON Fee Engine for intelligent data processing and fee calculations.
 
 ## Conventions
 
@@ -40,14 +40,49 @@ This document gives the AI agent a concise, authoritative overview of our data m
 - Use `eng.units_ledger` + `analytics.v_unit_prices` for AUM and MOIC
 - Normalize legacy rows to 1,000 USD unit price unless explicitly documented otherwise
 
+## ARCHON Fee Engine Integration
+
+### Enhanced Calculator (`lib/services/fee-engine/enhanced-calculator.ts`)
+- **Precedence Ordering**: Fees applied in strict order (PREMIUM always first)
+- **Basis Calculations**: GROSS, NET, NET_AFTER_PREMIUM
+- **Discounts**: Stored as NEGATIVE amounts in fee_application
+- **Validation**: Full invariant checking and reconciliation
+- **Annual Fees**: Multiplier with audit notes
+
+### Enhanced Service (`lib/services/fee-engine/enhanced-service.ts`)
+- **CSV Import**: Parse and preview with validation
+- **Schedule Management**: Version control for fee configurations
+- **Partner Fees**: Excluded from investor analytics (PARTNER_ prefix)
+- **Batch Processing**: Efficient multi-transaction calculations
+- **Reporting**: Comprehensive fee reports with audit trails
+
+### Chat Interface (`/admin/chat`)
+The EQUITIE Bot integrates media ingestion with fee calculations:
+- **File Processing**: CSV, PDF (LPAs, fee schedules)
+- **Commands**: 
+  - "Calculate fees for deal X with $Y"
+  - "Show fee schedule for deal X"
+  - "Validate fee configuration"
+  - "Apply fees" (saves to database)
+  - "Generate fee report"
+- **AI Reasoning**: GPT-5 powered analysis with fee context
+
 ## Admin APIs
 
+### Original Endpoints
 - POST `/api/admin/fees/profiles`: create/activate profiles
 - GET `/api/admin/fees/profiles`: list from `analytics.v_fee_profiles`
 - POST `/api/admin/fees/import`: CSV → `fees.legacy_import`
 - GET `/api/admin/fees/import`: preview view
 - POST `/api/admin/fees/apply`: apply staged rows
 - POST `/api/admin/ingest/parse`: AI parse doc → mapping + profile suggestion
+
+### Enhanced Chat Endpoint
+- POST `/api/admin/chat`: Unified interface for all operations
+  - Accepts FormData with message and file
+  - Auto-detects fee data vs investor data
+  - Returns structured responses with actions
+  - Maintains context for multi-step operations
 - POST `/api/admin/ingest/apply`: stage rows (optionally create profile)
 
 ## Parsing Guidance
