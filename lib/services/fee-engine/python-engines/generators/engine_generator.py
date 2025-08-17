@@ -10,8 +10,8 @@ from datetime import datetime
 from pathlib import Path
 import textwrap
 
-from .complexity_analyzer import DealComplexityAnalyzer, ComplexityLevel
-from ..base.types import DealConfiguration, DealType, FeeComponentType
+from generators.complexity_analyzer import DealComplexityAnalyzer, ComplexityLevel
+from base.types import DealConfiguration, DealType, FeeComponentType
 
 
 class DealEngineGenerator:

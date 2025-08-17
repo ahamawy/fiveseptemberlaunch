@@ -186,8 +186,8 @@ import os
 import json
 from decimal import Decimal
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'python-engines'))
+# Add current directory to path for imports
+sys.path.insert(0, os.path.dirname(__file__))
 
 from generators.complexity_analyzer import DealComplexityAnalyzer, ComplexityLevel
 from base.types import DealConfiguration, DealType, FeeSchedule, FeeComponent, FeeComponentType, FeeBasis
@@ -271,8 +271,8 @@ import os
 import json
 from decimal import Decimal
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'python-engines'))
+# Add current directory to path for imports
+sys.path.insert(0, os.path.dirname(__file__))
 
 from generators.engine_generator import DealEngineGenerator
 from base.types import DealConfiguration, DealType, FeeSchedule, FeeComponent, FeeComponentType, FeeBasis

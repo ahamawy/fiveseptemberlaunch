@@ -8,7 +8,7 @@ from decimal import Decimal
 from enum import Enum
 import json
 
-from ..base.types import (
+from base.types import (
     DealConfiguration, DealType, FeeComponentType, FeeBasis
 )
 
