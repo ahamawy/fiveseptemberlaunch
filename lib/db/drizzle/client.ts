@@ -1,20 +1,19 @@
-import { createClient } from '@supabase/supabase-js';
-import { drizzle } from 'drizzle-orm/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
 
 /**
- * Drizzle + Supabase client
- * Uses RLS-aware supabase-js client under the hood.
+ * Server-side Drizzle client using a direct Postgres connection.
+ * Note: bypasses RLS. Use ONLY for admin scripts, CLI tools or server jobs.
+ * Runtime app code should continue using supabase-js & RLS.
  */
-export function createDrizzleClient() {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Supabase env vars missing (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)');
+export function createDrizzleDirectClient() {
+  const connectionString = process.env.SUPABASE_DB_URL;
+  if (!connectionString) {
+    throw new Error('SUPABASE_DB_URL missing');
   }
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
-  const db = drizzle(supabase);
-  return { db, supabase };
+  const pool = new Pool({ connectionString, max: 4 });
+  const db = drizzle(pool);
+  return { db, pool };
 }
 
 
