@@ -1,4 +1,5 @@
 import type { RequestInit } from 'node-fetch';
+import { ContextAggregator } from './context-aggregator.service';
 
 export type ExtractedDealData = {
   deal?: {
@@ -31,14 +32,14 @@ export type ExtractedDealData = {
 
 const DEFAULT_MODEL = process.env.OPENROUTER_MODEL || 'openrouter/auto';
 
-function buildPrompt(docText: string): string {
+async function buildPrompt(docText: string): Promise<string> {
+  const fullContext = await ContextAggregator.loadFullContext();
   return [
-    'You are EQUITIE BACKEND BOT. Extract structured deal and fee data from the document below.',
-    'Output strictly as minified JSON, no prose. Schema:',
-    '{"deal":{"deal_id":number?,"name":string?,"unit_price_usd":number?,"valuation":{"pre_money_purchase":number?,"pre_money_sell":number?},"premium_percent":number?,"premium_formula":string?},',
-    ' "partner":{"management_fee_percent":number?,"admin_fee_amount":number?,"subscription_fee_percent":number?,"performance_fee_percent":number?},',
-    ' "profile":object?,',
-    ' "investor_fee_lines":[{"investor_name":string?,"investor_id":number?,"gross_capital_usd":number,"discount_structuring_pct":number?,"discount_management_pct":number?,"discount_admin_pct":number?}]}',
+    'You are EQUITIE BACKEND BOT with complete schema and fee engine context. Extract structured data.',
+    'Output strictly as minified JSON matching ExtractedDealData. Use discounts as negative fee lines.',
+    'CONTEXT START',
+    fullContext,
+    'CONTEXT END',
     'Document:\n',
     docText
   ].join('\n');
@@ -65,12 +66,13 @@ export async function extractDealDataWithOpenRouter(params: {
     context = await res.readFile(ctxPath, 'utf8');
   } catch {}
 
+  const prompt = await buildPrompt(docText);
   const body = {
     model: model || DEFAULT_MODEL,
     messages: [
       { role: 'system', content: 'You are a precise extraction engine that outputs only JSON.' },
       context ? { role: 'system', content: `PROJECT CONTEXT:\n${context}` } : undefined,
-      { role: 'user', content: buildPrompt(docText) }
+      { role: 'user', content: prompt }
     ],
     temperature: 0,
     top_p: 0.1,

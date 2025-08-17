@@ -1,3 +1,39 @@
+import { ColumnMapper } from './column-mapper.service';
+import { extractDealDataWithOpenRouter } from './openrouter.service';
+
+function parseCSV(content: string): { columns: string[]; rows: string[][] } {
+  const lines = content.split(/\r?\n/).filter(Boolean);
+  if (lines.length === 0) return { columns: [], rows: [] };
+  const columns = lines[0].split(',').map(s => s.trim());
+  const rows = lines.slice(1).map(l => l.split(',').map(s => s.trim()));
+  return { columns, rows };
+}
+
+export class AIAgentService {
+  static async processCSVWithSchema(content: string, filename: string) {
+    const { columns, rows } = parseCSV(content);
+    const sample = rows.slice(0, 10).map(r => r.join(',')).join('\n');
+    const docText = `CSV FILE: ${filename}\nHEADERS: ${columns.join(', ')}\nSAMPLE:\n${sample}`;
+
+    try {
+      const mapping = await extractDealDataWithOpenRouter({ docText });
+      if ((mapping as any)?.investor_fee_lines || (mapping as any)?.deal) {
+        return { success: true, data: mapping, columns };
+      }
+    } catch {}
+
+    // Fallback – suggest mappings
+    const suggested = ColumnMapper.mapCSVToSchema(columns, 'investors');
+    return {
+      success: false,
+      message: 'CSV Analysis Results',
+      detectedColumns: columns,
+      suggestedMappings: suggested,
+      data: { rows: rows.slice(0, 20) }
+    };
+  }
+}
+
 import { createClient } from '@supabase/supabase-js';
 import { systemContext } from './system-context.service';
 import { knowledgeBase } from './knowledge-base.service';
