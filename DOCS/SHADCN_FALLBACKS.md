@@ -5,8 +5,8 @@ If shadcn primitives are not installed yet, use the components in `UI_FALLBACKS`
 
 When shadcn is available, replace imports with:
 ```tsx
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 ```
 
 Keep Tailwind aliases consistent (e.g., `equitie-purple` -> brand config).

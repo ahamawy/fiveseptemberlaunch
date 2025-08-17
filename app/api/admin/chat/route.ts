@@ -7,9 +7,19 @@ const agent = new EquitieAIAgent();
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
-    const message = formData.get('message') as string || '';
-    const file = formData.get('file') as File | null;
+    const contentType = req.headers.get('content-type') || '';
+    let message = '';
+    let file: File | null = null;
+
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await req.formData();
+      message = (formData.get('message') as string) || '';
+      file = (formData.get('file') as File) || null;
+    } else {
+      const body = await req.json().catch(() => null);
+      message = body?.message || body?.text || '';
+      file = null;
+    }
     
     let response = '';
     let extractedData = null;

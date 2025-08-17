@@ -2,18 +2,18 @@
 
 import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Calculator, 
-  Upload, 
-  FileText, 
-  CheckCircle, 
+import {
+  Calculator,
+  Upload,
+  FileText,
+  CheckCircle,
   AlertCircle,
   TrendingUp,
   DollarSign,
@@ -41,12 +41,12 @@ export default function EquitieFeeEnginePage() {
     try {
       const formData = new FormData();
       formData.append('message', `Calculate fees for deal ${dealId} with $${grossCapital} investment`);
-      
+
       const response = await fetch('/api/admin/chat', {
         method: 'POST',
         body: formData
       });
-      
+
       const data = await response.json();
       if (data.extractedData) {
         setCalculationResult(data.extractedData);
@@ -66,17 +66,17 @@ export default function EquitieFeeEnginePage() {
     reader.onload = async (e) => {
       const content = e.target?.result as string;
       setCsvContent(content);
-      
+
       // Process through chat API
       const formData = new FormData();
       formData.append('file', file);
       formData.append('message', 'Process this fee data');
-      
+
       const response = await fetch('/api/admin/chat', {
         method: 'POST',
         body: formData
       });
-      
+
       const data = await response.json();
       if (data.extractedData) {
         setImportResult(data.extractedData);
@@ -88,12 +88,12 @@ export default function EquitieFeeEnginePage() {
   const validateSchedule = async () => {
     const formData = new FormData();
     formData.append('message', `Validate schedule for deal ${dealId}`);
-    
+
     const response = await fetch('/api/admin/chat', {
       method: 'POST',
       body: formData
     });
-    
+
     const data = await response.json();
     setValidationResult(data);
   };
@@ -184,7 +184,7 @@ export default function EquitieFeeEnginePage() {
                       className="bg-background-deep/50 border-white/10"
                     />
                   </div>
-                  <Button 
+                  <Button
                     onClick={calculateFees}
                     disabled={isCalculating}
                     className="w-full bg-gradient-to-r from-primary-purple to-primary-blue hover:opacity-90"
@@ -222,7 +222,7 @@ export default function EquitieFeeEnginePage() {
                           </div>
                         ))}
                       </div>
-                      
+
                       <div className="pt-4 border-t border-white/10 space-y-2">
                         <div className="flex justify-between">
                           <span className="text-sm text-text-muted">Transfer Pre-Discount</span>
@@ -277,7 +277,7 @@ export default function EquitieFeeEnginePage() {
                     className="bg-background-deep/50 border-white/10"
                   />
                 </div>
-                
+
                 {csvContent && (
                   <div>
                     <Label htmlFor="preview">CSV Preview</Label>
@@ -330,7 +330,7 @@ export default function EquitieFeeEnginePage() {
                     placeholder="Deal ID"
                     className="bg-background-deep/50 border-white/10"
                   />
-                  <Button 
+                  <Button
                     onClick={validateSchedule}
                     className="bg-gradient-to-r from-primary-purple to-primary-blue"
                   >
@@ -341,8 +341,8 @@ export default function EquitieFeeEnginePage() {
                 {validationResult && (
                   <div className="space-y-4">
                     {validationResult.response && (
-                      <Alert className={validationResult.response.includes('valid') ? 
-                        "bg-success-dark/20 border-success-light/50" : 
+                      <Alert className={validationResult.response.includes('valid') ?
+                        "bg-success-dark/20 border-success-light/50" :
                         "bg-error-dark/20 border-error-light/50"
                       }>
                         <AlertCircle className="w-4 h-4" />
