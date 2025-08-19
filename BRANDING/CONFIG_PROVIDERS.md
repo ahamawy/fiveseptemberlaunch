@@ -21,7 +21,7 @@ Modular design tokens that define the visual language of the platform.
 
 **Usage:**
 ```typescript
-import { colors, typography, spacing } from '@/branding/tokens';
+import { colors, typography, spacing } from '@/BRANDING/tokens';
 ```
 
 ### 2. Tailwind Configuration (`tailwind.config.js`)

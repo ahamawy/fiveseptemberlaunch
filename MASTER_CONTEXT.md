@@ -3,11 +3,12 @@
 ## Database Schema
 
 ### Core Tables
+
 ```sql
 -- Investors
 investors.investor (investor_id, full_name, primary_email, investor_type, kyc_status)
 
--- Deals  
+-- Deals
 deals.deal (deal_id, deal_name, deal_type, deal_status, underlying_company_id)
 
 -- Companies
@@ -18,16 +19,17 @@ transactions.transaction.primary (transaction_id, investor_id, deal_id, amount_u
 ```
 
 ### Fee Tables
+
 ```sql
 -- Fee Schedule
 fees.fee_schedule (
-  schedule_id, deal_id, component, rate, is_percent, 
+  schedule_id, deal_id, component, rate, is_percent,
   basis [GROSS|NET|NET_AFTER_PREMIUM], precedence, effective_at
 )
 
 -- Applied Fees
 fees.fee_application (
-  id, transaction_id, deal_id, component, amount [negative for discounts], 
+  id, transaction_id, deal_id, component, amount [negative for discounts],
   percent, applied, notes
 )
 
@@ -36,6 +38,7 @@ fees.calculator_profile (profile_id, profile_name, config_json)
 ```
 
 ### Analytics Views
+
 ```sql
 analytics.v_deals           -- Deal summaries with metrics
 analytics.v_investors        -- Investor profiles with KYC
@@ -47,6 +50,7 @@ analytics.v_fee_profiles     -- Fee configurations
 ## ARCHON Fee Engine
 
 ### Precedence Algorithm
+
 ```typescript
 // 1. PREMIUM always first (precedence = 1)
 // 2. Apply fees in precedence order
@@ -55,58 +59,61 @@ analytics.v_fee_profiles     -- Fee configurations
 function calculateFees(schedule: FeeSchedule[], gross: number) {
   let net = gross;
   let premium = 0;
-  
+
   // Sort by precedence
   schedule.sort((a, b) => a.precedence - b.precedence);
-  
+
   for (const fee of schedule) {
-    const basis = fee.basis === 'GROSS' ? gross : 
-                  fee.basis === 'NET' ? net : 
-                  net - premium;
-    
-    const amount = fee.is_percent ? basis * fee.rate / 100 : fee.rate;
-    
-    if (fee.component === 'PREMIUM') {
+    const basis =
+      fee.basis === "GROSS" ? gross : fee.basis === "NET" ? net : net - premium;
+
+    const amount = fee.is_percent ? (basis * fee.rate) / 100 : fee.rate;
+
+    if (fee.component === "PREMIUM") {
       premium = amount;
     }
-    
+
     net -= amount;
   }
-  
+
   return { gross, net, premium, transfer: net };
 }
 ```
 
 ### Discount Handling
+
 ```typescript
 // Discounts stored as NEGATIVE amounts
 const discounts = [
-  { component: 'STRUCTURING_DISCOUNT', amount: -500 },  // $500 discount
-  { component: 'ADMIN_DISCOUNT', amount: -100 }         // $100 discount
+  { component: "STRUCTURING_DISCOUNT", amount: -500 }, // $500 discount
+  { component: "ADMIN_DISCOUNT", amount: -100 }, // $100 discount
 ];
 ```
 
 ### Partner Fees
+
 ```typescript
 // Partner fees prefixed with PARTNER_ are excluded from investor analytics
-const partnerFees = ['PARTNER_CARRY', 'PARTNER_PROMOTE', 'PARTNER_SETUP'];
+const partnerFees = ["PARTNER_CARRY", "PARTNER_PROMOTE", "PARTNER_SETUP"];
 ```
 
 ## Service Layer
 
 ### DealsService
-```typescript
-import { dealsService } from '@/lib/services';
 
-await dealsService.getDeals({ stage: 'active' });
+```typescript
+import { dealsService } from "@/lib/services";
+
+await dealsService.getDeals({ stage: "active" });
 await dealsService.getDealById(dealId);
 await dealsService.getDealMetrics(dealId);
 await dealsService.getActiveDeals();
 ```
 
 ### InvestorsService
+
 ```typescript
-import { investorsService } from '@/lib/services';
+import { investorsService } from "@/lib/services";
 
 await investorsService.getDashboardData(investorId);
 await investorsService.getPortfolioData(investorId);
@@ -115,13 +122,16 @@ await investorsService.getCommitments(investorId);
 ```
 
 ### FeeService
+
 ```typescript
-import { enhancedFeeService } from '@/lib/services/fee-engine/enhanced-service';
+import { enhancedFeeService } from "@/lib/services/fee-engine/enhanced-service";
 
 // Preview calculation
 const calc = await enhancedFeeService.previewFees(
-  dealId, grossCapital, unitPrice, 
-  { discounts: [{ component: 'STRUCTURING_DISCOUNT', percent: 0.5 }] }
+  dealId,
+  grossCapital,
+  unitPrice,
+  { discounts: [{ component: "STRUCTURING_DISCOUNT", percent: 0.5 }] }
 );
 
 // Apply to transaction
@@ -134,6 +144,7 @@ await enhancedFeeService.importFeeSchedule(csvData);
 ## API Endpoints
 
 ### Public APIs
+
 ```
 GET  /api/deals                               # List deals
 GET  /api/deals/[dealId]                     # Single deal
@@ -145,6 +156,7 @@ GET  /api/documents                          # Documents list
 ```
 
 ### Admin APIs
+
 ```
 POST /api/admin/chat                         # AI chat interface
 POST /api/admin/fees/apply                   # Apply fees
@@ -157,6 +169,7 @@ POST /api/admin/ingest/parse                 # Parse with AI
 ## CSV Import Formats
 
 ### Investor List
+
 ```csv
 Investor Name,Email,Gross Capital,Structuring Discount %,Management Discount %
 John Doe,john@example.com,100000,50,0
@@ -164,6 +177,7 @@ Jane Smith,jane@example.com,75000,0,100
 ```
 
 ### Fee Schedule
+
 ```csv
 Component,Rate,Basis,Precedence
 PREMIUM,3.77358,GROSS,1
@@ -173,6 +187,7 @@ ADMIN,450,FIXED,4
 ```
 
 ### Transactions
+
 ```csv
 Transaction ID,Investor,Deal,Amount,Date,Type
 1,John Doe,GRQAI,100000,2025-07-01,commitment
@@ -182,6 +197,7 @@ Transaction ID,Investor,Deal,Amount,Date,Type
 ## Chat Commands
 
 ### Fee Calculations
+
 ```
 "Calculate fees for deal 1 with $1M investment"
 "Apply 50% structuring discount"
@@ -191,6 +207,7 @@ Transaction ID,Investor,Deal,Amount,Date,Type
 ```
 
 ### Data Import
+
 ```
 "Import investor CSV" → Upload file
 "Parse this document" → Upload PDF/Excel
@@ -199,6 +216,7 @@ Transaction ID,Investor,Deal,Amount,Date,Type
 ```
 
 ### Database Operations
+
 ```
 "Create fee profile for deal X"
 "List all active deals"
@@ -209,6 +227,7 @@ Transaction ID,Investor,Deal,Amount,Date,Type
 ## Configuration
 
 ### Environment Variables
+
 ```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://ikezqzljrupkzmyytgok.supabase.co
@@ -225,12 +244,13 @@ OPENROUTER_API_KEY=sk-or-v1...
 ```
 
 ### Config Module
-```typescript
-import { config } from '@/lib/config';
 
-config.getDataMode();     // 'mock' | 'supabase' | 'mcp'
-config.hasSupabase();     // boolean
-config.getDiagnostics();  // full status
+```typescript
+import { config } from "@/lib/config";
+
+config.getDataMode(); // 'mock' | 'supabase' | 'mcp'
+config.hasSupabase(); // boolean
+config.getDiagnostics(); // full status
 ```
 
 ## Database Sync Policy
@@ -245,6 +265,7 @@ config.getDiagnostics();  // full status
 ## MCP Execution via Docker
 
 - All MCP-related tooling must run in Docker for reproducible, modular execution. Example:
+
 ```bash
 docker run --rm \
   --env-file ./.env.local \
@@ -256,35 +277,43 @@ docker run --rm \
 ## Brand Tokens
 
 ### Colors
+
 ```typescript
 const colors = {
-  primary: '#C898FF',      // Equitie Purple
-  background: '#040210',   // Deep background
-  surface: '#0A0515',      // Card surface
-  text: '#FFFFFF',         // Primary text
-  muted: '#8B87A0'        // Secondary text
+  primary: "#C898FF", // Equitie Purple
+  background: "#040210", // Deep background
+  surface: "#0A0515", // Card surface
+  text: "#FFFFFF", // Primary text
+  muted: "#8B87A0", // Secondary text
 };
 ```
 
 ### Components
-```typescript
-import { BRAND_CONFIG, COMPONENT_STYLES } from '@/branding/brand.config';
 
-const card = COMPONENT_STYLES.card.gradient;    // Gradient card
-const glass = COMPONENT_STYLES.card.glass;      // Glass morphism
+```typescript
+import { BRAND_CONFIG, COMPONENT_STYLES } from "@/BRANDING/brand.config";
+
+const card = COMPONENT_STYLES.card.gradient; // Gradient card
+const glass = COMPONENT_STYLES.card.glass; // Glass morphism
 const button = COMPONENT_STYLES.button.primary; // Primary button
 ```
 
 ### Utilities
-```typescript
-import { formatCurrency, formatPercentage, getStatusColor } from '@/lib/theme-utils';
 
-formatCurrency(1000000);        // "$1,000,000"
-formatPercentage(0.152);        // "15.2%"
-getStatusColor(5.2);            // Success color for positive
+```typescript
+import {
+  formatCurrency,
+  formatPercentage,
+  getStatusColor,
+} from "@/lib/theme-utils";
+
+formatCurrency(1000000); // "$1,000,000"
+formatPercentage(0.152); // "15.2%"
+getStatusColor(5.2); // Success color for positive
 ```
 
 ## File Structure
+
 ```
 /app
   /api                 # API routes
@@ -303,6 +332,7 @@ getStatusColor(5.2);            // Success color for positive
 ## Testing
 
 ### Playwright Tests
+
 ```bash
 npx playwright test                    # All tests
 npx playwright test investor-portal    # Portal only
@@ -311,21 +341,23 @@ npx playwright test --ui              # Interactive
 ```
 
 ### Test Patterns
+
 ```typescript
 // Portal test
-test('dashboard loads metrics', async ({ page }) => {
-  await page.goto('/investor-portal/dashboard');
+test("dashboard loads metrics", async ({ page }) => {
+  await page.goto("/investor-portal/dashboard");
   await expect(page.locator('[data-testid="total-value"]')).toBeVisible();
 });
 
 // API test
-test('fee calculation', async () => {
+test("fee calculation", async () => {
   const calc = await enhancedFeeService.previewFees(1, 100000, 1000);
   expect(calc.netAmount).toBeLessThan(100000);
 });
 ```
 
 ## Quick Commands
+
 ```bash
 npm run dev           # Start dev (port 3000)
 npm run build        # Production build
@@ -334,6 +366,7 @@ npm run lint         # Check code quality
 ```
 
 ## Supabase Project
+
 - **ID**: ikezqzljrupkzmyytgok
 - **Name**: EquiTieOSH
 - **URL**: https://ikezqzljrupkzmyytgok.supabase.co
@@ -342,16 +375,19 @@ npm run lint         # Check code quality
 ## Key Patterns
 
 ### Service Layer
+
 Always use services, never direct DB access:
+
 ```typescript
 // ✅ Good
 const deals = await dealsService.getActiveDeals();
 
 // ❌ Bad
-const deals = await supabase.from('deals').select();
+const deals = await supabase.from("deals").select();
 ```
 
 ### Error Handling
+
 ```typescript
 try {
   const result = await service.method();
@@ -362,8 +398,9 @@ try {
 ```
 
 ### Type Safety
+
 ```typescript
-import type { Deal, Investor, Transaction } from '@/lib/db/types';
+import type { Deal, Investor, Transaction } from "@/lib/db/types";
 
 function processDeal(deal: Deal): void {
   // Type-safe operations
@@ -373,18 +410,21 @@ function processDeal(deal: Deal): void {
 ## Recent Updates
 
 ### 2025-08-17
+
 - AI ingestion with full context loading
 - Column mapper for CSV intelligence
 - Enhanced fee service with GPT-5
 - Documentation consolidation
 
 ### 2025-08-16
+
 - ARCHON Fee Engine integration
 - Admin chat interface
 - Fee profile management
 - CSV import system
 
 ### 2025-08-15
+
 - Supabase migration complete
 - Service layer implementation
 - Mock/production switching

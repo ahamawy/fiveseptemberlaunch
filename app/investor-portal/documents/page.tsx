@@ -93,7 +93,7 @@ export default function DocumentsPage() {
       </div>
 
       {/* Documents List */}
-      <Card variant="glass" hover>
+      <Card variant="glass" className="hover:shadow-lg transition-shadow">
         <CardHeader>
           <CardTitle>Your Documents</CardTitle>
           <CardDescription>
@@ -179,7 +179,7 @@ export default function DocumentsPage() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card variant="gradient" hover>
+        <Card variant="gradient" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -193,7 +193,7 @@ export default function DocumentsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -209,7 +209,7 @@ export default function DocumentsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -225,7 +225,7 @@ export default function DocumentsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>

@@ -2,13 +2,14 @@
 
 import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { FeeHubBanner } from '@/components/admin/FeeHubBanner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/Label';
+import { Textarea } from '@/components/ui/Textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import { Alert, AlertDescription } from '@/components/ui/Alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import {
   Calculator,
   Upload,
@@ -101,6 +102,7 @@ export default function EquitieFeeEnginePage() {
   return (
     <div className="min-h-screen bg-background-deep">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <FeeHubBanner />
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">

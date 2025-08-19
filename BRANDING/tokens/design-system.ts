@@ -3,7 +3,7 @@
  * Comprehensive design tokens extracted from Figma with light/dark theme support
  * 
  * Usage:
- * import { tokens, getTheme, applyTheme } from '@/branding/tokens/design-system';
+ * import { tokens, getTheme, applyTheme } from '@/BRANDING/tokens/design-system';
  * const theme = getTheme('dark');
  * const primaryColor = theme.colors.primary[300];
  */

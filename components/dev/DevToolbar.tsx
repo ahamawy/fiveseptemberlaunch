@@ -136,6 +136,12 @@ const PAGE_ROUTES: PageRoute[] = [
         icon: Icons.document,
         description: 'Import legacy fee data'
       },
+      { 
+        name: 'Deal Equations', 
+        path: '/admin/deal-equations',
+        icon: Icons.chart,
+        description: 'View and test deal fee equations'
+      },
     ]
   },
   {

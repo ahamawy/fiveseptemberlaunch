@@ -9,9 +9,11 @@ export async function GET(
     const investorId = parseInt(params.id);
     
     // Get portfolio holdings from investor_units
-    const holdings = await investorsService.getPortfolioHoldings(investorId);
+    const holdingsResponse = await investorsService.getPortfolioHoldings(investorId) as any;
     
-    if (!holdings?.data) {
+    const holdings = holdingsResponse?.data || holdingsResponse || [];
+    
+    if (!Array.isArray(holdings) || holdings.length === 0) {
       return NextResponse.json({
         deals: [],
         historicalPerformance: [],
@@ -25,7 +27,7 @@ export async function GET(
       });
     }
 
-    const deals = holdings.data;
+    const deals = holdings;
 
     // Calculate portfolio allocation by sector
     const sectorAllocation = deals.reduce((acc: any, deal: any) => {

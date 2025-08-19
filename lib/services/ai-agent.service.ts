@@ -1,7 +1,7 @@
 import { ColumnMapper } from './column-mapper.service';
 import { extractDealDataWithOpenRouter } from './openrouter.service';
 
-function parseCSV(content: string): { columns: string[]; rows: string[][] } {
+function parseCSVWithColumns(content: string): { columns: string[]; rows: string[][] } {
   const lines = content.split(/\r?\n/).filter(Boolean);
   if (lines.length === 0) return { columns: [], rows: [] };
   const columns = lines[0].split(',').map(s => s.trim());
@@ -11,7 +11,7 @@ function parseCSV(content: string): { columns: string[]; rows: string[][] } {
 
 export class AIAgentService {
   static async processCSVWithSchema(content: string, filename: string) {
-    const { columns, rows } = parseCSV(content);
+    const { columns, rows } = parseCSVWithColumns(content);
     const sample = rows.slice(0, 10).map(r => r.join(',')).join('\n');
     const docText = `CSV FILE: ${filename}\nHEADERS: ${columns.join(', ')}\nSAMPLE:\n${sample}`;
 
@@ -49,10 +49,10 @@ function getSupabaseClient() {
 export function parseCSV(content: string): any[] {
   const lines = content.split('\n').filter(line => line.trim());
   if (lines.length === 0) return [];
-  
+
   // Parse headers
   const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-  
+
   // Parse data rows
   const data = [];
   for (let i = 1; i < lines.length; i++) {
@@ -63,7 +63,7 @@ export function parseCSV(content: string): any[] {
     });
     data.push(row);
   }
-  
+
   return data;
 }
 
@@ -88,22 +88,22 @@ export async function analyzeCSVDataWithAI(data: any[]): Promise<{
 
   const columns = Object.keys(data[0]);
   const sampleData = data.slice(0, 3);
-  
+
   // Use GPT-5 to understand the data with full system context
   const apiKey = process.env.OPENROUTER_API_KEY;
   const model = process.env.OPENROUTER_MODEL || 'openrouter/auto';
-  
+
   // Get system context for intelligent analysis
   const csvContext = systemContext.getCSVAnalysisContext(columns);
   const mappingAnalysis = systemContext.analyzeCSVMapping(columns, 'investors');
-  
+
   // Search knowledge base for relevant context
   const kbSearch = await knowledgeBase.ragSearch({
     query: `CSV import ${columns.slice(0, 3).join(' ')}`,
     strategy: 'hybrid',
     limit: 3
   });
-  
+
   if (apiKey) {
     try {
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -173,7 +173,7 @@ Respond with JSON:
       if (response.ok) {
         const result = await response.json();
         const analysis = JSON.parse(result?.choices?.[0]?.message?.content || '{}');
-        
+
         // Calculate metrics if not provided by AI
         let totalValue = 0;
         if (analysis.type === 'investors' && data.length > 0) {
@@ -182,7 +182,7 @@ Respond with JSON:
             return sum + (isNaN(commitment) ? 0 : commitment);
           }, 0);
         }
-        
+
         return {
           type: analysis.type || 'unknown',
           columns,
@@ -205,7 +205,7 @@ Respond with JSON:
       console.error('GPT-5 analysis failed:', error);
     }
   }
-  
+
   // Fallback to basic analysis if GPT-5 fails
   return analyzeCSVData(data);
 }
@@ -230,7 +230,7 @@ export function analyzeCSVData(data: any[]): {
 
   const columns = Object.keys(data[0]);
   const columnLower = columns.map(c => c.toLowerCase());
-  
+
   let type: 'investors' | 'fees' | 'transactions' | 'unknown' = 'unknown';
   let summary = '';
   const suggestions = [];
@@ -283,12 +283,12 @@ export function transformInvestorData(data: any[]): any[] {
       kyc_status: 'pending',
       created_at: new Date().toISOString()
     };
-    
+
     // Clean up the data
     if (!transformed.full_name) {
       transformed.full_name = 'Unknown Investor';
     }
-    
+
     return transformed;
   });
 }
@@ -307,7 +307,7 @@ export class EquitieAIAgent {
       // Parse CSV
       const parsedData = parseCSV(content);
       const analysis = await analyzeCSVDataWithAI(parsedData);
-      
+
       if (analysis.type === 'unknown') {
         return {
           success: false,
@@ -320,7 +320,7 @@ export class EquitieAIAgent {
       // Handle investor data
       if (analysis.type === 'investors') {
         const transformedData = transformInvestorData(parsedData);
-        
+
         return {
           success: true,
           data: {
@@ -348,7 +348,7 @@ export class EquitieAIAgent {
         message: `Analyzed ${analysis.type} data with ${analysis.rowCount} records`,
         actions: analysis.suggestions
       };
-      
+
     } catch (error: any) {
       return {
         success: false,
@@ -399,14 +399,14 @@ export class EquitieAIAgent {
   async querySupabase(query: string): Promise<any> {
     // Parse the natural language query and execute Supabase operations
     const lowerQuery = query.toLowerCase();
-    
+
     if (lowerQuery.includes('count') && lowerQuery.includes('investor')) {
       const { count } = await this.supabase
         .from('investors')
         .select('*', { count: 'exact', head: true });
       return { count, message: `There are ${count} investors in the database` };
     }
-    
+
     if (lowerQuery.includes('total') && lowerQuery.includes('commitment')) {
       const { data } = await this.supabase
         .from('investors')
@@ -414,7 +414,7 @@ export class EquitieAIAgent {
       const total = data?.reduce((sum, inv) => sum + (inv.commitment_amount || 0), 0) || 0;
       return { total, message: `Total commitments: $${total.toLocaleString()}` };
     }
-    
+
     if (lowerQuery.includes('list') && lowerQuery.includes('investor')) {
       const { data } = await this.supabase
         .from('investors')
@@ -422,14 +422,14 @@ export class EquitieAIAgent {
         .limit(10);
       return { data, message: `Showing ${data?.length || 0} investors` };
     }
-    
+
     return { message: 'Query not understood. Try asking about investor counts, total commitments, or listing investors.' };
   }
 }
 
 // GPT-5 style reasoning for complex operations
 export async function reasonAboutData(
-  data: any[], 
+  data: any[],
   context: string,
   apiKey: string
 ): Promise<{
@@ -438,10 +438,10 @@ export async function reasonAboutData(
   risks: string[];
   nextSteps: string[];
 }> {
-  
+
   // Call OpenRouter with advanced reasoning prompt
   const model = process.env.OPENROUTER_MODEL || 'openrouter/auto';
-  
+
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -464,7 +464,7 @@ export async function reasonAboutData(
 
   const result = await response.json();
   const content = result?.choices?.[0]?.message?.content || '';
-  
+
   // Parse the AI response into structured format
   return {
     insights: extractSection(content, 'insights') || ['Data analyzed successfully'],

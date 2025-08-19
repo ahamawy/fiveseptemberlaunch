@@ -20,40 +20,40 @@ export async function POST(req: NextRequest) {
       message = body?.message || body?.text || '';
       file = null;
     }
-    
+
     let response = '';
     let extractedData = null;
     let suggestedActions: string[] = [];
-    
+
     // Process uploaded file with intelligent parsing
     if (file) {
       const arrayBuffer = await file.arrayBuffer();
       const content = new TextDecoder().decode(arrayBuffer);
-      
+
       // Handle CSV files (investor data, fee schedules, etc.)
       if (file.name.endsWith('.csv')) {
         const result = await agent.processCSVFile(content, file.name);
-        
+
         if (result.success) {
           response = `📊 **${result.message}**\n\n`;
-          
+
           // Check if this is a fee-related CSV
           const lowerContent = content.toLowerCase();
-          const isFeeData = lowerContent.includes('fee') || lowerContent.includes('discount') || 
+          const isFeeData = lowerContent.includes('fee') || lowerContent.includes('discount') ||
                            lowerContent.includes('premium') || lowerContent.includes('structuring');
-          
+
           if (isFeeData) {
             // Use enhanced fee engine for fee calculations
             response += `💰 **Fee Calculation Engine Activated**\n\n`;
-            
+
             try {
               const importResult = await enhancedFeeService.importFromCSV(content);
-              
+
               if (importResult.success) {
                 response += `✅ **Fee Import Preview:**\n`;
                 response += `• Records processed: ${importResult.imported}\n`;
                 response += `• Failed: ${importResult.failed}\n\n`;
-                
+
                 // Show fee calculation preview
                 if (importResult.preview.length > 0) {
                   response += `**📈 Fee Calculation Summary:**\n`;
@@ -61,19 +61,19 @@ export async function POST(req: NextRequest) {
                   let totalTransferPre = 0;
                   let totalDiscounts = 0;
                   let totalTransferPost = 0;
-                  
+
                   importResult.preview.forEach(item => {
                     totalGross += item.gross_capital;
                     totalTransferPre += item.transferPreDiscount;
                     totalDiscounts += item.totalDiscounts;
                     totalTransferPost += item.transferPostDiscount;
                   });
-                  
+
                   response += `• Total Gross Capital: $${totalGross.toLocaleString()}\n`;
                   response += `• Transfer Pre-Discount: $${totalTransferPre.toLocaleString()}\n`;
                   response += `• Total Discounts: $${totalDiscounts.toLocaleString()}\n`;
                   response += `• Transfer Post-Discount: $${totalTransferPost.toLocaleString()}\n\n`;
-                  
+
                   // Show first record detail
                   const first = importResult.preview[0];
                   if (first) {
@@ -87,13 +87,13 @@ export async function POST(req: NextRequest) {
                     response += `• **Units:** ${first.units}\n\n`;
                   }
                 }
-                
+
                 response += `**🎯 Next Actions:**\n`;
                 response += `• Type "apply fees" to save these calculations\n`;
                 response += `• Type "validate schedule" to check fee configuration\n`;
                 response += `• Type "show precedence" to see fee ordering\n`;
                 response += `• Upload another CSV to process more data\n`;
-                
+
                 extractedData = importResult;
                 suggestedActions = ['Apply Fees', 'Validate Schedule', 'Show Precedence'];
               } else {
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
               }
               response += `**Columns:** ${result.data.analysis.columns.join(', ')}\n`;
               response += `**Rows:** ${result.data.analysis.rowCount}\n`;
-              
+
               // Column mappings and data quality remain the same
               if (result.data.analysis.columnMappings) {
                 response += `\n**Column Mappings to Supabase:**\n`;
@@ -121,19 +121,19 @@ export async function POST(req: NextRequest) {
                 });
               }
             }
-            
+
             extractedData = result.data;
             suggestedActions = result.actions || [];
           }
         } else {
           response = `❌ ${result.message}`;
         }
-      } 
+      }
       // Handle PDF files (fee schedules, LPAs, etc.)
       else if (file.type === 'application/pdf') {
         response = `📄 **PDF Processing with Fee Extraction**\n\n`;
         response += `Analyzing: ${file.name}\n\n`;
-        
+
         // TODO: Integrate PDF extraction for fee schedules
         response += `🔍 **Detected Document Type:** Fee Schedule / LPA\n`;
         response += `\n**Available Actions:**\n`;
@@ -141,31 +141,31 @@ export async function POST(req: NextRequest) {
         response += `• Create fee schedule in database\n`;
         response += `• Apply to specific deals\n`;
         response += `\nType "extract fees from pdf" to process this document.`;
-        
+
         suggestedActions = ['Extract Fees', 'Create Schedule', 'Apply to Deal'];
       }
       else {
         response = `📎 Uploaded: ${file.name}\n\nSupported formats: CSV (investor data, fees), PDF (LPAs, fee schedules), Excel (coming soon)`;
       }
     }
-    
+
     // Process user message with enhanced fee context
     if (message) {
       const lowerMessage = message.toLowerCase();
-      
+
       // Fee calculation commands
       if (lowerMessage.includes('calculate fee') || lowerMessage.includes('preview fee')) {
         const match = message.match(/deal\s+(\d+)/i);
         const dealId = match ? parseInt(match[1]) : 1;
         const amountMatch = message.match(/\$?([\d,]+)/);
         const amount = amountMatch ? parseFloat(amountMatch[1].replace(/,/g, '')) : 100000;
-        
+
         try {
           const calculation = await enhancedFeeService.previewFees(dealId, amount);
-          
+
           response = `💰 **Fee Calculation for Deal ${dealId}**\n\n`;
           response += `**Input:** $${amount.toLocaleString()}\n\n`;
-          
+
           response += `**Fee Breakdown (Applied in Precedence Order):**\n`;
           calculation.state.appliedFees.forEach((fee, idx) => {
             const sign = fee.amount < 0 ? '' : '+';
@@ -173,18 +173,18 @@ export async function POST(req: NextRequest) {
             if (fee.percent) response += ` (${(fee.percent * 100).toFixed(2)}%)`;
             response += ` [${fee.basis || 'GROSS'}]\n`;
           });
-          
+
           response += `\n**Summary:**\n`;
           response += `• Transfer Pre-Discount: $${calculation.transferPreDiscount.toLocaleString()}\n`;
           response += `• Total Discounts: $${calculation.totalDiscounts.toLocaleString()}\n`;
           response += `• Transfer Post-Discount: $${calculation.transferPostDiscount.toLocaleString()}\n`;
           response += `• Units Allocated: ${calculation.units}\n`;
-          
+
           if (!calculation.validation.valid) {
             response += `\n⚠️ **Validation Issues:**\n`;
             calculation.validation.errors.forEach(err => response += `• ${err}\n`);
           }
-          
+
           extractedData = calculation;
         } catch (error: any) {
           response = `❌ Fee calculation error: ${error.message}`;
@@ -194,11 +194,11 @@ export async function POST(req: NextRequest) {
       else if (lowerMessage.includes('apply fee') && extractedData) {
         try {
           const result = await enhancedFeeService.applyImport(extractedData.preview || []);
-          
+
           response = `✅ **Fees Applied Successfully**\n\n`;
           response += `• Applied: ${result.applied} records\n`;
           response += `• Failed: ${result.failed} records\n`;
-          
+
           if (result.errors.length > 0) {
             response += `\n⚠️ **Errors:**\n`;
             result.errors.forEach(err => response += `• ${err}\n`);
@@ -211,12 +211,12 @@ export async function POST(req: NextRequest) {
       else if (lowerMessage.includes('validate schedule')) {
         const match = message.match(/deal\s+(\d+)/i);
         const dealId = match ? parseInt(match[1]) : 1;
-        
+
         try {
           const validation = await enhancedFeeService.validateSchedule(dealId);
-          
+
           response = `🔍 **Fee Schedule Validation for Deal ${dealId}**\n\n`;
-          
+
           if (validation.valid) {
             response += `✅ **Schedule is valid!**\n\n`;
           } else {
@@ -224,12 +224,12 @@ export async function POST(req: NextRequest) {
             validation.errors.forEach(err => response += `• ${err}\n`);
             response += '\n';
           }
-          
+
           if (validation.warnings.length > 0) {
             response += `⚠️ **Warnings:**\n`;
             validation.warnings.forEach(warn => response += `• ${warn}\n`);
           }
-          
+
           // Show schedule details
           const schedule = await enhancedFeeService.getFeeSchedule(dealId);
           if (schedule.length > 0) {
@@ -248,24 +248,24 @@ export async function POST(req: NextRequest) {
       else if (lowerMessage.includes('fee report') || lowerMessage.includes('show fee')) {
         const match = message.match(/deal\s+(\d+)/i);
         const dealId = match ? parseInt(match[1]) : 1;
-        
+
         try {
           const report = await enhancedFeeService.generateFeeReport(dealId);
-          
+
           response = `📊 **Fee Report for Deal ${dealId}**\n\n`;
-          
+
           response += `**Schedule Configuration:**\n`;
           report.schedule.forEach(s => {
             response += `• ${s.component}: ${s.is_percent ? (s.rate * 100).toFixed(2) + '%' : '$' + s.rate}`;
             response += ` (${s.basis}, precedence: ${s.precedence})\n`;
           });
-          
+
           response += `\n**Summary Statistics:**\n`;
           response += `• Total Fees Collected: $${report.summary.totalFees.toLocaleString()}\n`;
           response += `• Total Discounts Given: $${report.summary.totalDiscounts.toLocaleString()}\n`;
           response += `• Net Transfers: $${report.summary.netTransfers.toLocaleString()}\n`;
           response += `• Transactions Processed: ${report.summary.transactionCount}\n`;
-          
+
           extractedData = report;
         } catch (error: any) {
           response = `❌ Report generation error: ${error.message}`;
@@ -275,7 +275,7 @@ export async function POST(req: NextRequest) {
       else if (lowerMessage.includes('import') && extractedData?.preview) {
         const investors = transformInvestorData(extractedData.preview);
         const importResult = await agent.importInvestorsToSupabase(investors);
-        
+
         response = `✅ **${importResult.message}**\n\n`;
         if (importResult.errors.length > 0) {
           response += `⚠️ **Errors encountered:**\n`;
@@ -289,22 +289,22 @@ export async function POST(req: NextRequest) {
       // Enhanced reasoning with fee context
       else if (lowerMessage.includes('analyze') || lowerMessage.includes('recommend')) {
         const apiKey = process.env.OPENROUTER_API_KEY!;
-        
+
         // Add fee context to reasoning
         const feeContext = extractedData ? {
           ...extractedData,
           feeEngineVersion: 'ARCHON Enhanced v2.0',
           capabilities: ['precedence ordering', 'basis calculations', 'discount handling', 'partner fees']
         } : {};
-        
+
         const reasoning = await reasonAboutData(
           feeContext,
           message + ' Consider fee calculations, precedence rules, and discount strategies.',
           apiKey
         );
-        
+
         response = `🧠 **AI Analysis with Fee Intelligence:**\n\n`;
-        
+
         if (reasoning.insights.length > 0) {
           response += `**Insights:**\n`;
           reasoning.insights.forEach(insight => {
@@ -312,7 +312,7 @@ export async function POST(req: NextRequest) {
           });
           response += '\n';
         }
-        
+
         if (reasoning.recommendations.length > 0) {
           response += `**Recommendations:**\n`;
           reasoning.recommendations.forEach(rec => {
@@ -320,7 +320,7 @@ export async function POST(req: NextRequest) {
           });
           response += '\n';
         }
-        
+
         if (reasoning.nextSteps.length > 0) {
           response += `**Next Steps:**\n`;
           reasoning.nextSteps.forEach(step => {
@@ -329,7 +329,7 @@ export async function POST(req: NextRequest) {
         }
       }
       // Supabase queries (original)
-      else if (lowerMessage.includes('how many') || lowerMessage.includes('count') || 
+      else if (lowerMessage.includes('how many') || lowerMessage.includes('count') ||
                lowerMessage.includes('total') || lowerMessage.includes('list')) {
         const queryResult = await agent.querySupabase(message);
         response = queryResult.message;
@@ -342,7 +342,7 @@ export async function POST(req: NextRequest) {
         response = await getEnhancedChatResponse(message);
       }
     }
-    
+
     // If no specific processing, provide enhanced helpful response
     if (!response) {
       response = `🤖 **EQUITIE AI Agent with ARCHON Fee Engine**\n\n`;
@@ -368,7 +368,7 @@ export async function POST(req: NextRequest) {
       response += `• "Validate fee configuration"\n`;
       response += `• Upload a CSV to process fees or investor data\n`;
     }
-    
+
     return NextResponse.json({
       response,
       extractedData,
@@ -379,13 +379,13 @@ export async function POST(req: NextRequest) {
         size: file.size
       } : undefined
     });
-    
+
   } catch (error: any) {
     console.error('API route error:', error);
     return NextResponse.json(
-      { 
+      {
         response: `Error: ${error.message}. Please try again.`,
-        error: error.message 
+        error: error.message
       },
       { status: 500 }
     );
@@ -395,7 +395,7 @@ export async function POST(req: NextRequest) {
 async function getEnhancedChatResponse(message: string): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   const model = process.env.OPENROUTER_MODEL || 'openrouter/auto';
-  
+
   if (!apiKey) {
     return 'OpenRouter API key not configured.';
   }
@@ -413,20 +413,20 @@ async function getEnhancedChatResponse(message: string): Promise<string> {
           {
             role: 'system',
             content: `You are the EQUITIE AI Agent powered by GPT-5 with the ARCHON Fee Engine integrated. You have deep knowledge of:
-            
+
 1. Fee Calculations:
    - Precedence-based fee ordering (PREMIUM always first)
    - Basis calculations (GROSS, NET, NET_AFTER_PREMIUM)
    - Discounts as negative amounts in fee_application table
    - Partner fees excluded from investor analytics
    - Annual fee handling with audit notes
-   
+
 2. Data Processing:
    - CSV parsing and validation
    - PDF extraction (fee schedules, LPAs)
    - Supabase integration
    - Data quality analysis
-   
+
 3. Business Intelligence:
    - Investment analysis
    - Risk assessment

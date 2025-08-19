@@ -211,7 +211,7 @@ export default function TransactionsPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <p className="text-sm text-text-secondary">Capital Calls</p>
             <p className="text-2xl font-bold text-error mt-1">
@@ -220,7 +220,7 @@ export default function TransactionsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <p className="text-sm text-text-secondary">Distributions</p>
             <p className="text-2xl font-bold text-success mt-1">
@@ -229,7 +229,7 @@ export default function TransactionsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <p className="text-sm text-text-secondary">Total Fees</p>
             <p className="text-2xl font-bold text-warning mt-1">
@@ -238,7 +238,7 @@ export default function TransactionsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <p className="text-sm text-text-secondary">Pending</p>
             <p className="text-2xl font-bold text-accent-yellow mt-1">
@@ -247,7 +247,7 @@ export default function TransactionsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="gradient" hover>
+        <Card variant="gradient" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <p className="text-sm text-text-secondary">Completed</p>
             <p className="text-2xl font-bold text-text-primary mt-1">
@@ -258,7 +258,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Filters and Transactions Table */}
-      <Card variant="glass" hover>
+      <Card variant="glass" className="hover:shadow-lg transition-shadow">
         <CardHeader>
           <CardTitle>All Transactions</CardTitle>
         </CardHeader>

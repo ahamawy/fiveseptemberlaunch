@@ -1,5 +1,7 @@
 # EQUITIE Bot Context (Backend Reasoning Guide with ARCHON Fee Engine)
 
+> For feature-specific canonical docs, refer to `FEATURES/<feature-code>-<feature-name>/README.md`. For Fees, see `FEATURES/fees/README.md`.
+
 This document provides the AI agent with comprehensive context about our data model, conventions, flows, and the integrated ARCHON Fee Engine for intelligent data processing and fee calculations.
 
 ## Conventions
@@ -31,7 +33,7 @@ This document provides the AI agent with comprehensive context about our data mo
 
 ## Import Flow
 
-- Stage rows in `fees.legacy_import` (investor_id or investor_name, gross_capital_usd, discount_*_pct)
+- Stage rows in `fees.legacy_import` (investor*id or investor_name, gross_capital_usd, discount*\*\_pct)
 - Preview in `analytics.v_fee_import_preview`
 - Apply to `fees.fee_application`, then update derived views
 
@@ -43,6 +45,7 @@ This document provides the AI agent with comprehensive context about our data mo
 ## ARCHON Fee Engine Integration
 
 ### Enhanced Calculator (`lib/services/fee-engine/enhanced-calculator.ts`)
+
 - **Precedence Ordering**: Fees applied in strict order (PREMIUM always first)
 - **Basis Calculations**: GROSS, NET, NET_AFTER_PREMIUM
 - **Discounts**: Stored as NEGATIVE amounts in fee_application
@@ -50,16 +53,19 @@ This document provides the AI agent with comprehensive context about our data mo
 - **Annual Fees**: Multiplier with audit notes
 
 ### Enhanced Service (`lib/services/fee-engine/enhanced-service.ts`)
+
 - **CSV Import**: Parse and preview with validation
 - **Schedule Management**: Version control for fee configurations
-- **Partner Fees**: Excluded from investor analytics (PARTNER_ prefix)
+- **Partner Fees**: Excluded from investor analytics (PARTNER\_ prefix)
 - **Batch Processing**: Efficient multi-transaction calculations
 - **Reporting**: Comprehensive fee reports with audit trails
 
 ### Chat Interface (`/admin/chat`)
+
 The EQUITIE Bot integrates media ingestion with fee calculations:
+
 - **File Processing**: CSV, PDF (LPAs, fee schedules)
-- **Commands**: 
+- **Commands**:
   - "Calculate fees for deal X with $Y"
   - "Show fee schedule for deal X"
   - "Validate fee configuration"
@@ -70,6 +76,7 @@ The EQUITIE Bot integrates media ingestion with fee calculations:
 ## Admin APIs
 
 ### Original Endpoints
+
 - POST `/api/admin/fees/profiles`: create/activate profiles
 - GET `/api/admin/fees/profiles`: list from `analytics.v_fee_profiles`
 - POST `/api/admin/fees/import`: CSV → `fees.legacy_import`
@@ -78,6 +85,7 @@ The EQUITIE Bot integrates media ingestion with fee calculations:
 - POST `/api/admin/ingest/parse`: AI parse doc → mapping + profile suggestion
 
 ### Enhanced Chat Endpoint
+
 - POST `/api/admin/chat`: Unified interface for all operations
   - Accepts FormData with message and file
   - Auto-detects fee data vs investor data
@@ -89,7 +97,7 @@ The EQUITIE Bot integrates media ingestion with fee calculations:
 
 - Extract: deal_id, unit_price_usd, valuations (purchase/sell pre-money), premium_percent or inputs to derive it
 - Extract partner fees: management_pct (net or gross basis), admin_fee amount, structuring_pct, performance_pct
-- Extract investor lines: investor_name/id, gross_capital_usd, discount_% per component
+- Extract investor lines: investor*name/id, gross_capital_usd, discount*% per component
 - Prefer IDs if available; else include exact names for resolver
 
 ## Invariants

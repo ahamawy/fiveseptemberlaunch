@@ -1,5 +1,7 @@
 # Standard CSV Formats (Reference)
 
+> Canonical CSV specs per feature are linked from each feature’s README. For Fees, see `FEATURES/fees/README.md`.
+
 ## Investor List (with discounts)
 
 ```csv

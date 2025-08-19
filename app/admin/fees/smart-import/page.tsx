@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
+import { FeeHubBanner } from '@/components/admin/FeeHubBanner';
 import { formatCurrency } from '@/lib/theme-utils';
 import { 
   ArrowUpTrayIcon, 
@@ -163,6 +164,7 @@ export default function SmartImportPage() {
   return (
     <div className="min-h-screen bg-background-deep">
       <div className="p-6 space-y-6">
+        <FeeHubBanner />
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 text-white">
             Smart Fee Import

@@ -4,6 +4,7 @@
  */
 
 import { BaseService } from './base.service';
+import { dealEquationExecutor, DealEquation } from './fee-engine/deal-equation-executor';
 import type { 
   Deal, 
   Company, 
@@ -279,6 +280,123 @@ export class DealsService extends BaseService {
       search: query,
       limit: 20
     });
+  }
+
+  /**
+   * Create a new deal with fee equation
+   */
+  async createDeal(input: {
+    name: string;
+    company_id?: number;
+    stage: DealStage;
+    type: DealType;
+    currency: string;
+    opening_date?: string;
+    closing_date?: string;
+    target_raise?: number;
+    minimum_investment?: number;
+    fee_structure_type?: string;
+  }) {
+    try {
+      this.log('createDeal', input);
+      
+      // Create the deal
+      const deal = await this.dataClient.createDeal({
+        ...input,
+        slug: this.generateSlug(input.name),
+        current_raise: 0
+      });
+      
+      // Attach fee equation based on deal type
+      const equationName = input.fee_structure_type || this.getDefaultEquationType(input.type);
+      const templates = dealEquationExecutor.constructor.getEquationTemplates();
+      const template = templates[equationName] || templates['STANDARD_PRIMARY_V1'];
+      
+      const equation: DealEquation = {
+        deal_id: deal.id,
+        equation_name: equationName,
+        rules: template.rules || {},
+        metadata: {
+          party_type: 'investor',
+          effective_date: new Date()
+        }
+      };
+      
+      // Save equation configuration
+      await dealEquationExecutor.saveEquation(equation);
+      
+      this.log('Deal created with equation', {
+        deal_id: deal.id,
+        equation: equationName
+      });
+      
+      // Clear cache
+      this.clearCache();
+      
+      return deal;
+    } catch (error) {
+      this.handleError(error, 'createDeal');
+    }
+  }
+
+  /**
+   * Update deal fee equation
+   */
+  async updateDealEquation(dealId: number, equationType: string) {
+    try {
+      const templates = dealEquationExecutor.constructor.getEquationTemplates();
+      const template = templates[equationType];
+      
+      if (!template) {
+        throw new Error(`Unknown equation type: ${equationType}`);
+      }
+      
+      const equation: DealEquation = {
+        deal_id: dealId,
+        equation_name: equationType,
+        rules: template.rules || {},
+        metadata: {
+          party_type: 'investor',
+          effective_date: new Date()
+        }
+      };
+      
+      await dealEquationExecutor.saveEquation(equation);
+      
+      this.log('Deal equation updated', {
+        deal_id: dealId,
+        equation: equationType
+      });
+      
+      return equation;
+    } catch (error) {
+      this.handleError(error, 'updateDealEquation');
+    }
+  }
+
+  /**
+   * Get default equation type for deal type
+   */
+  private getDefaultEquationType(dealType: DealType): string {
+    const mapping: Record<DealType, string> = {
+      'primary': 'STANDARD_PRIMARY_V1',
+      'secondary': 'SECONDARY_MARKET_V1',
+      'advisory': 'ADVISORY_V1',
+      'fund': 'CARRY_FUND_V1',
+      'co-invest': 'STANDARD_PRIMARY_V1'
+    };
+    
+    return mapping[dealType] || 'STANDARD_PRIMARY_V1';
+  }
+
+  /**
+   * Generate URL-friendly slug from name
+   */
+  private generateSlug(name: string): string {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 
   /**

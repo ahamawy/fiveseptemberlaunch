@@ -133,7 +133,7 @@ export default function DealsPage() {
 
       {/* Summary Statistics */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
-        <Card variant="gradient" hover>
+        <Card variant="gradient" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <p className="text-sm text-text-secondary">Total Committed</p>
             <p className="text-2xl font-bold text-text-primary mt-1">
@@ -142,7 +142,7 @@ export default function DealsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <p className="text-sm text-text-secondary">Capital Called</p>
             <p className="text-2xl font-bold text-text-primary mt-1">
@@ -151,7 +151,7 @@ export default function DealsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <p className="text-sm text-text-secondary">Distributed</p>
             <p className="text-2xl font-bold text-accent-green mt-1">
@@ -160,7 +160,7 @@ export default function DealsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <p className="text-sm text-text-secondary">Remaining</p>
             <p className="text-2xl font-bold text-text-primary mt-1">
@@ -169,7 +169,7 @@ export default function DealsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <p className="text-sm text-text-secondary">Active Deals</p>
             <p className="text-2xl font-bold text-primary-300 mt-1">
@@ -178,7 +178,7 @@ export default function DealsPage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <p className="text-sm text-text-secondary">Avg Called %</p>
             <p className="text-2xl font-bold text-text-primary mt-1">
@@ -202,7 +202,7 @@ export default function DealsPage() {
           <CardContent>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {data.upcomingCalls.slice(0, 3).map((call, idx) => (
-                <Card key={idx} variant="glass" hover>
+                <Card key={idx} variant="glass" className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-4">
                     <p className="text-sm text-text-secondary">{call.dealName}</p>
                     <p className="text-lg font-bold text-text-primary mt-1">
@@ -220,7 +220,7 @@ export default function DealsPage() {
       )}
 
       {/* Deals Filter and List */}
-      <Card variant="glass" hover>
+      <Card variant="glass" className="hover:shadow-lg transition-shadow">
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle>All Commitments</CardTitle>

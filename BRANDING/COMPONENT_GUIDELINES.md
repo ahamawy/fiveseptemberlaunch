@@ -7,7 +7,7 @@ This document provides comprehensive styling guidelines for all UI components in
 
 ### Importing Tokens
 ```typescript
-import { tokens, getTheme } from '@/branding/tokens/design-system';
+import { tokens, getTheme } from '@/BRANDING/tokens/design-system';
 
 // Get current theme
 const theme = getTheme('dark'); // or 'light'

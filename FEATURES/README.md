@@ -1,9 +1,11 @@
 # EquiTie Platform Features
 
 ## Overview
+
 This directory contains the complete feature tree and implementation examples for the EquiTie platform. All features follow a hierarchical numbering system for easy navigation and implementation.
 
 ## Feature Numbering Convention
+
 ```
 domain.section.subsection.component.subcomponent
 ```
@@ -13,6 +15,7 @@ Example: `15.1.1` = Investor App > Investor Portal > Dashboard
 ## Current Implementation Status
 
 ### ✅ Implemented
+
 - **15.1.1 investor-portal-dashboard** - Investor Portal Dashboard
   - Full Supabase integration
   - Service layer with caching
@@ -20,9 +23,11 @@ Example: `15.1.1` = Investor App > Investor Portal > Dashboard
   - Mock/real data switching
 
 ### 🚀 Ready to Ship
+
 All features can now be rapidly implemented using:
+
 - Established service patterns
-- ultrathink/ context files  
+- ultrathink/ context files
 - Supabase integration
 - Brand token system
 
@@ -33,6 +38,7 @@ All features can now be rapidly implemented using:
 1. **Find your feature code** in `FEATURE_TREE.md`
 2. **Create feature folder**: `FEATURES/[feature-code]-[feature-name]/`
 3. **Copy template structure**:
+
    ```
    FEATURES/15.1.2-investor-portal-onboarding-kyc/
    ├── dto/           # Data validation with Zod
@@ -40,8 +46,16 @@ All features can now be rapidly implemented using:
    ├── routes/        # API route handlers
    ├── services/      # Business logic
    └── FEATURE.md     # Feature specification
+
    ```
-4. **Use existing patterns**:
+
+4. **Add canonical docs**:
+   - Create `README.md` using `TEMPLATES/FEATURE_DOCS_INDEX.md`
+   - Follow `DOCS/FEATURES_GUIDE.md` for per-feature docs (`docs/API.md`, `docs/UI.md`, etc.)
+   ```
+
+   ```
+5. **Use existing patterns**:
    - Service layer: `lib/services/`
    - Database: `lib/db/supabase-adapter.ts`
    - UI components: `components/ui/`
@@ -50,6 +64,7 @@ All features can now be rapidly implemented using:
 ## Feature Tree Structure
 
 ### Top-Level Domains
+
 1. **Deals** - Deal management and lifecycle
 2. **Investors** - Investor profiles and management
 3. **Transactions** - Financial transactions
@@ -77,9 +92,11 @@ All features can now be rapidly implemented using:
 ## Examples
 
 ### Example 1: Deals CRUD
+
 ```
 1.1.1.1.1 deals-data-crud-read-by-id
 ```
+
 - Domain: 1 (Deals)
 - Section: 1.1 (deals-data)
 - Subsection: 1.1.1 (deals-data-crud)
@@ -87,9 +104,11 @@ All features can now be rapidly implemented using:
 - Feature: 1.1.1.1.1 (read-by-id)
 
 ### Example 2: Investor Dashboard
+
 ```
 15.1.1 investor-portal-dashboard
 ```
+
 - Domain: 15 (Investor App)
 - Section: 15.1 (investor-portal)
 - Feature: 15.1.1 (dashboard)
@@ -100,7 +119,7 @@ All features use the established service layer pattern:
 
 ```typescript
 // Import service
-import { investorsService } from '@/lib/services';
+import { investorsService } from "@/lib/services";
 
 // Use in component/route
 const data = await investorsService.getDashboardData(investorId);
@@ -115,7 +134,7 @@ Features connect to Supabase through the adapter:
 // NEXT_PUBLIC_USE_MOCK_DATA=false -> Supabase
 // NEXT_PUBLIC_USE_MOCK_DATA=true -> Mock data
 
-import { dataClient } from '@/lib/db/client';
+import { dataClient } from "@/lib/db/client";
 const deals = await dataClient.getDeals();
 ```
 
@@ -139,13 +158,13 @@ export async function GET(request: NextRequest) {
 Use existing branded components:
 
 ```typescript
-import { Card, Button, Table } from '@/components/ui';
-import { BRAND_CONFIG } from '@/BRANDING/brand.config';
+import { Card, Button, Table } from "@/components/ui";
+import { BRAND_CONFIG } from "@/BRANDING/brand.config";
 
 <Card variant="gradient" glow>
   <CardTitle gradient>Portfolio Value</CardTitle>
   <CardContent>{formatCurrency(value)}</CardContent>
-</Card>
+</Card>;
 ```
 
 ## Environment Configuration
@@ -184,8 +203,8 @@ open http://localhost:3001/investor-portal/dashboard
 2. Create feature folder with proper code
 3. Follow existing patterns
 4. Use service layer
-5. Test with mock data first
-6. Switch to Supabase
+5. Add deprecation banners to any legacy docs pointing to the feature `README.md`
+6. Test with mock data first, then switch to Supabase
 7. Create PR with feature code in title
 
 ## Resources
@@ -200,6 +219,7 @@ open http://localhost:3001/investor-portal/dashboard
 ## Support
 
 For questions about features:
+
 1. Check `FEATURE_TREE.md` for feature details
 2. Review existing examples in `FEATURES/examples/`
 3. Use ultrathink/ context with Claude Code

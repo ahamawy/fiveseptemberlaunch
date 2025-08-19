@@ -1,3 +1,0 @@
--- Initial migration placeholder (assumes modular schemas exist).
--- create schema if not exists deals;
--- create table deals.deal (...);

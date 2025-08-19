@@ -180,7 +180,7 @@ export default function ProfilePage() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card variant="gradient" hover>
+        <Card variant="gradient" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -196,7 +196,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -212,7 +212,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -228,7 +228,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" hover>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -260,7 +260,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Tab Content */}
-      <Card variant="glass" hover>
+      <Card variant="glass" className="hover:shadow-lg transition-shadow">
         <CardContent className="p-6">
           {/* Personal Information Tab */}
           {activeTab === 'personal' && (

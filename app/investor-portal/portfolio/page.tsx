@@ -103,7 +103,7 @@ export default function PortfolioPage() {
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Card variant="glass" hover glow>
+            <Card variant="glass" className="hover:shadow-lg transition-shadow">
               <CardContent>
                 <dt className="text-sm font-medium text-text-secondary">Total Portfolio Value</dt>
                 <dd className="mt-3 text-3xl font-bold text-text-primary">
@@ -111,19 +111,19 @@ export default function PortfolioPage() {
                 </dd>
               </CardContent>
             </Card>
-            <Card variant="glass" hover glow>
+            <Card variant="glass" className="hover:shadow-lg transition-shadow">
               <CardContent>
                 <dt className="text-sm font-medium text-text-secondary">Total Deals</dt>
                 <dd className="mt-3 text-3xl font-bold text-text-primary">{data.summary.totalDeals}</dd>
               </CardContent>
             </Card>
-            <Card variant="glass" hover glow>
+            <Card variant="glass" className="hover:shadow-lg transition-shadow">
               <CardContent>
                 <dt className="text-sm font-medium text-text-secondary">Active Deals</dt>
                 <dd className="mt-3 text-3xl font-bold text-success-400">{data.summary.activeDeals}</dd>
               </CardContent>
             </Card>
-            <Card variant="glass" hover glow>
+            <Card variant="glass" className="hover:shadow-lg transition-shadow">
               <CardContent>
                 <dt className="text-sm font-medium text-text-secondary">Exited Deals</dt>
                 <dd className="mt-3 text-3xl font-bold text-info-400">{data.summary.exitedDeals}</dd>
@@ -276,7 +276,7 @@ export default function PortfolioPage() {
               ) : (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {data.deals.map((deal) => (
-                    <Card key={deal.dealId} variant="gradient" hover>
+                    <Card key={deal.dealId} variant="gradient" className="hover:shadow-lg transition-shadow">
                       <CardContent>
                         <div className="mb-3">
                           <h4 className="text-sm font-semibold text-text-primary">{deal.dealName}</h4>

@@ -7,14 +7,14 @@ export async function GET(request: NextRequest) {
     const client = new SupabaseDirectClient(new SchemaConfig()).getClient();
     
     // Get all deals with investor counts and capital
-    const { data: deals, error } = await client
+    const deals = await client
       .from('investor_units')
       .select('deal_id')
       .then(async (result: any) => {
         if (result.error) throw result.error;
         
         // Get unique deal IDs
-        const dealIds = [...new Set(result.data?.map((r: any) => r.deal_id) || [])];
+        const dealIds = [...new Set(result.data?.map((r: any) => r.deal_id) || [])] as number[];
         
         // Get deal details for each
         const dealDetails = await Promise.all(

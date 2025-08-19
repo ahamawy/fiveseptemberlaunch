@@ -190,7 +190,7 @@ function StyleGuideContent() {
 
                 {/* Quick Examples */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <Card variant="gradient" hover glow>
+                  <Card variant="gradient" className="hover:shadow-lg transition-shadow">
                     <CardHeader>
                       <CardTitle>Gradient Card</CardTitle>
                     </CardHeader>
@@ -199,7 +199,7 @@ function StyleGuideContent() {
                     </CardContent>
                   </Card>
 
-                  <Card variant="glass" hover className="group">
+                  <Card variant="glass" className="group hover:shadow-lg transition-shadow">
                     <CardHeader>
                       <CardTitle>Glass Morphism</CardTitle>
                     </CardHeader>
@@ -209,7 +209,7 @@ function StyleGuideContent() {
                     </CardContent>
                   </Card>
 
-                  <Card variant="elevated" hover>
+                  <Card variant="elevated" className="hover:shadow-lg transition-shadow">
                     <CardHeader>
                       <CardTitle>Elevated Card</CardTitle>
                     </CardHeader>
@@ -498,7 +498,7 @@ function StyleGuideContent() {
                         </CardContent>
                       </Card>
 
-                      <Card variant="glass" hover glow>
+                      <Card variant="glass" className="hover:shadow-lg transition-shadow">
                         <CardHeader>
                           <CardTitle gradient>Interactive Card</CardTitle>
                         </CardHeader>
@@ -768,7 +768,7 @@ function StyleGuideContent() {
 
                 {/* Metrics Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card variant="gradient" hover>
+                  <Card variant="gradient" className="hover:shadow-lg transition-shadow">
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div>
@@ -786,7 +786,7 @@ function StyleGuideContent() {
                     </CardContent>
                   </Card>
 
-                  <Card variant="gradient" hover>
+                  <Card variant="gradient" className="hover:shadow-lg transition-shadow">
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div>
@@ -806,7 +806,7 @@ function StyleGuideContent() {
                     </CardContent>
                   </Card>
 
-                  <Card variant="gradient" hover>
+                  <Card variant="gradient" className="hover:shadow-lg transition-shadow">
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div>

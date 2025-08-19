@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     // Create preview data with validation status
     const preview = validation.rows.map(row => ({
       ...row,
-      status: 'valid' as const,
+      status: 'valid' as 'valid' | 'warning',
       calculated_amount: row.amount || (row.percent ? 0 : undefined), // Will be calculated on apply
       message: undefined as string | undefined
     }));

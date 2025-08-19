@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     if (name.endsWith('.csv')) {
       const { AIAgentService } = await import('@/lib/services/ai-agent.service');
       const result = await AIAgentService.processCSVWithSchema(buf.toString('utf8'), file.name);
-      return NextResponse.json({ success: true, filename: file.name, detected: 'csv', ...result });
+      return NextResponse.json({ ...result, success: true, filename: file.name, detected: 'csv' });
     }
 
     const mapping = await parseDocumentWithAI(docText);

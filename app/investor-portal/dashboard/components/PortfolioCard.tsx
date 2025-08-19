@@ -20,7 +20,7 @@ export default function PortfolioCard({ title, value, change, currency = 'USD' }
   const isPositive = change !== undefined && change >= 0;
 
   return (
-    <Card variant="glass" hover glow>
+    <Card variant="glass" className="hover:shadow-lg transition-shadow">
       <CardContent>
         <dt className="text-sm font-medium text-text-secondary truncate">
           {title}

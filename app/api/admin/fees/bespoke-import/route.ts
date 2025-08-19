@@ -168,7 +168,7 @@ async function calculateFees(
   const netTransfer = row.net_transfer || (grossCapital - totalFees + discountAmount);
   
   return {
-    investor_id: investorId,
+    investor_id: investorId || 0,
     deal_id: row.deal_id,
     gross_capital: grossCapital,
     fees,
@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
     
     for (const row of rows) {
       try {
-        const calculation = await calculateFees(client, row, profileId);
+        const calculation = await calculateFees(client, row, profileId ?? undefined);
         results.push(calculation);
         
         if (applyDirectly) {
@@ -314,9 +314,8 @@ export async function GET(request: NextRequest) {
       // Get any existing fees for this deal
       const { data: existingFees } = await client
         .from('fee_application_record')
-        .select('component, SUM(amount)')
-        .eq('deal_id', dealId)
-        .group('component');
+        .select('component, amount')
+        .eq('deal_id', dealId);
       
       dealData = {
         deal_id: dealId,

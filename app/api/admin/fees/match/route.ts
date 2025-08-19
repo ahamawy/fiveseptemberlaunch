@@ -82,8 +82,8 @@ export async function PATCH(request: NextRequest) {
     const result = await engine.applyMatches(matches);
     
     return NextResponse.json({
-      success: true,
-      ...result
+      ...result,
+      success: true
     });
   } catch (error: any) {
     return NextResponse.json({

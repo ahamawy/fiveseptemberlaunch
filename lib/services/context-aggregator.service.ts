@@ -20,22 +20,10 @@ export class ContextAggregator {
     return await safeRead('DOCS/CSV_FORMATS.md');
   }
 
-  static async loadSchemaAsMarkdown(): Promise<string> {
-    // Fallback: include raw TypeScript schema file if markdown not available
-    const tsSchema = await safeRead('lib/knowledge/supabase-schema.ts');
-    if (!tsSchema) return '';
-    return '```typescript\n' + trimTo(tsSchema, 60_000) + '\n```';
-  }
-
   static async loadFullContext(): Promise<string> {
-    const parts: string[] = [];
-    parts.push(await safeRead('DOCS/EQUITIE_BOT_CONTEXT.md'));
-    parts.push(await safeRead('ARCHON_FEE_ENGINE_CONTEXT.md'));
-    parts.push(await safeRead('LEGACY_DEAL_ENGINE_DOCS.md'));
-    parts.push(await safeRead('DB/feature_tables_map.md'));
-    parts.push(await this.loadSchemaAsMarkdown());
-    parts.push(await this.loadCSVExamples());
-    return trimTo(parts.filter(Boolean).join('\n\n=== NEXT CONTEXT ===\n\n'), 140_000);
+    // Simplified - load single master context file
+    const masterContext = await safeRead('MASTER_CONTEXT.md');
+    return trimTo(masterContext, 100_000); // Hard limit for GPT
   }
 }
 
