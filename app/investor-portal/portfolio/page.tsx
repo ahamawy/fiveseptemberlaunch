@@ -224,6 +224,9 @@ export default function PortfolioPage() {
                           Company
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                          Type
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                           Committed
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
@@ -248,6 +251,9 @@ export default function PortfolioPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
                             {deal.companyName}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary capitalize">
+                            {deal.dealType === 'fund' ? 'Partnership' : deal.dealType.replace('_',' ')}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
                             {formatCurrency(deal.committed, deal.currency)}
@@ -280,7 +286,12 @@ export default function PortfolioPage() {
                       <CardContent>
                         <div className="mb-3">
                           <h4 className="text-sm font-semibold text-text-primary">{deal.dealName}</h4>
-                          <p className="text-xs text-text-secondary">{deal.companyName}</p>
+                          <p className="text-xs text-text-secondary">
+                            {deal.companyName}
+                            <span className="ml-2 px-2 py-0.5 rounded-full border border-white/10 text-[10px] uppercase tracking-wide text-white/70">
+                              {deal.dealType === 'fund' ? 'Partnership' : deal.dealType}
+                            </span>
+                          </p>
                         </div>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
