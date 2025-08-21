@@ -42,7 +42,6 @@ async function deriveForDeal(client: any, dealId: number) {
 
   // 2) Replace existing fees.fee_schedule scope rows for this deal
   const { error: delErr } = await client
-    .schema("fees")
     .from("fee_schedule")
     .delete()
     .eq("scope_type", "DEAL")
@@ -69,7 +68,6 @@ async function deriveForDeal(client: any, dealId: number) {
   });
 
   const { data: inserted, error: insErr } = await client
-    .schema("fees")
     .from("fee_schedule")
     .insert(insertRows)
     .select("id");

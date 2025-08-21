@@ -77,17 +77,15 @@ export class EnhancedFeeCalculator {
   async loadActiveFeeSchedule(dealId: number): Promise<FeeScheduleRow[]> {
     const supabase = this.client.getClient();
 
-    // Prefer fees.fee_schedule (DEAL scope) when available
-    const { data: feeRows, error: feeErr } = await supabase
-      .schema("fees")
-      .from("fee_schedule")
+    // Try to load from fee_schedule_config first (public schema)
+    const { data: configRows, error: configErr } = await supabase
+      .from("fee_schedule_config")
       .select("*")
-      .eq("scope_type", "DEAL")
-      .eq("scope_id", dealId)
-      .eq("is_active", true);
+      .eq("deal_id", dealId)
+      .order("precedence", { ascending: true });
 
-    if (feeErr) {
-      throw new Error(`Failed to load fee schedule: ${feeErr.message}`);
+    if (configErr) {
+      throw new Error(`Failed to load fee schedule: ${configErr.message}`);
     }
 
     const precedenceOrder: Record<string, number> = {
@@ -99,27 +97,25 @@ export class EnhancedFeeCalculator {
       ADVISORY: 6,
     };
 
-    if (Array.isArray(feeRows) && feeRows.length > 0) {
-      const rows = (feeRows || []).map((row: any) => {
-        const basisRaw = String(row.basis || "NET").toUpperCase();
+    if (Array.isArray(configRows) && configRows.length > 0) {
+      const rows = (configRows || []).map((row: any) => {
+        const basisRaw = String(row.basis || "GROSS").toUpperCase();
         const basis =
-          basisRaw === "GROSS" || basisRaw === "NET" ? basisRaw : "NET";
-        const isPercent = row.rate_percent != null && row.rate_percent !== "";
-        const rateNum = isPercent
-          ? parseFloat(row.rate_percent)
-          : parseFloat(row.amount || "0");
+          basisRaw === "GROSS" || basisRaw === "NET" ? basisRaw : "GROSS";
+        const isPercent = row.is_percent !== false;
+        const rateNum = parseFloat(row.rate || "0");
         const component = String(row.component || "").toUpperCase();
-        const precedence = precedenceOrder[component] ?? 99;
+        const precedence = row.precedence || precedenceOrder[component] || 99;
         return {
-          schedule_id: row.id || 0,
-          deal_id: Number(row.scope_id),
+          schedule_id: row.schedule_id || 0,
+          deal_id: Number(row.deal_id),
           component,
           rate: rateNum,
           is_percent: Boolean(isPercent),
           basis: basis as "GROSS" | "NET" | "NET_AFTER_PREMIUM",
           precedence,
-          effective_at: new Date(),
-          version: Number(row.version || 1),
+          effective_at: new Date(row.created_at || Date.now()),
+          version: 1,
         } as FeeScheduleRow;
       });
 

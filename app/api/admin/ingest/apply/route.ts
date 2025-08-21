@@ -32,7 +32,6 @@ export async function POST(req: NextRequest) {
       const profile = buildLegacyProfileFromMapping(usedMapping);
       const client = new SupabaseDirectClient(new SchemaConfig()).getClient();
       const { data: ins, error: insErr } = await (client as any)
-        .schema('fees')
         .from('calculator_profile')
         .insert({ name: `Profile deal ${deal_id}`,'kind':'LEGACY', config: profile })
         .select('id')
@@ -41,7 +40,6 @@ export async function POST(req: NextRequest) {
       profile_id = ins?.id;
 
       const { data: sched, error: schedErr } = await (client as any)
-        .schema('fees')
         .from('fee_schedule')
         .select('schedule_id')
         .eq('deal_id', deal_id)
@@ -50,8 +48,7 @@ export async function POST(req: NextRequest) {
       schedule_id = sched?.schedule_id;
       if (!schedule_id) {
         const { data: created, error: createErr } = await (client as any)
-          .schema('fees')
-          .from('fee_schedule')
+            .from('fee_schedule')
           .insert({ deal_id, component: 'STRUCTURING', rate: 0, is_percent: true, basis: 'GROSS' })
           .select('schedule_id')
           .single();
@@ -60,12 +57,10 @@ export async function POST(req: NextRequest) {
       }
       // Activate new version
       await (client as any)
-        .schema('fees')
         .from('schedule_version')
         .update({ is_active: false })
         .eq('schedule_id', schedule_id);
       const { error: verErr } = await (client as any)
-        .schema('fees')
         .from('schedule_version')
         .insert({ schedule_id, version: 1, calculator_profile_id: profile_id, is_active: true });
       if (verErr) return NextResponse.json({ error: verErr.message }, { status: 500 });

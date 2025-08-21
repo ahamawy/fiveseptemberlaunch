@@ -69,7 +69,6 @@ export async function stageLegacyImport(dealId: number, mapping: ExtractedDealDa
     discount_admin_pct: r.discount_admin_pct ?? 0
   }));
   const { error } = await (client as any)
-    .schema('fees')
     .from('legacy_import')
     .insert(insertRows);
   if (error) throw new Error(error.message);
