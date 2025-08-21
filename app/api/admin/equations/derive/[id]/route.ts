@@ -78,11 +78,11 @@ async function deriveForDeal(client: any, dealId: number) {
 
 export async function POST(
   _req: Request,
-  { params }: { params: { dealId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const supabase = new SupabaseDirectClient(new SchemaConfig()).getClient();
-    const param = params.dealId;
+    const param = params.id;
 
     if (param.toLowerCase() === "all") {
       // Derive for all deals present in public config
