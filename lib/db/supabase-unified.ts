@@ -51,9 +51,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDeals(filters?: DealFilters): Promise<Deal[]> {
     try {
-      // Use dotted table names directly
-      const tableName = 'deals.deal';
-      let query = this.client.from(tableName)
+      // Query deals schema explicitly to avoid public-only constraint
+      let query = (this.client as any)
+        .schema('deals')
+        .from('deal')
         .select('*')
         .order('deal_id', { ascending: false });
 
@@ -82,8 +83,9 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDealById(id: number): Promise<Deal | null> {
     try {
-      const tableName = 'deals.deal';
-      const { data, error } = await this.client.from(tableName)
+      const { data, error } = await (this.client as any)
+        .schema('deals')
+        .from('deal')
         .select('*')
         .eq('deal_id', id)
         .single();
@@ -102,9 +104,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDealBySlug(slug: string): Promise<Deal | null> {
     try {
-      const tableName = 'deals.deal';
       // First try to find by slug if column exists, otherwise by name
-      const { data, error } = await this.client.from(tableName)
+      const { data, error } = await (this.client as any)
+        .schema('deals')
+        .from('deal')
         .select('*')
         .ilike('deal_name', slug.replace(/-/g, ' '))
         .single();
@@ -176,8 +179,9 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCompanies(): Promise<Company[]> {
     try {
-      const tableName = 'companies.company';
-      const { data, error } = await this.client.from(tableName)
+      const { data, error } = await (this.client as any)
+        .schema('companies')
+        .from('company')
         .select('*')
         .order('company_id');
 
@@ -195,8 +199,9 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCompanyById(id: number): Promise<Company | null> {
     try {
-      const tableName = 'companies.company';
-      const { data, error } = await this.client.from(tableName)
+      const { data, error } = await (this.client as any)
+        .schema('companies')
+        .from('company')
         .select('*')
         .eq('company_id', id)
         .single();
