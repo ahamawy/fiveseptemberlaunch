@@ -61,6 +61,8 @@ docker run --rm --env-file ./.env.local -v "$PWD":/workspace -w /workspace your-
 ### Admin Tools
 
 - Chat: `/admin/chat`
-- Fees: `/admin/fees/profiles`
+- Formula System: `/admin/formulas`
+- Formula Manager: `/admin/formula-manager`
+- Fees (legacy profiles): `/admin/fees/profiles`
 
-## Last Updated: 2025-08-17
+## Last Updated: 2025-08-21

@@ -178,21 +178,21 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getInvestorByPublicId(publicId: string): Promise<Investor | null> {
     try {
-      const tableName = 'investors.investor';
+      const tableName = "investors.investor";
       const { data, error } = await this.client
         .from(tableName)
-        .select('*')
-        .eq('public_id', publicId)
+        .select("*")
+        .eq("public_id", publicId)
         .single();
 
       if (error) {
-        console.error('Error fetching investor by public_id:', error);
+        console.error("Error fetching investor by public_id:", error);
         return null;
       }
 
       return data ? this.mapInvestorFromDb(data) : null;
     } catch (error) {
-      console.error('Error in getInvestorByPublicId:', error);
+      console.error("Error in getInvestorByPublicId:", error);
       return null;
     }
   }

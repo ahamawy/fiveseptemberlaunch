@@ -107,13 +107,15 @@ export class InvestorsService extends BaseService {
   /**
    * Get investor by public_id (external-safe identifier)
    */
-  async getInvestorByPublicId(publicId: string): Promise<InvestorProfile | null> {
+  async getInvestorByPublicId(
+    publicId: string
+  ): Promise<InvestorProfile | null> {
     const cacheKey = `investor:public:${publicId}`;
     const cached = this.getCached<InvestorProfile>(cacheKey);
     if (cached) return cached;
 
     try {
-      this.log('getInvestorByPublicId', { publicId });
+      this.log("getInvestorByPublicId", { publicId });
       await this.delay();
 
       const adapter: any = this.dataClient as any;
@@ -123,13 +125,18 @@ export class InvestorsService extends BaseService {
       // Compute basic metrics similar to getInvestorById
       const [commitments, transactions] = await Promise.all([
         this.dataClient.getCommitments(investor.id),
-        this.dataClient.getTransactions({ investor_id: investor.id })
+        this.dataClient.getTransactions({ investor_id: investor.id }),
       ]);
 
-      const signedCommitments = commitments.filter((c) => c.status === 'signed');
-      const totalCommitted = signedCommitments.reduce((sum, c) => sum + c.amount, 0);
+      const signedCommitments = commitments.filter(
+        (c) => c.status === "signed"
+      );
+      const totalCommitted = signedCommitments.reduce(
+        (sum, c) => sum + c.amount,
+        0
+      );
       const capitalCalls = transactions.filter(
-        (t) => t.type === 'capital_call' && t.status === 'completed'
+        (t) => t.type === "capital_call" && t.status === "completed"
       );
       const totalCalled = capitalCalls.reduce((sum, t) => sum + t.amount, 0);
 
@@ -144,7 +151,7 @@ export class InvestorsService extends BaseService {
       this.setCache(cacheKey, profile);
       return profile;
     } catch (error) {
-      this.handleError(error, 'getInvestorByPublicId');
+      this.handleError(error, "getInvestorByPublicId");
     }
   }
 

@@ -16,7 +16,10 @@ export default function Nav() {
             <span className="inline-block">About</span>
           </Link>
           <motion.div {...micro("buttonPrimary")}>
-            <Link href="/investor-portal/dashboard" className={COMPONENT_STYLES.button.secondary}>
+            <Link
+              href="/investor-portal/dashboard"
+              className={COMPONENT_STYLES.button.secondary}
+            >
               Enter Portal
             </Link>
           </motion.div>
@@ -25,4 +28,3 @@ export default function Nav() {
     </nav>
   );
 }
-

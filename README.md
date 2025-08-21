@@ -10,14 +10,18 @@ npm run dev   # http://localhost:3000
 ## Key Features
 
 ### Investor Portal
+
 - `/investor-portal/dashboard` - Portfolio metrics
 - `/investor-portal/portfolio` - Holdings
 - `/investor-portal/transactions` - History
 - `/investor-portal/deals` - Opportunities
 
 ### Admin Tools
+
 - `/admin/chat` - AI assistant with fee calculations
-- `/admin/fees/profiles` - Fee management
+- `/admin/formulas` - Formula templates, assignments, testing
+- `/admin/formula-manager` - Visual formula editor
+- `/admin/fees/profiles` - Legacy fee profiles
 
 ## Environment Setup
 
@@ -28,6 +32,13 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
 NEXT_PUBLIC_USE_MOCK_DATA=false
 OPENROUTER_API_KEY=your-key
 ```
+
+### Supabase Schema Access
+
+- Use `@supabase/supabase-js` with explicit schemas for cross‑schema tables:
+  - Deals: `client.schema('deals').from('deal')`
+  - Companies: `client.schema('companies').from('company')`
+  - Public tables (e.g., `deal_formula_templates`) use default schema
 
 ## Testing
 
@@ -43,11 +54,20 @@ npx playwright test --ui  # Interactive
 - Discounts as negative amounts
 - Full audit trail
 
+## Formula System
+
+- Database‑driven formula templates and per‑deal assignments
+- API:
+  - `GET/POST /api/deals/[id]/formula`
+  - `POST /api/deals/[id]/calculate`, `GET /api/deals/[id]/calculate`
+- Admin UI: `/admin/formulas`, `/admin/formula-manager`
+
 ## Documentation
 
 - **Main**: [CLAUDE.md](./CLAUDE.md)
 - **Bot Context**: [MASTER_CONTEXT.md](./MASTER_CONTEXT.md)
 - **API**: [DOCS/API.md](./DOCS/API.md)
+  - Investors endpoint `/api/investors/[id]` accepts numeric id or `public_id`
 
 ## Database Sync (Drizzle)
 
@@ -73,7 +93,7 @@ npx playwright test --ui  # Interactive
 
 ## Chat Commands
 
-```
+```text
 "Calculate fees for deal 1 with $1M"
 "Import CSV" → Upload file
 "Show fee schedule"
@@ -90,9 +110,10 @@ npx playwright test --ui  # Interactive
 ```
 
 ## Status
+
 ✅ Supabase integrated
 ✅ ARCHON Fee Engine operational
 ✅ 25 tests passing
 ✅ AI assistant active
 
-Branch: `legacydealengines`
+Branch: `dealformulas`

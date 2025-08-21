@@ -73,6 +73,40 @@ const calculation = await enhancedFeeService.previewFees(
 - `"Import CSV"` → Upload to /admin/chat
 - `"Apply fees"` → Save to database
 
+## Formula System (Database‑Driven)
+
+### Admin UI
+
+- `/admin/formulas` — unified management (templates, assignments, testing)
+- `/admin/formula-manager` — visual formula editor
+
+### Core Endpoints
+
+```text
+GET  /api/admin/formulas
+GET  /api/admin/formulas/[id]
+POST /api/admin/formulas
+PUT  /api/admin/formulas/[id]
+DELETE /api/admin/formulas/[id]
+POST /api/admin/formulas/test
+
+GET  /api/deals/[id]/formula          # fetch active assignment
+POST /api/deals/[id]/formula          # assign template { formulaTemplateId }
+POST /api/deals/[id]/calculate        # perform calculation + audit
+GET  /api/deals/[id]/calculate        # fetch calculation history
+```
+
+### Assignment Source of Truth
+
+- `public.deal_formula_assignments` is the canonical linkage between deals and formula templates. We do not write to non‑public `core.deals` from the app.
+
+### Supabase Schema Usage
+
+- Use explicit schemas for reads:
+  - Deals: `schema('deals').from('deal')`
+  - Companies: `schema('companies').from('company')`
+- Public tables are accessed via default schema (e.g., `deal_formula_templates`, `deal_formula_assignments`).
+
 ## Database Schema (Key Tables)
 
 ### Core
@@ -88,6 +122,13 @@ const calculation = await enhancedFeeService.previewFees(
 - `fees.fee_application` - Applied fees
 - `fees.calculator_profile` - Calculation profiles
 
+### Formula System
+
+- `public.deal_formula_templates` — reusable formulas (NC, proceeds, flags)
+- `public.deal_formula_assignments` — deal→formula linkage with effective_date
+- `public.deal_variable_values` — variables by deal/investor/date
+- `public.calculation_audit_log` — audited calculation results
+
 ### Analytics
 
 - `investor_analytics` - Per-investor metrics
@@ -96,13 +137,21 @@ const calculation = await enhancedFeeService.previewFees(
 
 ## API Endpoints
 
-```
+```text
 GET  /api/deals
+GET  /api/deals/[id]/formula
+POST /api/deals/[id]/formula
+POST /api/deals/[id]/calculate
+GET  /api/deals/[id]/calculate
+GET  /api/investors/[id]             # id or public_id
 GET  /api/investors/[id]/dashboard
 GET  /api/investors/[id]/portfolio
 GET  /api/transactions
 POST /api/admin/fees/apply
 POST /api/admin/chat
+GET  /api/admin/formulas
+POST /api/admin/formulas
+POST /api/admin/formulas/test
 ```
 
 ## Configuration
@@ -148,6 +197,16 @@ npm run build           # Production build
 - Fee schedule management
 - CSV import with validation
 - Partner fee exclusion
+
+### Formula System
+
+- Database‑driven templates + assignments
+- New admin UI `/admin/formulas` with inline assignment table
+- New API: `/api/deals/[id]/formula`, `/api/deals/[id]/calculate`
+
+### Investors
+
+- GET `/api/investors/[id]` now accepts numeric ID or `public_id` (string)
 
 ### Admin Chat
 

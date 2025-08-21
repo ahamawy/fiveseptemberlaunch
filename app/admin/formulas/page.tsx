@@ -67,8 +67,12 @@ export default function FormulasPage() {
   const [testVariables, setTestVariables] = useState("{}");
   const [testResult, setTestResult] = useState<any>(null);
   const [selectedDeal, setSelectedDeal] = useState<number | null>(null);
-  const [selectedFormulaForDeal, setSelectedFormulaForDeal] = useState<number | null>(null);
-  const [dealFormulaMap, setDealFormulaMap] = useState<Record<number, { id: number; name: string; code: string } | null>>({});
+  const [selectedFormulaForDeal, setSelectedFormulaForDeal] = useState<
+    number | null
+  >(null);
+  const [dealFormulaMap, setDealFormulaMap] = useState<
+    Record<number, { id: number; name: string; code: string } | null>
+  >({});
 
   useEffect(() => {
     fetchFormulas();
@@ -105,7 +109,14 @@ export default function FormulasPage() {
               const r = await fetch(`/api/deals/${d.id}/formula`);
               const j = await r.json();
               if (j?.success && j?.data) {
-                return [d.id, { id: j.data.id, name: j.data.formula_name, code: j.data.formula_code }] as const;
+                return [
+                  d.id,
+                  {
+                    id: j.data.id,
+                    name: j.data.formula_name,
+                    code: j.data.formula_code,
+                  },
+                ] as const;
               }
               return [d.id, null] as const;
             } catch (_) {
@@ -113,8 +124,13 @@ export default function FormulasPage() {
             }
           })
         );
-        const map: Record<number, { id: number; name: string; code: string } | null> = {};
-        results.forEach(([id, val]) => { map[id] = val; });
+        const map: Record<
+          number,
+          { id: number; name: string; code: string } | null
+        > = {};
+        results.forEach(([id, val]) => {
+          map[id] = val;
+        });
         setDealFormulaMap(map);
       }
     } catch (error) {
@@ -176,7 +192,8 @@ export default function FormulasPage() {
             Formula Management System
           </h1>
           <p className="text-gray-400">
-            Centralized management for all deal formula templates and assignments
+            Centralized management for all deal formula templates and
+            assignments
           </p>
         </div>
 
@@ -195,7 +212,9 @@ export default function FormulasPage() {
                     Formula Templates
                   </h2>
                   <Button
-                    onClick={() => window.location.href = '/admin/formula-manager'}
+                    onClick={() =>
+                      (window.location.href = "/admin/formula-manager")
+                    }
                     className="bg-primary hover:bg-primary/90"
                   >
                     <PlusIcon className="w-4 h-4 mr-2" />
@@ -254,7 +273,10 @@ export default function FormulasPage() {
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                onClick={() => window.location.href = '/admin/formula-manager'}
+                                onClick={() =>
+                                  (window.location.href =
+                                    "/admin/formula-manager")
+                                }
                                 className="text-white hover:bg-white/10"
                               >
                                 <PencilIcon className="w-4 h-4" />
@@ -338,29 +360,43 @@ export default function FormulasPage() {
                   </div>
                 </div>
                 <div className="mt-8">
-                  <h3 className="text-white font-semibold mb-3">Current Assignments</h3>
+                  <h3 className="text-white font-semibold mb-3">
+                    Current Assignments
+                  </h3>
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow className="border-white/10">
                           <TableHead className="text-white">Deal</TableHead>
-                          <TableHead className="text-white">Current Formula</TableHead>
+                          <TableHead className="text-white">
+                            Current Formula
+                          </TableHead>
                           <TableHead className="text-white">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {deals.map((d) => (
                           <TableRow key={d.id} className="border-white/10">
-                            <TableCell className="text-white">{d.name}</TableCell>
+                            <TableCell className="text-white">
+                              {d.name}
+                            </TableCell>
                             <TableCell className="text-white font-mono">
-                              {dealFormulaMap[d.id]
-                                ? `${dealFormulaMap[d.id]!.code} — ${dealFormulaMap[d.id]!.name}`
-                                : <span className="text-white/60">(none)</span>}
+                              {dealFormulaMap[d.id] ? (
+                                `${dealFormulaMap[d.id]!.code} — ${
+                                  dealFormulaMap[d.id]!.name
+                                }`
+                              ) : (
+                                <span className="text-white/60">(none)</span>
+                              )}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Select
-                                  value={selectedDeal === d.id ? selectedFormulaForDeal?.toString() : undefined}
+                                  value={
+                                    selectedDeal === d.id
+                                      ? selectedFormulaForDeal?.toString()
+                                      : undefined
+                                  }
                                   onValueChange={(value) => {
                                     setSelectedDeal(d.id);
                                     setSelectedFormulaForDeal(Number(value));
@@ -373,7 +409,11 @@ export default function FormulasPage() {
                                     {formulas
                                       .filter((f) => f.is_active)
                                       .map((f) => (
-                                        <SelectItem key={f.id} value={f.id.toString()} className="text-white hover:bg-white/10">
+                                        <SelectItem
+                                          key={f.id}
+                                          value={f.id.toString()}
+                                          className="text-white hover:bg-white/10"
+                                        >
                                           {f.formula_name}
                                         </SelectItem>
                                       ))}
@@ -382,25 +422,42 @@ export default function FormulasPage() {
                                 <Button
                                   onClick={async () => {
                                     if (!selectedFormulaForDeal) return;
-                                    const res = await fetch(`/api/deals/${d.id}/formula`, {
-                                      method: 'POST',
-                                      headers: { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify({ formulaTemplateId: selectedFormulaForDeal })
-                                    });
+                                    const res = await fetch(
+                                      `/api/deals/${d.id}/formula`,
+                                      {
+                                        method: "POST",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                          formulaTemplateId:
+                                            selectedFormulaForDeal,
+                                        }),
+                                      }
+                                    );
                                     const j = await res.json();
                                     if (j?.success) {
                                       setDealFormulaMap({
                                         ...dealFormulaMap,
-                                        [d.id]: { id: j.data.id, name: j.data.formula_name, code: j.data.formula_code }
+                                        [d.id]: {
+                                          id: j.data.id,
+                                          name: j.data.formula_name,
+                                          code: j.data.formula_code,
+                                        },
                                       });
                                       setSelectedDeal(null);
                                       setSelectedFormulaForDeal(null);
                                     } else {
-                                      alert(j?.error || 'Failed to assign formula');
+                                      alert(
+                                        j?.error || "Failed to assign formula"
+                                      );
                                     }
                                   }}
                                   className="bg-primary hover:bg-primary/90"
-                                  disabled={selectedDeal !== d.id || !selectedFormulaForDeal}
+                                  disabled={
+                                    selectedDeal !== d.id ||
+                                    !selectedFormulaForDeal
+                                  }
                                 >
                                   Assign
                                 </Button>

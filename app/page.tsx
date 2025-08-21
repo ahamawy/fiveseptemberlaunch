@@ -8,8 +8,9 @@ import Footer from "@/components/landing/Footer";
 export default function HomePage() {
   return (
     <main
-      className="min-h-screen bg-[color:var(--bg,#0B071A)]"
+      className="bg-[color:var(--bg,#0B071A)]"
       style={{
+        minHeight: "100vh",
         background: "linear-gradient(180deg, #0B071A 0%, #040210 100%)",
       }}
     >

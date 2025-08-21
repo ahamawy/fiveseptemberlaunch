@@ -119,28 +119,16 @@ const PAGE_ROUTES: PageRoute[] = [
         description: 'AI assistant for document analysis'
       },
       { 
-        name: 'EQUITIE Fee Engine', 
-        path: '/admin/equitie-fee-engine',
+        name: 'Formula System', 
+        path: '/admin/formulas',
         icon: Icons.dollar,
-        description: 'Advanced fee calculation system'
+        description: 'Manage formula templates and assignments'
       },
       { 
-        name: 'Fee Profiles', 
-        path: '/admin/fees/profiles',
-        icon: Icons.settings,
-        description: 'Manage fee calculation profiles'
-      },
-      { 
-        name: 'Legacy Import', 
-        path: '/admin/fees/import',
-        icon: Icons.document,
-        description: 'Import legacy fee data'
-      },
-      { 
-        name: 'Deal Equations', 
-        path: '/admin/deal-equations',
+        name: 'Formula Builder', 
+        path: '/admin/formula-manager',
         icon: Icons.chart,
-        description: 'View and test deal fee equations'
+        description: 'Visual formula builder and editor'
       },
     ]
   },

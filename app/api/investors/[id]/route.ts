@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { investorsService } from '@/lib/services';
+import { NextRequest, NextResponse } from "next/server";
+import { investorsService } from "@/lib/services";
 
 export async function GET(
   request: NextRequest,
@@ -11,16 +11,19 @@ export async function GET(
     const investor = isNaN(asNumber)
       ? await investorsService.getInvestorByPublicId(params.id)
       : await investorsService.getInvestorById(asNumber);
-    
+
     if (!investor) {
-      return NextResponse.json({ error: 'Investor not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Investor not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(investor);
   } catch (error) {
-    console.error('Error fetching investor:', error);
+    console.error("Error fetching investor:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
