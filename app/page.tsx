@@ -4,6 +4,7 @@ import CTA from "@/components/landing/CTA";
 import Background from "@/components/landing/Background";
 import Nav from "@/components/landing/Nav";
 import Footer from "@/components/landing/Footer";
+import Positioning from "@/components/landing/Positioning";
 
 export default function HomePage() {
   return (
@@ -19,6 +20,7 @@ export default function HomePage() {
       <Hero />
       <div className="mt-4" />
       <Stats />
+      <Positioning />
       <div className="mt-8" />
       <CTA />
       <Footer />
