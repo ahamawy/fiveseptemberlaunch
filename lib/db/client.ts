@@ -56,6 +56,7 @@ export interface IDataClient {
   // Investors
   getInvestors(): Promise<Investor[]>;
   getInvestorById(id: number): Promise<Investor | null>;
+  getInvestorByPublicId(publicId: string): Promise<Investor | null>;
   getCurrentInvestor(): Promise<Investor | null>;
   
   // Companies

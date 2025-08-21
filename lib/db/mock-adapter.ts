@@ -226,6 +226,11 @@ export class MockAdapter implements IDataClient {
     return Promise.resolve(investor || null);
   }
 
+  async getInvestorByPublicId(publicId: string): Promise<Investor | null> {
+    const investor = this.investors.find(i => i.public_id === publicId);
+    return Promise.resolve(investor || null);
+  }
+
   async getCurrentInvestor(): Promise<Investor | null> {
     // Use mock user ID from environment or default to 1
     const mockUserId = parseInt(process.env.NEXT_PUBLIC_MOCK_USER_ID || '1');

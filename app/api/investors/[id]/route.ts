@@ -6,22 +6,14 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const investorId = parseInt(params.id);
-    
-    if (isNaN(investorId)) {
-      return NextResponse.json(
-        { error: 'Invalid investor ID' },
-        { status: 400 }
-      );
-    }
-
-    const investor = await investorsService.getInvestorById(investorId);
+    // Support numeric ID or public_id (non-numeric)
+    const asNumber = parseInt(params.id);
+    const investor = isNaN(asNumber)
+      ? await investorsService.getInvestorByPublicId(params.id)
+      : await investorsService.getInvestorById(asNumber);
     
     if (!investor) {
-      return NextResponse.json(
-        { error: 'Investor not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Investor not found' }, { status: 404 });
     }
 
     return NextResponse.json(investor);
