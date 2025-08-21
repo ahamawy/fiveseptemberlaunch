@@ -350,21 +350,36 @@ export class InvestorsService extends BaseService {
       const adapter = this.dataClient as any;
       const units = await adapter.getInvestorUnits(id);
       
-      // Get deals and companies to enrich the data
+      // Get deals to enrich the data
       const dealIds = [...new Set(units.map((u: any) => u.deal_id))];
       const deals = await Promise.all(
         dealIds.map(dealId => this.dataClient.getDealById(dealId))
       );
+
+      // Fetch related companies (the Deal type doesn't include company details by default)
+      const companyIds = [...new Set(
+        deals
+          .filter((d: any) => d && d.company_id)
+          .map((d: any) => d.company_id)
+      )];
+      const companies = await Promise.all(
+        companyIds.map((cid: number) => this.dataClient.getCompanyById(cid))
+      );
+      const companyMap: Record<number, any> = {};
+      companies.forEach((c: any) => {
+        if (c?.id) companyMap[c.id] = c;
+      });
       
       // Map units to portfolio format
       const holdings = units.map((unit: any) => {
         const deal = deals.find(d => d?.id === unit.deal_id);
+        const company = deal?.company_id ? companyMap[deal.company_id] : undefined;
         
         return {
           dealId: unit.deal_id,
           dealName: deal?.name || `Deal ${unit.deal_id}`,
-          companyName: deal?.company?.name || 'Unknown Company',
-          sector: deal?.company?.industry || 'Unknown',
+          companyName: company?.name || 'Unknown Company',
+          sector: company?.industry || 'Unknown',
           dealType: deal?.type || 'primary',
           committed: parseFloat(unit.investment_amount),
           called: parseFloat(unit.net_capital),
