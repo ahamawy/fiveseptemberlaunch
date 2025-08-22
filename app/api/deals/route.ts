@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dealsService } from "@/lib/services";
 import { getServiceClient } from "@/lib/db/supabase/server-client";
+import { findCompanyAssetUrls } from "@/lib/utils/storage";
 import type { DealStage, DealType } from "@/lib/db/types";
 
 export async function GET(request: NextRequest) {
@@ -56,32 +57,9 @@ export async function GET(request: NextRequest) {
         companyIdToDesc.set(c.company_id, c.company_description ?? null);
       });
       // Fetch storage assets per company
-      const bucket = "company-assets";
       for (const cid of companyIds) {
-        try {
-          const { data: files } = await sb.storage
-            .from(bucket)
-            .list(String(cid), { limit: 100 });
-          const list = Array.isArray(files) ? files : [];
-          const findFile = (candidates: string[]) =>
-            list.find((f) =>
-              candidates.some((name) => f.name.toLowerCase().includes(name))
-            );
-          const logoFile = findFile(["logo", "icon"]);
-          const bgFile = findFile(["background", "bg", "cover"]);
-          const makeUrl = (fileName?: string) => {
-            if (!fileName) return null;
-            const path = `${cid}/${fileName}`;
-            const pub = sb.storage.from(bucket).getPublicUrl(path);
-            return pub?.data?.publicUrl || null;
-          };
-          companyIdToAssets.set(cid, {
-            logo_url: makeUrl(logoFile?.name),
-            background_url: makeUrl(bgFile?.name),
-          });
-        } catch {
-          companyIdToAssets.set(cid, { logo_url: null, background_url: null });
-        }
+        const assets = await findCompanyAssetUrls(sb as any, cid as number);
+        companyIdToAssets.set(cid as number, assets);
       }
     }
     // Add investor_count and tx_count from transactions

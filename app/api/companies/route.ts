@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServiceClient } from "@/lib/db/supabase/server-client";
+import { findCompanyAssetUrls } from "@/lib/utils/storage";
 
 export async function GET() {
   try {
@@ -26,38 +27,9 @@ export async function GET() {
       });
     }
     // Enrich with asset URLs from storage bucket `company-assets/{company_id}`
-    const bucket = "company-assets";
-    async function getAssetUrls(companyId: number) {
-      try {
-        const { data: files } = await sb.storage
-          .from(bucket)
-          .list(String(companyId), {
-            limit: 100,
-          });
-        const list = Array.isArray(files) ? files : [];
-        const findFile = (candidates: string[]) =>
-          list.find((f) =>
-            candidates.some((name) => f.name.toLowerCase().includes(name))
-          );
-        const logoFile = findFile(["logo", "icon"]);
-        const bgFile = findFile(["background", "bg", "cover"]);
-        const makeUrl = (fileName?: string) => {
-          if (!fileName) return null;
-          const path = `${companyId}/${fileName}`;
-          const pub = sb.storage.from(bucket).getPublicUrl(path);
-          return pub?.data?.publicUrl || null;
-        };
-        return {
-          logo_url: makeUrl(logoFile?.name),
-          background_url: makeUrl(bgFile?.name),
-        } as const;
-      } catch {
-        return { logo_url: null, background_url: null } as const;
-      }
-    }
     const enriched = await Promise.all(
       (data || []).map(async (c: any) => {
-        const assets = await getAssetUrls(c.company_id);
+        const assets = await findCompanyAssetUrls(sb as any, c.company_id);
         return {
           ...c,
           deal_count: countsMap.get(c.company_id) || 0,

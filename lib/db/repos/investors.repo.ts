@@ -200,6 +200,7 @@ export class InvestorsRepo extends BaseRepo {
         currency: d.deal_currency || "USD",
         stage: d.deal_status || "active",
         documentsCount: docsByDeal.get(row.deal_id) || 0,
+        // asset urls resolved at consumer via /api/companies if needed
       };
     });
 
