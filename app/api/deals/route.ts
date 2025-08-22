@@ -88,6 +88,7 @@ export async function GET(request: NextRequest) {
     const dealIds = mapped.map((m: any) => m.id).filter(Boolean);
     let investorCountMap = new Map<number, number>();
     let txCountMap = new Map<number, number>();
+    let docsCountMap = new Map<number, number>();
     if (dealIds.length > 0) {
       const { data: tx } = await sb
         .from("transactions.transaction.primary")
@@ -101,6 +102,18 @@ export async function GET(request: NextRequest) {
         if (t.investor_id) investorsByDeal.get(d)!.add(t.investor_id);
       });
       investorsByDeal.forEach((set, d) => investorCountMap.set(d, set.size));
+
+      // Documents count per deal (all investors)
+      const { data: docs } = await (sb as any)
+        .schema('documents')
+        .from('document')
+        .select('deal_id')
+        .in('deal_id', dealIds);
+      (docs || []).forEach((d: any) => {
+        const id = d.deal_id as number;
+        if (!id) return;
+        docsCountMap.set(id, (docsCountMap.get(id) || 0) + 1);
+      });
     }
 
     const enriched = mapped.map((m: any) => ({
@@ -119,6 +132,7 @@ export async function GET(request: NextRequest) {
         : null,
       investor_count: investorCountMap.get(m.id) || 0,
       tx_count: txCountMap.get(m.id) || 0,
+      documents_count: docsCountMap.get(m.id) || 0,
       display: `${m.name} — ${
         m.company_id
           ? companyIdToName.get(m.company_id) || `Company #${m.company_id}`

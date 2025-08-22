@@ -160,6 +160,22 @@ export class InvestorsRepo extends BaseRepo {
       })
     );
 
+    // Documents count per deal for this investor
+    const docsByDeal = new Map<number, number>();
+    try {
+      const { data: docs } = await (this.db as any)
+        .schema("documents")
+        .from("document")
+        .select("deal_id")
+        .in("deal_id", dealIds)
+        .eq("investor_id", investorId);
+      (docs || []).forEach((d: any) => {
+        const id = d.deal_id as number;
+        if (!id) return;
+        docsByDeal.set(id, (docsByDeal.get(id) || 0) + 1);
+      });
+    } catch {}
+
     const dealsOut = perDeal.map((row) => {
       const d = dealIdToDeal.get(row.deal_id) || {};
       const comp = d.underlying_company_id
@@ -183,6 +199,7 @@ export class InvestorsRepo extends BaseRepo {
         status: (d.deal_status || "active").toString().toLowerCase(),
         currency: d.deal_currency || "USD",
         stage: d.deal_status || "active",
+        documentsCount: docsByDeal.get(row.deal_id) || 0,
       };
     });
 

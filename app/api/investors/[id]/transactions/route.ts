@@ -45,7 +45,7 @@ export async function GET(
     const { data: deals } = await (sb as any)
       .schema("deals")
       .from("deal")
-      .select("deal_id, deal_name, underlying_company_id")
+      .select("deal_id, deal_name, deal_currency, underlying_company_id")
       .in("deal_id", dealIds);
     const dealIdToDeal = new Map<number, any>();
     const companyIds = new Set<number>();
@@ -56,17 +56,38 @@ export async function GET(
     const { data: companies } = await (sb as any)
       .schema("companies")
       .from("company")
-      .select("company_id, company_name")
+      .select("company_id, company_name, company_sector")
       .in("company_id", Array.from(companyIds));
     const companyIdToName = new Map<number, string>();
-    (companies || []).forEach((c: any) =>
-      companyIdToName.set(c.company_id, c.company_name)
-    );
+    const companyIdToSector = new Map<number, string | null>();
+    (companies || []).forEach((c: any) => {
+      companyIdToName.set(c.company_id, c.company_name);
+      companyIdToSector.set(c.company_id, c.company_sector || null);
+    });
+
+    // Documents per deal for this investor
+    let docsByDeal = new Map<number, number>();
+    if (dealIds.length > 0) {
+      const { data: docs } = await (sb as any)
+        .schema("documents")
+        .from("document")
+        .select("deal_id")
+        .in("deal_id", dealIds)
+        .eq("investor_id", investorId);
+      (docs || []).forEach((d: any) => {
+        const id = d.deal_id as number;
+        if (!id) return;
+        docsByDeal.set(id, (docsByDeal.get(id) || 0) + 1);
+      });
+    }
 
     const enriched = rows.map((t: any) => {
       const deal = t.deal_id ? dealIdToDeal.get(t.deal_id) : null;
       const companyName = deal?.underlying_company_id
         ? companyIdToName.get(deal.underlying_company_id) || null
+        : null;
+      const companySector = deal?.underlying_company_id
+        ? companyIdToSector.get(deal.underlying_company_id) || null
         : null;
       const occurred_on =
         t.transaction_date || t.created_at || t.processed_at || null;
@@ -76,7 +97,7 @@ export async function GET(
         t.gross_capital ??
         t.amount ??
         null;
-      const currency = t.currency || "USD";
+      const currency = t.currency || deal?.deal_currency || "USD";
       const rawType = t.transaction_type || t.type || null;
       const inferredType =
         rawType ||
@@ -89,10 +110,13 @@ export async function GET(
         ...t,
         dealName: deal?.deal_name || null,
         companyName,
+        companySector,
+        companySector: companySector,
         transaction_date: occurred_on,
         amount: normalizedAmount,
         currency,
         type: inferredType,
+        documentsCount: t.deal_id ? docsByDeal.get(t.deal_id) || 0 : 0,
       };
     });
 
