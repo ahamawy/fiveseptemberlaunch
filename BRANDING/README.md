@@ -21,6 +21,24 @@ import {
 - `theme`: helper to access CSS variables
 - `brandCSS`: CSS-in-JS helpers
 
+### Charts Theme
+
+`BRAND_CONFIG.charts` exposes:
+
+- `palette` (primary, accent, success, info, warning, error)
+- `gridColor`, `tickColor`, `tooltipBg`, `tooltipBorder`, `fontFamily`
+
+Wrappers (pre-themed):
+
+- Chart.js: `components/ui/Charts.tsx` (`LineChart`, `DoughnutChart`, `BarChartJS`)
+- Nivo: `components/ui/NivoCharts.tsx` (`NivoLine`, `NivoPie`, `NivoBar`)
+- Victory: `components/ui/VictoryCharts.tsx` (`VictoryLineChart`, `VictoryPieChart`)
+
+Motion & DnD:
+
+- Motion helper: `components/ui/Motion.tsx` (`MotionSection`)
+- DnD Kit: `components/ui/DnD.tsx` (`SortableList`)
+
 ## Guidelines
 
 - Keep style helpers in `lib/theme-utils.ts`

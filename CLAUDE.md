@@ -30,6 +30,25 @@ const primaryColor = BRAND_CONFIG.colors.primary.hero;
 const cardStyle = COMPONENT_STYLES.card.gradient;
 ```
 
+### Charts, Motion, and DnD (Themed)
+
+- Chart libraries available and pre-themed via brand tokens:
+  - Chart.js wrappers: `components/ui/Charts.tsx` (`LineChart`, `DoughnutChart`, `BarChartJS`)
+  - Nivo wrappers: `components/ui/NivoCharts.tsx` (`NivoLine`, `NivoPie`, `NivoBar`)
+  - Victory wrappers: `components/ui/VictoryCharts.tsx` (`VictoryLineChart`, `VictoryPieChart`)
+- Drag & Drop utilities (DnD Kit): `components/ui/DnD.tsx` (`SortableList`)
+- Motion helper (framer-motion): `components/ui/Motion.tsx` (`MotionSection`)
+
+Brand tokens for charts are exposed under `BRAND_CONFIG.charts` (palette, gridColor, tickColor, tooltipBg, tooltipBorder, fontFamily).
+
+Usage example (Nivo Pie):
+
+```tsx
+import { NivoPie } from "@/components/ui/NivoCharts";
+
+<NivoPie data={[{ id: "Tech", value: 420 }, { id: "Healthcare", value: 210 }]} />
+```
+
 ## Service Layer Pattern
 
 ```typescript

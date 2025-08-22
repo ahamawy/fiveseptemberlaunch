@@ -88,4 +88,13 @@ docker run --rm --env-file ./.env.local -v "$PWD":/workspace -w /workspace your-
 - ARCHON Fee Engine: `/admin/equitie-fee-engine`
 - Deal Equations: `/admin/deal-equations`
 
+## UI & Visualization
+
+- Chart wrappers (brand-themed):
+  - Chart.js: `components/ui/Charts.tsx`
+  - Nivo: `components/ui/NivoCharts.tsx`
+  - Victory: `components/ui/VictoryCharts.tsx`
+- Motion helper: `components/ui/Motion.tsx`
+- Drag & Drop: `components/ui/DnD.tsx`
+
 ## Last Updated: 2025-08-22
