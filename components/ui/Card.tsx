@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { ReactNode } from 'react';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'glass' | 'gradient' | 'elevated' | 'default';
+  variant?: 'glass' | 'gradient' | 'elevated' | 'default' | 'outline';
   children: ReactNode;
 }
 
@@ -18,7 +18,8 @@ export function Card({
     default: 'bg-surface border border-surface-border',
     glass: 'bg-glass-medium backdrop-blur-xl border border-glass-border',
     gradient: 'bg-gradient-to-br from-primary-300/10 via-surface to-secondary-blue/10 border border-primary-300/20',
-    elevated: 'bg-surface-elevated border border-surface-border shadow-elevated'
+    elevated: 'bg-surface-elevated border border-surface-border shadow-elevated',
+    outline: 'bg-transparent border border-surface-border'
   };
 
   return (
@@ -47,13 +48,22 @@ export function CardHeader({
   );
 }
 
+interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  gradient?: boolean;
+}
+
 export function CardTitle({
   className,
   children,
+  gradient,
   ...props
-}: React.HTMLAttributes<HTMLHeadingElement>) {
+}: CardTitleProps) {
+  const base = 'text-xl font-semibold text-white';
+  const gradientClass = gradient
+    ? 'bg-gradient-to-r from-primary-300 to-accent-blue text-gradient'
+    : '';
   return (
-    <h3 className={cn('text-xl font-semibold text-white', className)} {...props}>
+    <h3 className={cn(base, gradientClass, className)} {...props}>
       {children}
     </h3>
   );
@@ -78,6 +88,18 @@ export function CardContent({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div className={cn('', className)} {...props}>
+      {children}
+    </div>
+  );
+}
+
+export function CardFooter({
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={cn('mt-4 pt-4 border-t border-surface-border', className)} {...props}>
       {children}
     </div>
   );

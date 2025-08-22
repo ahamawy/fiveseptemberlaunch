@@ -111,7 +111,6 @@ export async function GET(
         dealName: deal?.deal_name || null,
         companyName,
         companySector,
-        companySector: companySector,
         transaction_date: occurred_on,
         amount: normalizedAmount,
         currency,
