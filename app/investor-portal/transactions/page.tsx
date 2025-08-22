@@ -1,11 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
-import { formatCurrency, formatDate } from '@/lib/theme-utils';
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/Table";
+import { formatCurrency, formatDate } from "@/lib/theme-utils";
 
 interface Transaction {
   id: number;
@@ -46,25 +54,37 @@ interface TransactionsData {
 export default function TransactionsPage() {
   const [data, setData] = useState<TransactionsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [filterType, setFilterType] = useState<string>('');
-  const [filterStatus, setFilterStatus] = useState<string>('');
+  const [filterType, setFilterType] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const searchParams = useSearchParams();
+  const investorParam = searchParams.get("investor");
 
   useEffect(() => {
     fetchTransactionsData();
-  }, [filterType, filterStatus, currentPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterType, filterStatus, currentPage, investorParam]);
 
   const fetchTransactionsData = async () => {
     try {
       const params = new URLSearchParams();
-      if (filterType) params.append('type', filterType);
-      if (filterStatus) params.append('status', filterStatus);
-      params.append('page', currentPage.toString());
-      params.append('limit', '10');
+      if (filterType) params.append("type", filterType);
+      if (filterStatus) params.append("status", filterStatus);
+      params.append("page", currentPage.toString());
+      params.append("limit", "10");
 
-      const response = await fetch(`/api/investors/1/transactions?${params.toString()}`);
+      const investorId =
+        investorParam ||
+        (typeof window !== "undefined"
+          ? localStorage.getItem("equitie-current-investor-id")
+          : null) ||
+        "1";
+      const response = await fetch(
+        `/api/investors/${investorId}/transactions?${params.toString()}`
+      );
       const result = await response.json();
-      
+
       // Transform the API response to the expected structure
       const transactionsData: TransactionsData = {
         transactions: (result.data || []).map((t: any) => ({
@@ -75,13 +95,13 @@ export default function TransactionsPage() {
           dealCode: t.dealCode || null,
           companyName: t.companyName || null,
           occurredOn: t.processed_at || t.created_at || t.occurredOn,
-          currency: t.currency || 'USD',
+          currency: t.currency || "USD",
           amount: t.amount || 0,
           type: t.type,
           status: t.status,
-          description: t.description || '',
-          reference: t.reference || '',
-          createdAt: t.created_at || t.createdAt
+          description: t.description || "",
+          reference: t.reference || "",
+          createdAt: t.created_at || t.createdAt,
         })),
         pagination: {
           page: currentPage,
@@ -89,23 +109,32 @@ export default function TransactionsPage() {
           totalCount: result.data?.length || 0,
           totalPages: Math.ceil((result.data?.length || 0) / 10),
           hasNextPage: false,
-          hasPreviousPage: currentPage > 1
+          hasPreviousPage: currentPage > 1,
         },
         summary: {
-          totalCapitalCalls: result.data?.filter((t: any) => t.type === 'capital_call')
-            .reduce((sum: number, t: any) => sum + t.amount, 0) || 0,
-          totalDistributions: result.data?.filter((t: any) => t.type === 'distribution')
-            .reduce((sum: number, t: any) => sum + t.amount, 0) || 0,
-          totalFees: result.data?.filter((t: any) => t.type === 'fee')
-            .reduce((sum: number, t: any) => sum + t.amount, 0) || 0,
-          pendingTransactions: result.data?.filter((t: any) => t.status === 'pending').length || 0,
-          completedTransactions: result.data?.filter((t: any) => t.status === 'completed').length || 0
-        }
+          totalCapitalCalls:
+            result.data
+              ?.filter((t: any) => t.type === "capital_call")
+              .reduce((sum: number, t: any) => sum + t.amount, 0) || 0,
+          totalDistributions:
+            result.data
+              ?.filter((t: any) => t.type === "distribution")
+              .reduce((sum: number, t: any) => sum + t.amount, 0) || 0,
+          totalFees:
+            result.data
+              ?.filter((t: any) => t.type === "fee")
+              .reduce((sum: number, t: any) => sum + t.amount, 0) || 0,
+          pendingTransactions:
+            result.data?.filter((t: any) => t.status === "pending").length || 0,
+          completedTransactions:
+            result.data?.filter((t: any) => t.status === "completed").length ||
+            0,
+        },
       };
-      
+
       setData(transactionsData);
     } catch (error) {
-      console.error('Error fetching transactions data:', error);
+      console.error("Error fetching transactions data:", error);
     } finally {
       setLoading(false);
     }
@@ -115,9 +144,24 @@ export default function TransactionsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-text-secondary">
-          <svg className="animate-spin h-8 w-8 text-primary-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          <svg
+            className="animate-spin h-8 w-8 text-primary-300 mx-auto mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
           </svg>
           Loading transactions...
         </div>
@@ -136,62 +180,128 @@ export default function TransactionsPage() {
   }
 
   const getTypeBadge = (type: string) => {
-    const variants: Record<string, 'error' | 'success' | 'warning' | 'info' | 'default'> = {
-      capital_call: 'error',
-      distribution: 'success',
-      fee: 'warning',
-      refund: 'info',
-      adjustment: 'default',
+    const variants: Record<
+      string,
+      "error" | "success" | "warning" | "info" | "default"
+    > = {
+      capital_call: "error",
+      distribution: "success",
+      fee: "warning",
+      refund: "info",
+      adjustment: "default",
     };
-    return variants[type] || 'default';
+    return variants[type] || "default";
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'warning' | 'success' | 'error' | 'default'> = {
-      pending: 'warning',
-      completed: 'success',
-      failed: 'error',
-      cancelled: 'default',
+    const variants: Record<
+      string,
+      "warning" | "success" | "error" | "default"
+    > = {
+      pending: "warning",
+      completed: "success",
+      failed: "error",
+      cancelled: "default",
     };
-    return variants[status] || 'default';
+    return variants[status] || "default";
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'capital_call':
+      case "capital_call":
         return (
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 11l5-5m0 0l5 5m-5-5v12"
+            />
           </svg>
         );
-      case 'distribution':
+      case "distribution":
         return (
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 13l-5 5m0 0l-5-5m5 5V6"
+            />
           </svg>
         );
-      case 'fee':
+      case "fee":
         return (
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
         );
-      case 'refund':
+      case "refund":
         return (
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+            />
           </svg>
         );
-      case 'adjustment':
+      case "adjustment":
         return (
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+            />
           </svg>
         );
       default:
         return (
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+            />
           </svg>
         );
     }
@@ -266,7 +376,9 @@ export default function TransactionsPage() {
           {/* Filters */}
           <div className="flex flex-wrap gap-4 mb-6">
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1">Type</label>
+              <label className="block text-sm font-medium text-text-secondary mb-1">
+                Type
+              </label>
               <select
                 value={filterType}
                 onChange={(e) => {
@@ -284,7 +396,9 @@ export default function TransactionsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1">Status</label>
+              <label className="block text-sm font-medium text-text-secondary mb-1">
+                Status
+              </label>
               <select
                 value={filterStatus}
                 onChange={(e) => {
@@ -324,8 +438,10 @@ export default function TransactionsPage() {
                     </TableCell>
                     <TableCell>
                       <Badge variant={getTypeBadge(transaction.type)}>
-                        <span className="mr-1 inline-flex">{getTypeIcon(transaction.type)}</span>
-                        {transaction.type.replace('_', ' ')}
+                        <span className="mr-1 inline-flex">
+                          {getTypeIcon(transaction.type)}
+                        </span>
+                        {transaction.type.replace("_", " ")}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-text-primary">
@@ -334,17 +450,34 @@ export default function TransactionsPage() {
                     <TableCell>
                       {transaction.dealName ? (
                         <div>
-                          <div className="text-sm text-text-primary">{transaction.dealName}</div>
-                          <div className="text-xs text-text-muted">{transaction.companyName}</div>
+                          <div className="text-sm text-text-primary">
+                            {transaction.dealName}
+                          </div>
+                          <div className="text-xs text-text-muted">
+                            {transaction.companyName}
+                          </div>
                         </div>
                       ) : (
                         <span className="text-sm text-text-muted">N/A</span>
                       )}
                     </TableCell>
                     <TableCell className="font-medium">
-                      <span className={transaction.type === 'capital_call' || transaction.type === 'fee' ? 'text-error' : 'text-success'}>
-                        {transaction.type === 'capital_call' || transaction.type === 'fee' ? '-' : '+'}
-                        {formatCurrency(transaction.amount, transaction.currency)}
+                      <span
+                        className={
+                          transaction.type === "capital_call" ||
+                          transaction.type === "fee"
+                            ? "text-error"
+                            : "text-success"
+                        }
+                      >
+                        {transaction.type === "capital_call" ||
+                        transaction.type === "fee"
+                          ? "-"
+                          : "+"}
+                        {formatCurrency(
+                          transaction.amount,
+                          transaction.currency
+                        )}
                       </span>
                     </TableCell>
                     <TableCell className="text-text-secondary text-sm">
@@ -363,14 +496,26 @@ export default function TransactionsPage() {
 
           {data.transactions.length === 0 && (
             <div className="text-center py-12">
-              <svg className="mx-auto h-12 w-12 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              <svg
+                className="mx-auto h-12 w-12 text-text-muted"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-text-primary">No transactions found</h3>
+              <h3 className="mt-2 text-sm font-medium text-text-primary">
+                No transactions found
+              </h3>
               <p className="mt-1 text-sm text-text-muted">
                 {filterType || filterStatus
-                  ? 'Try adjusting your filters'
-                  : 'Transactions will appear here when available'}
+                  ? "Try adjusting your filters"
+                  : "Transactions will appear here when available"}
               </p>
             </div>
           )}
@@ -379,13 +524,15 @@ export default function TransactionsPage() {
           {data.transactions.length > 0 && (
             <div className="mt-6 flex items-center justify-between">
               <div className="text-sm text-text-secondary">
-                Showing page {data.pagination.page} of {data.pagination.totalPages} ({data.pagination.totalCount} total transactions)
+                Showing page {data.pagination.page} of{" "}
+                {data.pagination.totalPages} ({data.pagination.totalCount} total
+                transactions)
               </div>
               <div className="flex gap-2">
                 <Button
                   onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={!data.pagination.hasPreviousPage}
-                  variant={data.pagination.hasPreviousPage ? 'glass' : 'ghost'}
+                  variant={data.pagination.hasPreviousPage ? "glass" : "ghost"}
                   size="sm"
                 >
                   Previous
@@ -393,7 +540,7 @@ export default function TransactionsPage() {
                 <Button
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={!data.pagination.hasNextPage}
-                  variant={data.pagination.hasNextPage ? 'primary' : 'ghost'}
+                  variant={data.pagination.hasNextPage ? "primary" : "ghost"}
                   size="sm"
                 >
                   Next

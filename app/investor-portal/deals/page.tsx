@@ -1,11 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
-import { formatCurrency, formatPercentage } from '@/lib/theme-utils';
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/Table";
+import { formatCurrency, formatPercentage } from "@/lib/theme-utils";
 
 interface Commitment {
   id: number;
@@ -50,19 +64,29 @@ interface CommitmentsData {
 export default function DealsPage() {
   const [data, setData] = useState<CommitmentsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [filterStage, setFilterStage] = useState<string>('all');
+  const [filterStage, setFilterStage] = useState<string>("all");
+
+  const searchParams = useSearchParams();
+  const investorParam = searchParams.get("investor");
 
   useEffect(() => {
     fetchCommitmentsData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [investorParam]);
 
   const fetchCommitmentsData = async () => {
     try {
-      const response = await fetch('/api/investors/1/commitments');
+      const investorId =
+        investorParam ||
+        (typeof window !== "undefined"
+          ? localStorage.getItem("equitie-current-investor-id")
+          : null) ||
+        "1";
+      const response = await fetch(`/api/investors/${investorId}/commitments`);
       const commitmentsData = await response.json();
       setData(commitmentsData);
     } catch (error) {
-      console.error('Error fetching commitments data:', error);
+      console.error("Error fetching commitments data:", error);
     } finally {
       setLoading(false);
     }
@@ -72,9 +96,24 @@ export default function DealsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-text-secondary">
-          <svg className="animate-spin h-8 w-8 text-primary-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          <svg
+            className="animate-spin h-8 w-8 text-primary-300 mx-auto mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
           </svg>
           Loading deals...
         </div>
@@ -93,31 +132,40 @@ export default function DealsPage() {
   }
 
   const getStageBadge = (stage: string) => {
-    const variants: Record<string, 'warning' | 'info' | 'success' | 'error' | 'default' | 'gradient'> = {
-      sourcing: 'warning',
-      due_diligence: 'info',
-      closing: 'gradient',
-      active: 'success',
-      exited: 'default',
-      cancelled: 'error',
+    const variants: Record<
+      string,
+      "warning" | "info" | "success" | "error" | "default" | "gradient"
+    > = {
+      sourcing: "warning",
+      due_diligence: "info",
+      closing: "gradient",
+      active: "success",
+      exited: "default",
+      cancelled: "error",
     };
-    return variants[stage] || 'default';
+    return variants[stage] || "default";
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'success' | 'warning' | 'error' | 'default'> = {
-      signed: 'success',
-      draft: 'warning',
-      cancelled: 'error',
+    const variants: Record<
+      string,
+      "success" | "warning" | "error" | "default"
+    > = {
+      signed: "success",
+      draft: "warning",
+      cancelled: "error",
     };
-    return variants[status] || 'default';
+    return variants[status] || "default";
   };
 
-  const filteredCommitments = filterStage === 'all'
-    ? data.commitments
-    : data.commitments.filter(c => c.dealStage === filterStage);
+  const filteredCommitments =
+    filterStage === "all"
+      ? data.commitments
+      : data.commitments.filter((c) => c.dealStage === filterStage);
 
-  const uniqueStages = Array.from(new Set(data.commitments.map(c => c.dealStage)));
+  const uniqueStages = Array.from(
+    new Set(data.commitments.map((c) => c.dealStage))
+  );
 
   return (
     <div className="space-y-8">
@@ -190,11 +238,24 @@ export default function DealsPage() {
 
       {/* Upcoming Capital Calls */}
       {data.upcomingCalls.length > 0 && (
-        <Card variant="glass" className="border-accent-yellow/30 bg-accent-yellow/5">
+        <Card
+          variant="glass"
+          className="border-accent-yellow/30 bg-accent-yellow/5"
+        >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <svg className="w-6 h-6 text-accent-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <svg
+                className="w-6 h-6 text-accent-yellow"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
               </svg>
               Upcoming Capital Calls
             </CardTitle>
@@ -202,14 +263,23 @@ export default function DealsPage() {
           <CardContent>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {data.upcomingCalls.slice(0, 3).map((call, idx) => (
-                <Card key={idx} variant="glass" className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={idx}
+                  variant="glass"
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardContent className="p-4">
-                    <p className="text-sm text-text-secondary">{call.dealName}</p>
+                    <p className="text-sm text-text-secondary">
+                      {call.dealName}
+                    </p>
                     <p className="text-lg font-bold text-text-primary mt-1">
                       {formatCurrency(call.amount, call.currency)}
                     </p>
                     <p className="text-xs text-text-muted mt-1">
-                      Expected: {call.date ? new Date(call.date).toLocaleDateString() : 'TBD'}
+                      Expected:{" "}
+                      {call.date
+                        ? new Date(call.date).toLocaleDateString()
+                        : "TBD"}
                     </p>
                   </CardContent>
                 </Card>
@@ -226,21 +296,21 @@ export default function DealsPage() {
             <CardTitle>All Commitments</CardTitle>
             <div className="flex gap-2 flex-wrap">
               <Button
-                variant={filterStage === 'all' ? 'primary' : 'glass'}
+                variant={filterStage === "all" ? "primary" : "glass"}
                 size="sm"
-                onClick={() => setFilterStage('all')}
+                onClick={() => setFilterStage("all")}
               >
                 All
               </Button>
-              {uniqueStages.map(stage => (
+              {uniqueStages.map((stage) => (
                 <Button
                   key={stage}
-                  variant={filterStage === stage ? 'primary' : 'glass'}
+                  variant={filterStage === stage ? "primary" : "glass"}
                   size="sm"
                   onClick={() => setFilterStage(stage)}
                   className="capitalize"
                 >
-                  {stage.replace('_', ' ')}
+                  {stage.replace("_", " ")}
                 </Button>
               ))}
             </div>
@@ -270,28 +340,43 @@ export default function DealsPage() {
                         <div className="font-medium text-text-primary">
                           {commitment.dealName}
                         </div>
-                        <div className="text-xs text-text-muted">{commitment.dealCode}</div>
+                        <div className="text-xs text-text-muted">
+                          {commitment.dealCode}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <div className="text-sm text-text-primary">{commitment.companyName}</div>
-                        <div className="text-xs text-text-muted">{commitment.companySector}</div>
+                        <div className="text-sm text-text-primary">
+                          {commitment.companyName}
+                        </div>
+                        <div className="text-xs text-text-muted">
+                          {commitment.companySector}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <Badge variant={getStageBadge(commitment.dealStage)}>
-                        {commitment.dealStage.replace('_', ' ')}
+                        {commitment.dealStage.replace("_", " ")}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-text-primary">
-                      {formatCurrency(commitment.committedAmount, commitment.currency)}
+                      {formatCurrency(
+                        commitment.committedAmount,
+                        commitment.currency
+                      )}
                     </TableCell>
                     <TableCell className="text-text-primary">
-                      {formatCurrency(commitment.capitalCalled, commitment.currency)}
+                      {formatCurrency(
+                        commitment.capitalCalled,
+                        commitment.currency
+                      )}
                     </TableCell>
                     <TableCell className="text-text-primary">
-                      {formatCurrency(commitment.capitalRemaining, commitment.currency)}
+                      {formatCurrency(
+                        commitment.capitalRemaining,
+                        commitment.currency
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -299,7 +384,9 @@ export default function DealsPage() {
                           <div className="bg-background-surface rounded-full h-2 overflow-hidden">
                             <div
                               className="bg-primary-300 h-2 transition-all duration-300"
-                              style={{ width: `${commitment.percentageCalled}%` }}
+                              style={{
+                                width: `${commitment.percentageCalled}%`,
+                              }}
                             />
                           </div>
                         </div>
@@ -309,7 +396,10 @@ export default function DealsPage() {
                       </div>
                     </TableCell>
                     <TableCell className="text-accent-green">
-                      {formatCurrency(commitment.capitalDistributed, commitment.currency)}
+                      {formatCurrency(
+                        commitment.capitalDistributed,
+                        commitment.currency
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge variant={getStatusBadge(commitment.status) as any}>
@@ -324,10 +414,22 @@ export default function DealsPage() {
 
           {filteredCommitments.length === 0 && (
             <div className="text-center py-12">
-              <svg className="mx-auto h-12 w-12 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              <svg
+                className="mx-auto h-12 w-12 text-text-muted"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-text-primary">No deals found</h3>
+              <h3 className="mt-2 text-sm font-medium text-text-primary">
+                No deals found
+              </h3>
               <p className="mt-1 text-sm text-text-muted">
                 Try adjusting your filters or check back later for new deals.
               </p>

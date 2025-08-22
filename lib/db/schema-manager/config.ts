@@ -14,14 +14,14 @@ export class SchemaConfig {
    * Check if running in development mode
    */
   isDevelopment(): boolean {
-    return this.env.NODE_ENV === 'development';
+    return this.env.NODE_ENV === "development";
   }
 
   /**
    * Check if running in production mode
    */
   isProduction(): boolean {
-    return this.env.NODE_ENV === 'production';
+    return this.env.NODE_ENV === "production";
   }
 
   /**
@@ -30,14 +30,15 @@ export class SchemaConfig {
   hasSupabaseCredentials(): boolean {
     const url = this.env.NEXT_PUBLIC_SUPABASE_URL;
     const anonKey = this.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    
+
     // Check for placeholder values
-    const isPlaceholder = url === 'https://placeholder.supabase.co' || 
-                         anonKey === 'placeholder-anon-key';
-    
+    const isPlaceholder =
+      url === "https://placeholder.supabase.co" ||
+      anonKey === "placeholder-anon-key";
+
     // Also check if Supabase is explicitly disabled
-    const isSupabaseEnabled = this.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true';
-    
+    const isSupabaseEnabled = this.env.NEXT_PUBLIC_ENABLE_SUPABASE === "true";
+
     return !!(url && anonKey && !isPlaceholder && isSupabaseEnabled);
   }
 
@@ -45,14 +46,14 @@ export class SchemaConfig {
    * Check if MCP is explicitly enabled
    */
   isMCPEnabled(): boolean {
-    return this.env.NEXT_PUBLIC_ENABLE_MCP === 'true';
+    return this.env.NEXT_PUBLIC_ENABLE_MCP === "true";
   }
 
   /**
    * Check if using mock data
    */
   isUsingMockData(): boolean {
-    return this.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
+    return this.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
   }
 
   /**
@@ -60,9 +61,12 @@ export class SchemaConfig {
    */
   getSupabaseUrl(): string {
     const url = this.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (!url) throw new Error('Supabase URL not configured');
+    if (!url) throw new Error("Supabase URL not configured");
     // Return placeholder if not enabled
-    if (url === 'https://placeholder.supabase.co' && this.env.NEXT_PUBLIC_ENABLE_SUPABASE !== 'true') {
+    if (
+      url === "https://placeholder.supabase.co" &&
+      this.env.NEXT_PUBLIC_ENABLE_SUPABASE !== "true"
+    ) {
       return url; // Don't throw for placeholders in mock mode
     }
     return url;
@@ -73,9 +77,12 @@ export class SchemaConfig {
    */
   getSupabaseAnonKey(): string {
     const key = this.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!key) throw new Error('Supabase anon key not configured');
+    if (!key) throw new Error("Supabase anon key not configured");
     // Return placeholder if not enabled
-    if (key === 'placeholder-anon-key' && this.env.NEXT_PUBLIC_ENABLE_SUPABASE !== 'true') {
+    if (
+      key === "placeholder-anon-key" &&
+      this.env.NEXT_PUBLIC_ENABLE_SUPABASE !== "true"
+    ) {
       return key; // Don't throw for placeholders in mock mode
     }
     return key;
@@ -85,7 +92,7 @@ export class SchemaConfig {
    * Get Supabase service key (for server-side operations)
    */
   getSupabaseServiceKey(): string | undefined {
-    return this.env.SUPABASE_SERVICE_KEY;
+    return this.env.SUPABASE_SERVICE_KEY || this.env.SUPABASE_SERVICE_ROLE_KEY;
   }
 
   /**
@@ -106,21 +113,21 @@ export class SchemaConfig {
    * Get configuration for logging
    */
   getLogLevel(): string {
-    return this.env.NEXT_PUBLIC_LOG_LEVEL || 'info';
+    return this.env.NEXT_PUBLIC_LOG_LEVEL || "info";
   }
 
   /**
    * Check if should enable query logging
    */
   shouldLogQueries(): boolean {
-    return this.isDevelopment() && this.getLogLevel() === 'debug';
+    return this.isDevelopment() && this.getLogLevel() === "debug";
   }
 
   /**
    * Get mock delay in milliseconds
    */
   getMockDelay(): number {
-    return parseInt(this.env.NEXT_PUBLIC_MOCK_DELAY_MS || '0', 10);
+    return parseInt(this.env.NEXT_PUBLIC_MOCK_DELAY_MS || "0", 10);
   }
 
   /**
@@ -128,12 +135,12 @@ export class SchemaConfig {
    */
   getSummary() {
     return {
-      mode: this.isDevelopment() ? 'development' : 'production',
+      mode: this.isDevelopment() ? "development" : "production",
       hasSupabaseCredentials: this.hasSupabaseCredentials(),
       isMCPEnabled: this.isMCPEnabled(),
       isUsingMockData: this.isUsingMockData(),
       logLevel: this.getLogLevel(),
-      mockDelay: this.getMockDelay()
+      mockDelay: this.getMockDelay(),
     };
   }
 
@@ -142,34 +149,37 @@ export class SchemaConfig {
    */
   validateNodeVersion(): { ok: boolean; version: string; required: string } {
     const nodeVersion = process.version;
-    const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0]);
+    const majorVersion = parseInt(nodeVersion.slice(1).split(".")[0]);
     const requiredVersion = 20;
-    
+
     return {
       ok: majorVersion >= requiredVersion,
       version: nodeVersion,
-      required: `v${requiredVersion}.0.0`
+      required: `v${requiredVersion}.0.0`,
     };
   }
 
   /**
    * Get Supabase project info from URL
    */
-  getSupabaseProjectInfo(): { projectId: string | null; region: string | null } {
+  getSupabaseProjectInfo(): {
+    projectId: string | null;
+    region: string | null;
+  } {
     const url = this.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (!url || url === 'https://placeholder.supabase.co') {
+    if (!url || url === "https://placeholder.supabase.co") {
       return { projectId: null, region: null };
     }
-    
+
     // Extract from URL pattern: https://[projectId].supabase.co
     const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
     if (match) {
       return {
         projectId: match[1],
-        region: null // Region not in URL, would need API call
+        region: null, // Region not in URL, would need API call
       };
     }
-    
+
     return { projectId: null, region: null };
   }
 
@@ -178,31 +188,31 @@ export class SchemaConfig {
    */
   hasValidSupabaseCredentials(): boolean {
     if (!this.hasSupabaseCredentials()) return false;
-    
+
     const url = this.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = this.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    
+
     // Check URL format
-    if (!url?.startsWith('https://') || !url?.includes('.supabase.co')) {
+    if (!url?.startsWith("https://") || !url?.includes(".supabase.co")) {
       return false;
     }
-    
+
     // Check key format (basic JWT structure check)
-    if (!key?.includes('.') || key.split('.').length !== 3) {
+    if (!key?.includes(".") || key.split(".").length !== 3) {
       return false;
     }
-    
+
     return true;
   }
 
   /**
    * Get data source mode
    */
-  getDataSourceMode(): 'mock' | 'supabase' | 'mcp' {
-    if (this.isUsingMockData()) return 'mock';
-    if (this.isMCPEnabled() && this.isDevelopment()) return 'mcp';
-    if (this.hasValidSupabaseCredentials()) return 'supabase';
-    return 'mock'; // fallback
+  getDataSourceMode(): "mock" | "supabase" | "mcp" {
+    if (this.isUsingMockData()) return "mock";
+    if (this.isMCPEnabled() && this.isDevelopment()) return "mcp";
+    if (this.hasValidSupabaseCredentials()) return "supabase";
+    return "mock"; // fallback
   }
 
   /**
@@ -211,26 +221,26 @@ export class SchemaConfig {
   getDiagnostics() {
     const nodeValidation = this.validateNodeVersion();
     const projectInfo = this.getSupabaseProjectInfo();
-    
+
     return {
       environment: {
-        mode: this.isDevelopment() ? 'development' : 'production',
+        mode: this.isDevelopment() ? "development" : "production",
         nodeVersion: nodeValidation,
-        dataSource: this.getDataSourceMode()
+        dataSource: this.getDataSourceMode(),
       },
       supabase: {
         configured: this.hasSupabaseCredentials(),
         valid: this.hasValidSupabaseCredentials(),
-        enabled: this.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true',
+        enabled: this.env.NEXT_PUBLIC_ENABLE_SUPABASE === "true",
         projectId: projectInfo.projectId,
-        url: this.env.NEXT_PUBLIC_SUPABASE_URL || null
+        url: this.env.NEXT_PUBLIC_SUPABASE_URL || null,
       },
       features: {
         mockData: this.isUsingMockData(),
         mcp: this.isMCPEnabled(),
-        devTools: this.env.NEXT_PUBLIC_ENABLE_DEVTOOLS === 'true',
-        logging: this.shouldLogQueries()
-      }
+        devTools: this.env.NEXT_PUBLIC_ENABLE_DEVTOOLS === "true",
+        logging: this.shouldLogQueries(),
+      },
     };
   }
 }

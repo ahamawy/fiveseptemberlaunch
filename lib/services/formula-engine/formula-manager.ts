@@ -3,11 +3,11 @@
  * Manages CRUD operations for formula templates and variables
  */
 
-import { createClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { getServiceClient } from "@/lib/db/supabase/server-client";
 import { FormulaExecutor } from "./formula-parser";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Server-only client: ensures privileged CRUD works under RLS without exposing keys
 
 export interface FormulaTemplate {
   id: number;
@@ -63,11 +63,11 @@ export interface CalculationAudit {
 }
 
 export class FormulaManager {
-  private supabase;
+  private supabase: SupabaseClient;
   private executor: FormulaExecutor;
 
   constructor() {
-    this.supabase = createClient(supabaseUrl, supabaseKey);
+    this.supabase = getServiceClient();
     this.executor = new FormulaExecutor();
   }
 
@@ -351,7 +351,7 @@ export class FormulaManager {
 
     // Create new assignment for today
     const today = new Date().toISOString().split("T")[0];
-    
+
     // First check if an assignment exists for today
     const { data: existing } = await this.supabase
       .from("deal_formula_assignments")

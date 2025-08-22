@@ -17,7 +17,7 @@ export default function Nav() {
           </Link>
           <motion.div {...micro("buttonPrimary")}>
             <Link
-              href="/investor-portal/dashboard"
+              href="/investor-portal/select"
               className={COMPONENT_STYLES.button.secondary}
             >
               Enter Portal

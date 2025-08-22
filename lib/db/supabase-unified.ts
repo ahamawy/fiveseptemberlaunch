@@ -34,7 +34,12 @@ export class UnifiedSupabaseAdapter implements IDataClient {
   constructor(options?: SupabaseAdapterOptions) {
     const supabaseUrl = options?.url || process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey =
-      options?.anonKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      options?.anonKey ||
+      (typeof window === "undefined"
+        ? process.env.SUPABASE_SERVICE_KEY ||
+          process.env.SUPABASE_SERVICE_ROLE_KEY
+        : undefined) ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error(
@@ -58,19 +63,18 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDeals(filters?: DealFilters): Promise<Deal[]> {
     try {
-      // Query deals schema explicitly to avoid public-only constraint
-      let query = (this.client as any)
-        .schema("deals")
-        .from("deal")
+      // Use legacy-friendly field names available in existing datasets
+      let query = this.client
+        .from("deals.deal")
         .select("*")
-        .order("deal_id", { ascending: false });
+        .order("id", { ascending: false });
 
       // Apply filters
       if (filters?.stage) {
-        query = query.eq("deal_status", filters.stage);
+        query = query.eq("stage", filters.stage);
       }
       if (filters?.search) {
-        query = query.ilike("deal_name", `%${filters.search}%`);
+        query = query.ilike("name", `%${filters.search}%`);
       }
 
       const { data, error } = await query;
@@ -90,11 +94,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDealById(id: number): Promise<Deal | null> {
     try {
-      const { data, error } = await (this.client as any)
-        .schema("deals")
-        .from("deal")
+      const { data, error } = await this.client
+        .from("deals.deal")
         .select("*")
-        .eq("deal_id", id)
+        .eq("id", id)
         .single();
 
       if (error) {
@@ -111,12 +114,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDealBySlug(slug: string): Promise<Deal | null> {
     try {
-      // First try to find by slug if column exists, otherwise by name
-      const { data, error } = await (this.client as any)
-        .schema("deals")
-        .from("deal")
+      const { data, error } = await this.client
+        .from("deals.deal")
         .select("*")
-        .ilike("deal_name", slug.replace(/-/g, " "))
+        .eq("slug", slug)
         .single();
 
       if (error) {
@@ -137,11 +138,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getInvestors(): Promise<Investor[]> {
     try {
-      const tableName = "investors.investor";
       const { data, error } = await this.client
-        .from(tableName)
+        .from("investors.investor")
         .select("*")
-        .order("investor_id");
+        .order("id");
 
       if (error) {
         console.error("Error fetching investors:", error);
@@ -157,11 +157,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getInvestorById(id: number): Promise<Investor | null> {
     try {
-      const tableName = "investors.investor";
       const { data, error } = await this.client
-        .from(tableName)
+        .from("investors.investor")
         .select("*")
-        .eq("investor_id", id)
+        .eq("id", id)
         .single();
 
       if (error) {
@@ -178,9 +177,8 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getInvestorByPublicId(publicId: string): Promise<Investor | null> {
     try {
-      const tableName = "investors.investor";
       const { data, error } = await this.client
-        .from(tableName)
+        .from("investors.investor")
         .select("*")
         .eq("public_id", publicId)
         .single();
@@ -209,11 +207,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCompanies(): Promise<Company[]> {
     try {
-      const { data, error } = await (this.client as any)
-        .schema("companies")
-        .from("company")
+      const { data, error } = await this.client
+        .from("companies.company")
         .select("*")
-        .order("company_id");
+        .order("id");
 
       if (error) {
         console.error("Error fetching companies:", error);
@@ -229,11 +226,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCompanyById(id: number): Promise<Company | null> {
     try {
-      const { data, error } = await (this.client as any)
-        .schema("companies")
-        .from("company")
+      const { data, error } = await this.client
+        .from("companies.company")
         .select("*")
-        .eq("company_id", id)
+        .eq("id", id)
         .single();
 
       if (error) {
@@ -254,11 +250,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCommitments(investorId?: number): Promise<Commitment[]> {
     try {
-      const tableName = this.useViews ? "commitments_view" : "commitments";
+      const tableName = this.useViews
+        ? "investors.commitment"
+        : "investors.commitment";
       let query = this.client
         .from(tableName)
         .select("*")
-        .order("commitment_date", { ascending: false });
+        .order("id", { ascending: false });
 
       if (investorId) {
         query = query.eq("investor_id", investorId);
@@ -280,7 +278,9 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCommitmentById(id: number): Promise<Commitment | null> {
     try {
-      const tableName = this.useViews ? "commitments_view" : "commitments";
+      const tableName = this.useViews
+        ? "investors.commitment"
+        : "investors.commitment";
       const { data, error } = await this.client
         .from(tableName)
         .select("*")
@@ -301,7 +301,9 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getCommitmentsByDealId(dealId: number): Promise<Commitment[]> {
     try {
-      const tableName = this.useViews ? "commitments_view" : "commitments";
+      const tableName = this.useViews
+        ? "investors.commitment"
+        : "investors.commitment";
       const { data, error } = await this.client
         .from(tableName)
         .select("*")
@@ -326,11 +328,15 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getTransactions(filters?: TransactionFilters): Promise<Transaction[]> {
     try {
-      const tableName = "transactions.transaction.primary";
+      const tableName = this.useViews
+        ? "transactions.transaction.primary"
+        : "transactions.transaction";
       let query = this.client
         .from(tableName)
         .select("*")
-        .order("transaction_date", { ascending: false });
+        .order(this.useViews ? "transaction_date" : "occurred_on", {
+          ascending: false,
+        });
 
       if (filters?.investor_id) {
         query = query.eq("investor_id", filters.investor_id);
@@ -339,13 +345,22 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         query = query.eq("deal_id", filters.deal_id);
       }
       if (filters?.type) {
-        query = query.eq("transaction_type", filters.type);
+        query = query.eq(
+          this.useViews ? "transaction_type" : "type",
+          filters.type
+        );
       }
       if (filters?.from_date) {
-        query = query.gte("transaction_date", filters.from_date);
+        query = query.gte(
+          this.useViews ? "transaction_date" : "occurred_on",
+          filters.from_date
+        );
       }
       if (filters?.to_date) {
-        query = query.lte("transaction_date", filters.to_date);
+        query = query.lte(
+          this.useViews ? "transaction_date" : "occurred_on",
+          filters.to_date
+        );
       }
 
       const { data, error } = await query;
@@ -364,11 +379,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getTransactionById(id: number): Promise<Transaction | null> {
     try {
-      const tableName = "transactions.transaction.primary";
+      const tableName = this.useViews
+        ? "transactions.transaction.primary"
+        : "transactions.transaction";
       const { data, error } = await this.client
         .from(tableName)
         .select("*")
-        .eq("transaction_id", id)
+        .eq(this.useViews ? "transaction_id" : "id", id)
         .single();
 
       if (error) {
@@ -389,12 +406,11 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDocuments(filters?: DocumentFilters): Promise<Document[]> {
     try {
-      // Note: v_documents view doesn't exist, using documents table directly
-      const tableName = "documents";
+      const tableName = "documents.document";
       let query = this.client
         .from(tableName)
         .select("*")
-        .order("uploaded_date", { ascending: false });
+        .order("created_at", { ascending: false });
 
       if (filters?.investor_id) {
         query = query.eq("investor_id", filters.investor_id);
@@ -422,7 +438,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getDocumentById(id: number): Promise<Document | null> {
     try {
-      const tableName = "documents";
+      const tableName = "documents.document";
       const { data, error } = await this.client
         .from(tableName)
         .select("*")
@@ -669,21 +685,20 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   private mapDealFromDb(dbDeal: any): Deal {
     return {
-      id: dbDeal.deal_id,
-      name: dbDeal.deal_name,
-      slug: dbDeal.deal_name?.toLowerCase().replace(/\s+/g, "-") || "",
-      company_id: dbDeal.underlying_company_id,
-      type: dbDeal.deal_type || "primary",
-      stage: dbDeal.deal_status || "active",
-      opening_date: dbDeal.deal_date,
-      closing_date: dbDeal.exit_date,
-      target_raise: dbDeal.gross_capital,
-      current_raise: dbDeal.initial_net_capital || 0,
-      minimum_investment: 50000, // Default value
-      currency: dbDeal.deal_currency || "USD",
+      id: dbDeal.id,
+      name: dbDeal.name,
+      slug:
+        dbDeal.slug || dbDeal.name?.toLowerCase().replace(/\s+/g, "-") || "",
+      company_id: dbDeal.company_id,
+      type: dbDeal.type || "primary",
+      stage: dbDeal.stage || "active",
+      opening_date: dbDeal.opening_date,
+      closing_date: dbDeal.closing_date,
+      target_raise: undefined as any,
+      current_raise: undefined as any,
+      minimum_investment: 50000,
+      currency: dbDeal.currency || "USD",
       description: null,
-      highlights: [],
-      documents: [],
       created_at: dbDeal.created_at || new Date().toISOString(),
       updated_at: dbDeal.updated_at || new Date().toISOString(),
     };
@@ -691,16 +706,16 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   private mapInvestorFromDb(dbInvestor: any): Investor {
     return {
-      id: dbInvestor.investor_id,
+      id: dbInvestor.id,
       public_id: dbInvestor.public_id || "",
-      user_id: dbInvestor.user_id,
-      type: dbInvestor.investor_type || "individual",
+      user_id: null,
+      type: dbInvestor.type || "individual",
       name: dbInvestor.full_name,
       email: dbInvestor.primary_email,
-      phone: dbInvestor.primary_phone,
-      country: dbInvestor.country_of_residence,
-      kyc_status: dbInvestor.kyc_status || "pending",
-      accredited: dbInvestor.is_accredited || false,
+      phone: null,
+      country: dbInvestor.country_residence,
+      kyc_status: dbInvestor.status || "pending",
+      accredited: false,
       created_at: dbInvestor.created_at,
       updated_at: dbInvestor.updated_at,
     };
@@ -708,33 +723,31 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   private mapCompanyFromDb(dbCompany: any): Company {
     return {
-      id: dbCompany.company_id,
-      name: dbCompany.company_name,
-      description: dbCompany.company_description,
-      industry: dbCompany.company_sector,
-      founded: dbCompany.founding_year?.toString(),
-      website: dbCompany.company_website,
-      logo: dbCompany.company_logo_url,
-      valuation: dbCompany.latest_valuation_mil
-        ? dbCompany.latest_valuation_mil * 1000000
-        : null,
-      employees: dbCompany.employee_count,
-      headquarters: dbCompany.headquarters_location,
+      id: dbCompany.id,
+      name: dbCompany.name,
+      type: dbCompany.type || null,
+      sector: dbCompany.sector,
+      country: dbCompany.country,
+      website: dbCompany.website,
       created_at: dbCompany.created_at,
       updated_at: dbCompany.updated_at,
-    };
+    } as any;
   }
 
   private mapTransactionFromDb(dbTx: any): Transaction {
     return {
       id: dbTx.transaction_id,
+      public_id: dbTx.public_id,
       investor_id: dbTx.investor_id,
       deal_id: dbTx.deal_id,
       type: dbTx.transaction_type || "investment",
       amount: dbTx.gross_capital || dbTx.amount,
       currency: dbTx.currency || "USD",
-      transaction_date: dbTx.transaction_date,
       status: dbTx.status || "completed",
+      fee_amount: null,
+      reference: null,
+      description: null,
+      processed_at: null,
       created_at: dbTx.created_at,
       updated_at: dbTx.updated_at,
     };

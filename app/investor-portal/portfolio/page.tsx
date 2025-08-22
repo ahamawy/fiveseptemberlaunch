@@ -55,13 +55,30 @@ export default function PortfolioPage() {
   const [loading, setLoading] = useState(true);
   const [selectedView, setSelectedView] = useState<"table" | "cards">("table");
 
+  const searchParams =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search)
+      : null;
+  const investorParam = searchParams?.get("investor") || null;
+  const resolveInvestorId = () => {
+    if (investorParam) return investorParam;
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("equitie-current-investor-id");
+      if (stored) return stored;
+    }
+    return "1";
+  };
+
   useEffect(() => {
     fetchPortfolioData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [investorParam]);
 
   const fetchPortfolioData = async () => {
     try {
-      const response = await fetch("/api/investors/1/portfolio");
+      const investorId = resolveInvestorId();
+      const response = await fetch(`/api/investors/${investorId}/portfolio`);
+      if (!response.ok) throw new Error("Failed to load portfolio");
       const portfolioData = await response.json();
       setData(portfolioData);
     } catch (error) {

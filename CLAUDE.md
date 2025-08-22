@@ -139,6 +139,9 @@ GET  /api/deals/[id]/calculate        # fetch calculation history
 
 ```text
 GET  /api/deals
+POST /api/deals                 # server-only (admin guard)
+PUT  /api/deals/[id]            # server-only (admin guard)
+DELETE /api/deals/[id]          # server-only (admin guard)
 GET  /api/deals/[id]/formula
 POST /api/deals/[id]/formula
 POST /api/deals/[id]/calculate
@@ -147,6 +150,14 @@ GET  /api/investors/[id]             # id or public_id
 GET  /api/investors/[id]/dashboard
 GET  /api/investors/[id]/portfolio
 GET  /api/transactions
+POST /api/transactions           # server-only (admin guard)
+GET  /api/companies
+POST /api/companies              # server-only (admin guard)
+GET  /api/companies/[id]
+PUT  /api/companies/[id]         # server-only (admin guard)
+DELETE /api/companies/[id]       # server-only (admin guard)
+GET  /api/documents
+POST /api/documents              # server-only (admin guard)
 POST /api/admin/fees/apply
 POST /api/admin/chat
 GET  /api/admin/formulas
@@ -160,6 +171,8 @@ POST /api/admin/formulas/test
 NEXT_PUBLIC_SUPABASE_URL=https://ikezqzljrupkzmyytgok.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
 NEXT_PUBLIC_USE_MOCK_DATA=false
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-jwt     # server-only writes
+ADMIN_API_KEY=your-admin-api-key                    # required in prod for write endpoints
 OPENROUTER_API_KEY=your-key
 ```
 
@@ -182,7 +195,14 @@ npm run build           # Production build
 /FEATURES               # Canonical per-feature docs (READMEs & docs/)
 ```
 
-## Recent Updates (2025-08-17)
+## Recent Updates (2025-08-22)
+
+### Platform & Tooling
+
+- Upgraded to Next.js 14.2.5; removed deprecated `experimental.appDir` from `next.config.js`
+- Node.js 20+ required (see `engines` in `package.json`)
+- Standardized Supabase cross-schema queries to use `.schema('<schema>').from('<table>')`
+- Ensured all server routes use the service-role client (`lib/db/supabase/server-client.ts`)
 
 ### AI Ingestion System
 
@@ -203,6 +223,8 @@ npm run build           # Production build
 - Database‑driven templates + assignments
 - New admin UI `/admin/formulas` with inline assignment table
 - New API: `/api/deals/[id]/formula`, `/api/deals/[id]/calculate`
+
+Important: Admin and formula endpoints require `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`. Missing or invalid keys will surface as "Invalid API key" or permission errors.
 
 ### Investors
 

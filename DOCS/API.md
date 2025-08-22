@@ -2,21 +2,31 @@
 
 ## Public Endpoints
 
-| Method | Endpoint                           | Description                                    | Response                                                         |
-| ------ | ---------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------- | ------- |
-| GET    | `/api/deals`                       | List all deals                                 | `{ data: Deal[], success: boolean }`                             |
-| GET    | `/api/deals/[dealId]`              | Get single deal                                | `{ data: Deal, success: boolean }`                               |
-| GET    | `/api/deals/[id]/formula`          | Get deal's active formula assignment           | `{ success, data: FormulaTemplate                                | null }` |
-| POST   | `/api/deals/[id]/formula`          | Assign a formula template to a deal            | `{ formulaTemplateId }` → `{ success, data: FormulaTemplate }`   |
-| POST   | `/api/deals/[id]/calculate`        | Execute calculation and store audit            | `{ investorId?, transactionId? }` → `{ success, data, auditId }` |
-| GET    | `/api/deals/[id]/calculate`        | Calculation history for a deal                 | `{ success, data: Audit[] }`                                     |
-| GET    | `/api/investors/[id]`              | Get investor profile (numeric id or public_id) | `{ data: Investor, success: boolean }`                           |
-| GET    | `/api/investors/[id]/dashboard`    | Dashboard metrics                              | `{ data: DashboardData, success: boolean }`                      |
-| GET    | `/api/investors/[id]/portfolio`    | Portfolio holdings                             | `{ data: Portfolio[], success: boolean }`                        |
-| GET    | `/api/investors/[id]/transactions` | Transaction history                            | `{ data: Transaction[], success: boolean }`                      |
-| GET    | `/api/investors/[id]/commitments`  | Commitments                                    | `{ data: Commitment[], success: boolean }`                       |
-| GET    | `/api/transactions`                | All transactions                               | `{ data: Transaction[], success: boolean }`                      |
-| GET    | `/api/documents`                   | Documents list                                 | `{ data: Document[], success: boolean }`                         |
+| Method | Endpoint                           | Description                            | Response                                                         |
+| ------ | ---------------------------------- | -------------------------------------- | ---------------------------------------------------------------- | ------- |
+| GET    | `/api/deals`                       | List all deals                         | `{ data: Deal[] }`                                               |
+| POST   | `/api/deals`                       | Create deal (server-only)              | `{ success, data: Deal }`                                        |
+| GET    | `/api/deals/[dealId]`              | Get single deal                        | `{ data: Deal }`                                                 |
+| PUT    | `/api/deals/[id]`                  | Update deal (server-only)              | `{ success, data: Deal }`                                        |
+| DELETE | `/api/deals/[id]`                  | Delete deal (server-only)              | `{ success }`                                                    |
+| GET    | `/api/deals/[id]/formula`          | Get deal's active formula assignment   | `{ success, data: FormulaTemplate                                | null }` |
+| POST   | `/api/deals/[id]/formula`          | Assign a formula template to a deal    | `{ formulaTemplateId }` → `{ success, data: FormulaTemplate }`   |
+| POST   | `/api/deals/[id]/calculate`        | Execute calculation and store audit    | `{ investorId?, transactionId? }` → `{ success, data, auditId }` |
+| GET    | `/api/deals/[id]/calculate`        | Calculation history for a deal         | `{ success, data: Audit[] }`                                     |
+| GET    | `/api/investors/[id]`              | Get investor profile (id or public_id) | `{ data: Investor }`                                             |
+| GET    | `/api/investors/[id]/dashboard`    | Dashboard metrics                      | `{ ... }`                                                        |
+| GET    | `/api/investors/[id]/portfolio`    | Portfolio holdings                     | `{ ... }`                                                        |
+| GET    | `/api/investors/[id]/transactions` | Transaction history                    | `{ data: Transaction[] }`                                        |
+| GET    | `/api/investors/[id]/commitments`  | Commitments                            | `{ ... }`                                                        |
+| GET    | `/api/transactions`                | All transactions                       | `{ data: Transaction[] }`                                        |
+| POST   | `/api/transactions`                | Create transaction (server-only)       | `{ success, data: Transaction }`                                 |
+| GET    | `/api/companies`                   | List companies                         | `{ data: Company[] }`                                            |
+| POST   | `/api/companies`                   | Create company (server-only)           | `{ success, data: Company }`                                     |
+| GET    | `/api/companies/[id]`              | Get company                            | `{ data: Company }`                                              |
+| PUT    | `/api/companies/[id]`              | Update company (server-only)           | `{ success, data: Company }`                                     |
+| DELETE | `/api/companies/[id]`              | Delete company (server-only)           | `{ success }`                                                    |
+| GET    | `/api/documents`                   | Documents list                         | `{ data: Document[] }`                                           |
+| POST   | `/api/documents`                   | Ingest document metadata (server-only) | `{ success, data }` (202 Accepted)                               |
 
 ## Admin Endpoints
 
@@ -60,6 +70,24 @@
 
 ### Sorting
 
+### Journey Scoping (Investor)
+
+- Investor-facing endpoints accept a specific investor via path params.
+- UI pages also accept a query parameter for routing:
+
+```text
+/investor-portal/dashboard?investor=<id>
+/investor-portal/portfolio?investor=<id>
+/investor-portal/transactions?investor=<id>
+/investor-portal/deals?investor=<id>
+```
+
+Fallback order used by UI pages:
+
+1. `?investor=<id>` query parameter
+2. `localStorage.equitie-current-investor-id`
+3. `1` (development default)
+
 ```text
 ?sort=created_at&order=desc
 ```
@@ -92,10 +120,43 @@
 
 ## Authentication
 
-Currently using mock authentication. Headers:
+Read endpoints are available without auth in development.
+
+Write endpoints are server-only and protected:
+
+- In development: allowed without special headers
+- In production: require header `x-admin-key: <ADMIN_API_KEY>`
+
+Supabase usage:
+
+- Server-only reads/writes use a dedicated service-role client from `lib/db/supabase/server-client.ts`
+- Do not expose service keys to the browser. Client-side uses anon key for read-only where applicable
+- Environment checklist (development):
+  - `NEXT_PUBLIC_SUPABASE_URL` must be set
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY` must be set
+  - `SUPABASE_SERVICE_ROLE_KEY` must be set for admin/formula endpoints
+  - Node.js v20+ is required
+
+Cross-schema queries:
+
+- Use explicit schemas for non-public tables:
+
+```ts
+// Good
+const { data } = await supabase
+  .schema('deals')
+  .from('deal')
+  .select('*');
+
+// Public schema (default)
+await supabase.from('transactions').select('*');
+```
+
+Headers used in examples:
 
 ```text
 X-Investor-Id: 1
+x-admin-key: <ADMIN_API_KEY>
 ```
 
 ## Rate Limiting

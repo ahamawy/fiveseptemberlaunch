@@ -13,16 +13,16 @@ from engines.deal_28_groq_engine import GroqDealEngine
 engine = GroqDealEngine()
 
 # Parse input data
-gross_capital = Decimal('125000')
+gross_capital = Decimal('100000')
 unit_price = Decimal('1000')
 
 result = engine.calculate_for_investor(
     investor_name="API User",
     gross_capital=gross_capital,
     unit_price=unit_price,
-    structuring_discount_percent=Decimal('25'),
+    structuring_discount_percent=Decimal('50'),
     management_discount_percent=Decimal('0'),
-    admin_discount_percent=Decimal('50')
+    admin_discount_percent=Decimal('100')
 )
 
 output = {

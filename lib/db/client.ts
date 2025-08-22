@@ -39,8 +39,14 @@ const checkUseMockData = () => {
 // Check if Supabase is properly configured
 const checkSupabaseEnabled = () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  return !!(url && key && url !== "https://placeholder.supabase.co");
+  // On server prefer service role; on client require anon
+  if (typeof window === "undefined") {
+    const serviceKey =
+      process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+    return !!(url && serviceKey && url !== "https://placeholder.supabase.co");
+  }
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return !!(url && anonKey && url !== "https://placeholder.supabase.co");
 };
 
 /**
