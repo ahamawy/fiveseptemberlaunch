@@ -43,7 +43,7 @@ export async function GET(
       new Set(rows.map((r: any) => r.deal_id).filter(Boolean))
     );
     const { data: deals } = await (sb as any)
-      .schema('deals')
+      .schema("deals")
       .from("deal")
       .select("deal_id, deal_name, underlying_company_id")
       .in("deal_id", dealIds);
@@ -54,7 +54,7 @@ export async function GET(
       if (d.underlying_company_id) companyIds.add(d.underlying_company_id);
     });
     const { data: companies } = await (sb as any)
-      .schema('companies')
+      .schema("companies")
       .from("company")
       .select("company_id, company_name")
       .in("company_id", Array.from(companyIds));

@@ -79,6 +79,22 @@ export const BRAND_CONFIG = {
     radial:  "radial-gradient(1000px 600px at 20% -10%, rgba(200,152,255,0.25), transparent)",
     hero:    "linear-gradient(145deg, #C898FF, #66D0FF)"
   }
+  ,
+  charts: {
+    palette: {
+      primary: "#C898FF",
+      accent: "#66D0FF",
+      success: "#22C55E",
+      info: "#3B82F6",
+      warning: "#F59E0B",
+      error: "#EF4444"
+    },
+    gridColor: "rgba(255,255,255,0.08)",
+    tickColor: "rgba(255,255,255,0.6)",
+    tooltipBg: "rgba(15,11,34,0.95)",
+    tooltipBorder: "rgba(255,255,255,0.12)",
+    fontFamily: "Inter, ui-sans-serif, system-ui"
+  }
 } as const;
 
 export const theme = BRAND_CONFIG; // alias

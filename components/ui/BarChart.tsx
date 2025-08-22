@@ -13,7 +13,7 @@ export function BarChart({ labels, values, maxBars = 10 }: BarChartProps) {
   const items = labels.map((l, i) => ({ label: l, value: values[i] || 0 }));
   const sorted = [...items].sort((a, b) => b.value - a.value).slice(0, maxBars);
   const max = Math.max(1, ...sorted.map((i) => i.value));
-  const barColor = BRAND_CONFIG.colors.primary[300] || "#7C3AED";
+  const barColor = BRAND_CONFIG.colors.primary.hero || BRAND_CONFIG.colors.primary.DEFAULT;
 
   return (
     <div className="space-y-2">

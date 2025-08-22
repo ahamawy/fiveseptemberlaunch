@@ -143,13 +143,10 @@ Cross-schema queries:
 
 ```ts
 // Good
-const { data } = await supabase
-  .schema('deals')
-  .from('deal')
-  .select('*');
+const { data } = await supabase.schema("deals").from("deal").select("*");
 
 // Public schema (default)
-await supabase.from('transactions').select('*');
+await supabase.from("transactions").select("*");
 ```
 
 Headers used in examples:

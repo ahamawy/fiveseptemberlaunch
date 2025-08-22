@@ -10,7 +10,7 @@ export class InvestorsRepo extends BaseRepo {
 
     try {
       const { data: snaps } = await this.db
-        .schema('analytics')
+        .schema("analytics")
         .from("mv_investment_snapshots")
         .select("deal_id, net_capital, current_value")
         .eq("investor_id", investorId);
@@ -95,7 +95,7 @@ export class InvestorsRepo extends BaseRepo {
     }> = [];
     try {
       const { data: snaps } = await this.db
-        .schema('analytics')
+        .schema("analytics")
         .from("mv_investment_snapshots")
         .select("deal_id, net_capital, current_value")
         .eq("investor_id", investorId);
@@ -132,7 +132,7 @@ export class InvestorsRepo extends BaseRepo {
 
     const dealIds = perDeal.map((d) => d.deal_id).filter(Boolean);
     const { data: deals } = await this.db
-      .schema('deals')
+      .schema("deals")
       .from("deal")
       .select(
         "deal_id, deal_name, deal_type, deal_status, deal_currency, underlying_company_id"
@@ -145,7 +145,7 @@ export class InvestorsRepo extends BaseRepo {
       if (d.underlying_company_id) companyIds.add(d.underlying_company_id);
     });
     const { data: companies } = await this.db
-      .schema('companies')
+      .schema("companies")
       .from("company")
       .select("company_id, company_name, company_sector")
       .in("company_id", Array.from(companyIds));

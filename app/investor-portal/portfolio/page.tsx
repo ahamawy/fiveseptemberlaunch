@@ -3,11 +3,8 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import {
-  formatCurrency,
-  formatPercentage,
-  getStatusColor,
-} from "@/lib/theme-utils";
+import { formatCurrency, formatPercentage, getStatusColor } from "@/lib/theme-utils";
+import { BarChart } from "@/components/ui/BarChart";
 
 interface DealPerformance {
   dealId: number;
@@ -48,6 +45,7 @@ interface PortfolioData {
     exitedDeals: number;
     totalValue: number;
   };
+  historicalPerformance?: Array<{ date: string; nav: number; irr: number; moic: number }>;
 }
 
 export default function PortfolioPage() {
@@ -179,6 +177,32 @@ export default function PortfolioPage() {
             </Card>
           </div>
 
+          {/* NAV Trend */}
+          {data.historicalPerformance && data.historicalPerformance.length > 0 && (
+            <Card variant="glass">
+              <CardHeader>
+                <CardTitle gradient>NAV Over Last 12 Months</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  {/* Lazy import to avoid SSR issues not necessary since page is client */}
+                  {(() => {
+                    const { LineChart } = require("@/components/ui/Charts");
+                    const labels = data.historicalPerformance!.map((p) => p.date);
+                    const values = data.historicalPerformance!.map((p) => Math.round(p.nav));
+                    return (
+                      <LineChart
+                        labels={labels}
+                        datasets={[{ label: "NAV", data: values }]}
+                        height={240}
+                      />
+                    );
+                  })()}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Allocation Charts */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <Card variant="glass">
@@ -186,26 +210,11 @@ export default function PortfolioPage() {
                 <CardTitle gradient>Allocation by Sector</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {data.allocation.bySector.map((sector) => (
-                    <div key={sector.sector}>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-text-secondary">
-                          {sector.sector}
-                        </span>
-                        <span className="font-medium text-text-primary">
-                          {formatPercentage(sector.percentage)}
-                        </span>
-                      </div>
-                      <div className="bg-surface-hover rounded-full h-2 overflow-hidden">
-                        <div
-                          className="h-2 rounded-full bg-gradient-to-r from-primary-300 to-accent-blue transition-all duration-500"
-                          style={{ width: `${sector.percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <BarChart
+                  labels={data.allocation.bySector.map((s) => s.sector)}
+                  values={data.allocation.bySector.map((s) => Math.round(s.value))}
+                  maxBars={10}
+                />
               </CardContent>
             </Card>
 
@@ -214,26 +223,11 @@ export default function PortfolioPage() {
                 <CardTitle gradient>Allocation by Type</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {data.allocation.byType.map((type) => (
-                    <div key={type.type}>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-text-secondary capitalize">
-                          {type.type.replace("_", " ")}
-                        </span>
-                        <span className="font-medium text-text-primary">
-                          {formatPercentage(type.percentage)}
-                        </span>
-                      </div>
-                      <div className="bg-surface-hover rounded-full h-2 overflow-hidden">
-                        <div
-                          className="h-2 rounded-full bg-gradient-to-r from-accent-green to-accent-teal transition-all duration-500"
-                          style={{ width: `${type.percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <BarChart
+                  labels={data.allocation.byType.map((t) => t.type.replace("_", " "))}
+                  values={data.allocation.byType.map((t) => Math.round(t.value))}
+                  maxBars={6}
+                />
               </CardContent>
             </Card>
           </div>

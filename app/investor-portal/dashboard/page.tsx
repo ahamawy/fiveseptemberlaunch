@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/Card";
 import { useSearchParams } from "next/navigation";
 
 interface DashboardData {
@@ -120,39 +121,41 @@ export default function DashboardPage() {
 
       {/* Portfolio cards */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div className="bg-surface-elevated rounded-xl p-6 border border-surface-border">
-          <h3 className="text-sm text-text-secondary mb-2">
-            Total Portfolio Value
-          </h3>
-          <p className="text-2xl font-bold text-white">
-            ${data.portfolio.totalValue.toLocaleString()}
-          </p>
-          <p className="text-sm text-green-400 mt-2">+12.5%</p>
-        </div>
+        <Card variant="gradient" className="hover:shadow-lg transition-shadow">
+          <CardContent className="p-6">
+            <h3 className="text-sm text-text-secondary mb-2">Total Portfolio Value</h3>
+            <p className="text-2xl font-bold text-text-primary">
+              ${data.portfolio.totalValue.toLocaleString()}
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="bg-surface-elevated rounded-xl p-6 border border-surface-border">
-          <h3 className="text-sm text-text-secondary mb-2">Total Committed</h3>
-          <p className="text-2xl font-bold text-white">
-            ${data.portfolio.totalCommitted.toLocaleString()}
-          </p>
-        </div>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
+          <CardContent className="p-6">
+            <h3 className="text-sm text-text-secondary mb-2">Total Committed</h3>
+            <p className="text-2xl font-bold text-text-primary">
+              ${data.portfolio.totalCommitted.toLocaleString()}
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="bg-surface-elevated rounded-xl p-6 border border-surface-border">
-          <h3 className="text-sm text-text-secondary mb-2">
-            Total Distributed
-          </h3>
-          <p className="text-2xl font-bold text-white">
-            ${data.portfolio.totalDistributed.toLocaleString()}
-          </p>
-        </div>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
+          <CardContent className="p-6">
+            <h3 className="text-sm text-text-secondary mb-2">Total Distributed</h3>
+            <p className="text-2xl font-bold text-text-primary">
+              ${data.portfolio.totalDistributed.toLocaleString()}
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="bg-surface-elevated rounded-xl p-6 border border-surface-border">
-          <h3 className="text-sm text-text-secondary mb-2">Unrealized Gain</h3>
-          <p className="text-2xl font-bold text-white">
-            ${data.portfolio.unrealizedGain.toLocaleString()}
-          </p>
-          <p className="text-sm text-green-400 mt-2">+8.3%</p>
-        </div>
+        <Card variant="glass" className="hover:shadow-lg transition-shadow">
+          <CardContent className="p-6">
+            <h3 className="text-sm text-text-secondary mb-2">Unrealized Gain</h3>
+            <p className="text-2xl font-bold text-text-primary">
+              ${data.portfolio.unrealizedGain.toLocaleString()}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Performance metrics */}
