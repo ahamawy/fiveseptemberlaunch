@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency, formatPercentage, getStatusColor } from "@/lib/theme-utils";
 import { BarChart } from "@/components/ui/BarChart";
+import { NivoPie } from "@/components/ui/NivoCharts";
 
 interface DealPerformance {
   dealId: number;
@@ -210,11 +211,21 @@ export default function PortfolioPage() {
                 <CardTitle gradient>Allocation by Sector</CardTitle>
               </CardHeader>
               <CardContent>
-                <BarChart
-                  labels={data.allocation.bySector.map((s) => s.sector)}
-                  values={data.allocation.bySector.map((s) => Math.round(s.value))}
-                  maxBars={10}
-                />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div>
+                    <BarChart
+                      labels={data.allocation.bySector.map((s) => s.sector)}
+                      values={data.allocation.bySector.map((s) => Math.round(s.value))}
+                      maxBars={10}
+                    />
+                  </div>
+                  <div>
+                    <NivoPie
+                      data={data.allocation.bySector.map((s) => ({ id: s.sector || "unknown", value: Math.round(s.value) }))}
+                      height={240}
+                    />
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
