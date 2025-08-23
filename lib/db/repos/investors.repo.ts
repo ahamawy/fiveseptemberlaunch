@@ -131,9 +131,9 @@ export class InvestorsRepo extends BaseRepo {
     }
 
     const dealIds = perDeal.map((d) => d.deal_id).filter(Boolean);
+    // Note: "deals.deal" is a table name in the public schema, not a schema.table reference
     const { data: deals } = await this.db
-      .schema("deals")
-      .from("deal")
+      .from("deals.deal")
       .select(
         "deal_id, deal_name, deal_type, deal_status, deal_currency, underlying_company_id"
       )
@@ -144,9 +144,9 @@ export class InvestorsRepo extends BaseRepo {
       dealIdToDeal.set(d.deal_id, d);
       if (d.underlying_company_id) companyIds.add(d.underlying_company_id);
     });
+    // Note: "companies.company" is a table name in the public schema
     const { data: companies } = await this.db
-      .schema("companies")
-      .from("company")
+      .from("companies.company")
       .select("company_id, company_name, company_sector")
       .in("company_id", Array.from(companyIds));
     const companyIdTo = new Map<
@@ -159,6 +159,26 @@ export class InvestorsRepo extends BaseRepo {
         sector: c.company_sector,
       })
     );
+
+    // Get latest valuations for each deal
+    const valuationsMap = new Map<number, { moic: number; irr: number | null }>();
+    if (dealIds.length > 0) {
+      const { data: valuations } = await this.db
+        .from("deal_valuations")
+        .select("deal_id, moic, irr, valuation_date")
+        .in("deal_id", dealIds)
+        .order("valuation_date", { ascending: false });
+      
+      // Keep only the latest valuation per deal
+      (valuations || []).forEach((v: any) => {
+        if (!valuationsMap.has(v.deal_id)) {
+          valuationsMap.set(v.deal_id, {
+            moic: parseFloat(v.moic) || 1.0,
+            irr: v.irr ? parseFloat(v.irr) : null
+          });
+        }
+      });
+    }
 
     // Documents count per deal for this investor
     const docsByDeal = new Map<number, number>();
@@ -183,7 +203,15 @@ export class InvestorsRepo extends BaseRepo {
         : undefined;
       const called = Number(row.net_capital || 0);
       const cur = Number(row.current_value || 0);
-      const moic = called > 0 ? cur / called : 0;
+      
+      // Use valuation MOIC if available, otherwise calculate from current value
+      const valuation = valuationsMap.get(row.deal_id);
+      const moic = valuation ? valuation.moic : (called > 0 ? cur / called : 1.0);
+      const irr = valuation?.irr || 0;
+      
+      // Apply MOIC to current value for proper valuation
+      const currentValue = called * moic;
+      
       return {
         dealId: row.deal_id,
         dealName: d.deal_name || `Deal #${row.deal_id}`,
@@ -193,8 +221,8 @@ export class InvestorsRepo extends BaseRepo {
         committed: called,
         called,
         distributed: 0,
-        currentValue: cur,
-        irr: 0,
+        currentValue,
+        irr,
         moic,
         status: (d.deal_status || "active").toString().toLowerCase(),
         currency: d.deal_currency || "USD",

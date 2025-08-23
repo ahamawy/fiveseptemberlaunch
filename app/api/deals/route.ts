@@ -14,6 +14,8 @@ export async function GET(request: NextRequest) {
 
     // Server-only read ensures cross-schema access works regardless of anon exposure
     const sb = getServiceClient();
+    
+    // Query from deals.deal table (in public schema)
     let query = sb.from("deals.deal").select("*");
     if (search) query = query.ilike("deal_name", `%${search}%`);
     if (stage) query = query.eq("deal_status", stage);
@@ -24,18 +26,48 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
     if (error) throw error;
 
-    const mapped = (data || []).map((d: any) => ({
-      id: d.deal_id,
-      name: d.deal_name,
-      stage: d.deal_status,
-      type: d.deal_type || "primary",
-      company_id: d.underlying_company_id,
-      currency: d.deal_currency,
-      opening_date: d.deal_date,
-      closing_date: d.exit_date,
-      created_at: d.created_at,
-      updated_at: d.updated_at,
-    }));
+    // Get latest valuations for each deal
+    const dealIds = (data || []).map((d: any) => d.deal_id);
+    let valuationsMap = new Map<number, { moic: number; irr: number | null }>();
+    
+    if (dealIds.length > 0) {
+      // Get latest valuation for each deal
+      const { data: valuations } = await sb
+        .from("deal_valuations")
+        .select("deal_id, moic, irr, valuation_date")
+        .in("deal_id", dealIds)
+        .order("valuation_date", { ascending: false });
+      
+      // Keep only the latest valuation per deal
+      (valuations || []).forEach((v: any) => {
+        if (!valuationsMap.has(v.deal_id)) {
+          valuationsMap.set(v.deal_id, {
+            moic: parseFloat(v.moic) || 1.0,
+            irr: v.irr ? parseFloat(v.irr) : null
+          });
+        }
+      });
+    }
+
+    const mapped = (data || []).map((d: any) => {
+      const valuation = valuationsMap.get(d.deal_id) || { moic: 1.0, irr: null };
+      return {
+        id: d.deal_id,
+        name: d.deal_name,
+        stage: d.deal_status,
+        type: d.deal_type || "primary",
+        company_id: d.underlying_company_id,
+        currency: d.deal_currency,
+        opening_date: d.deal_date,
+        closing_date: d.exit_date,
+        target_raise: d.target_raise,
+        minimum_investment: d.minimum_investment,
+        moic: valuation.moic,
+        irr: valuation.irr,
+        created_at: d.created_at,
+        updated_at: d.updated_at,
+      };
+    });
 
     // Enrich with company name
     const companyIds = Array.from(
@@ -58,20 +90,21 @@ export async function GET(request: NextRequest) {
       });
       // Fetch storage assets per company
       for (const cid of companyIds) {
-        const assets = await findCompanyAssetUrls(sb as any, cid as number);
+        const companyName = companyIdToName.get(cid as number);
+        const assets = await findCompanyAssetUrls(sb as any, cid as number, companyName);
         companyIdToAssets.set(cid as number, assets);
       }
     }
     // Add investor_count and tx_count from transactions
-    const dealIds = mapped.map((m: any) => m.id).filter(Boolean);
+    const mappedDealIds = mapped.map((m: any) => m.id).filter(Boolean);
     let investorCountMap = new Map<number, number>();
     let txCountMap = new Map<number, number>();
     let docsCountMap = new Map<number, number>();
-    if (dealIds.length > 0) {
+    if (mappedDealIds.length > 0) {
       const { data: tx } = await sb
-        .from("transactions.transaction.primary")
+        .from("transactions")
         .select("deal_id, investor_id, transaction_id")
-        .in("deal_id", dealIds);
+        .in("deal_id", mappedDealIds);
       const investorsByDeal = new Map<number, Set<number>>();
       (tx || []).forEach((t: any) => {
         const d = t.deal_id as number;
@@ -86,7 +119,7 @@ export async function GET(request: NextRequest) {
         .schema('documents')
         .from('document')
         .select('deal_id')
-        .in('deal_id', dealIds);
+        .in('deal_id', mappedDealIds);
       (docs || []).forEach((d: any) => {
         const id = d.deal_id as number;
         if (!id) return;
