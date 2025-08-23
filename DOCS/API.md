@@ -137,16 +137,42 @@ Supabase usage:
   - `SUPABASE_SERVICE_ROLE_KEY` must be set for admin/formula endpoints
   - Node.js v20+ is required
 
-Cross-schema queries:
+Cross-schema and dot-named tables:
 
-- Use explicit schemas for non-public tables:
+- Use explicit schemas only for true schema-qualified tables.
+- For dot-named tables (the dot is part of the table name in public schema), use `.from("deals.deal")` and `.from("companies.company")`.
 
 ```ts
-// Good
-const { data } = await supabase.schema("deals").from("deal").select("*");
+// Dot-named public tables
+const { data: deals } = await supabase.from("deals.deal").select("*");
+const { data: companies } = await supabase.from("companies.company").select("*");
 
-// Public schema (default)
-await supabase.from("transactions").select("*");
+// Regular public tables
+const { data: tx } = await supabase.from("transactions").select("*");
+const { data: vals } = await supabase
+  .from("deal_valuations")
+  .select("deal_id, moic, irr, valuation_date")
+  .order("valuation_date", { ascending: false });
+```
+
+Valuations (keep latest per deal):
+
+```ts
+const { data: valuations } = await supabase
+  .from("deal_valuations")
+  .select("deal_id, moic, irr, valuation_date")
+  .in("deal_id", dealIds)
+  .order("valuation_date", { ascending: false });
+
+const valuationsMap = new Map<number, { moic: number; irr: number | null }>();
+(valuations || []).forEach(v => {
+  if (!valuationsMap.has(v.deal_id)) {
+    valuationsMap.set(v.deal_id, {
+      moic: parseFloat(v.moic as any) || 1.0,
+      irr: v.irr ? parseFloat(v.irr as any) : null
+    });
+  }
+});
 ```
 
 Headers used in examples:

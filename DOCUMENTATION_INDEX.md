@@ -6,6 +6,7 @@
 - **[MASTER_CONTEXT.md](./MASTER_CONTEXT.md)** - Complete AI bot context (350 lines)
 - **[README.md](./README.md)** - Quick start guide
 - **[DOCS/API.md](./DOCS/API.md)** - API endpoints reference
+- **[DOCS/SUPABASE_SCHEMA.md](./DOCS/SUPABASE_SCHEMA.md)** - Supabase table naming & schema gotchas
 
 ## ARCHON Fee Engine
 

@@ -121,10 +121,13 @@ GET  /api/deals/[id]/calculate        # fetch calculation history
 
 ### Supabase Schema Usage
 
-- Use explicit schemas for reads:
-  - Deals: `schema('deals').from('deal')`
-  - Companies: `schema('companies').from('company')`
-- Public tables are accessed via default schema (e.g., `deal_formula_templates`, `deal_formula_assignments`).
+- Dot-named public tables (the dot is part of the table name):
+  - Deals: `from("deals.deal")`
+  - Companies: `from("companies.company")`
+- Regular public tables:
+  - Transactions: `from("transactions")`
+  - Valuations: `from("deal_valuations")`
+- Use explicit schemas only for true schema-qualified tables; do NOT use `schema('deals').from('deal')` for `"deals.deal"`.
 
 ## Database Schema (Key Tables)
 
@@ -205,7 +208,7 @@ npm run build           # Production build
 
 ## File Structure (high-level)
 
-```
+```text
 /app                    # Pages and API routes
 /lib/services           # Service layer
 /lib/db                 # Database adapters
@@ -220,7 +223,7 @@ npm run build           # Production build
 
 - Upgraded to Next.js 14.2.5; removed deprecated `experimental.appDir` from `next.config.js`
 - Node.js 20+ required (see `engines` in `package.json`)
-- Standardized Supabase cross-schema queries to use `.schema('<schema>').from('<table>')`
+- Standardized dot-named public table usage: `from('deals.deal')`, `from('companies.company')`
 - Ensured all server routes use the service-role client (`lib/db/supabase/server-client.ts`)
 
 ### AI Ingestion System
@@ -237,7 +240,7 @@ npm run build           # Production build
 - CSV import with validation
 - Partner fee exclusion
 
-### Formula System
+### Formula System Updates
 
 - Database‑driven templates + assignments
 - New admin UI `/admin/formulas` with inline assignment table
