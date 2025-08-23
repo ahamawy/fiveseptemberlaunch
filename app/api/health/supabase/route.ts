@@ -1,3 +1,24 @@
+import { NextResponse } from "next/server";
+import { getServiceClient } from "@/lib/db/supabase/server-client";
+
+export async function GET() {
+  try {
+    const sb = getServiceClient();
+    // Lightweight head select to verify connectivity and RLS bypass via service key
+    const { error } = await sb
+      .from("deals.deal")
+      .select("deal_id", { head: true, count: "exact" })
+      .limit(1);
+
+    if (error) {
+      return NextResponse.json({ ok: false, error: error.message }, { status: 200 });
+    }
+    return NextResponse.json({ ok: true }, { status: 200 });
+  } catch (e: any) {
+    return NextResponse.json({ ok: false, error: e?.message || "unknown" }, { status: 200 });
+  }
+}
+
 import { NextResponse } from 'next/server';
 import { getSupabaseConnectivity, getStatusMessage } from '@/lib/db/supabase/status';
 import { config } from '@/lib/config';
