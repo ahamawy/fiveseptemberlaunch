@@ -67,7 +67,7 @@ export function LineChart(
       data={{ labels: props.labels, datasets }}
       options={{
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
           tooltip: {
