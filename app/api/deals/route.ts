@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { dealsService } from "@/lib/services";
 import { getServiceClient } from "@/lib/db/supabase/server-client";
 import { findCompanyAssetUrls } from "@/lib/utils/storage";
+import { mapDealRowToDealSummary } from "@/lib/utils/data-contracts";
 import type { DealStage, DealType } from "@/lib/db/types";
 
 export async function GET(request: NextRequest) {
@@ -49,25 +50,9 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const mapped = (data || []).map((d: any) => {
-      const valuation = valuationsMap.get(d.deal_id) || { moic: 1.0, irr: null };
-      return {
-        id: d.deal_id,
-        name: d.deal_name,
-        stage: d.deal_status,
-        type: d.deal_type || "primary",
-        company_id: d.underlying_company_id,
-        currency: d.deal_currency,
-        opening_date: d.deal_date,
-        closing_date: d.exit_date,
-        target_raise: d.target_raise,
-        minimum_investment: d.minimum_investment,
-        moic: valuation.moic,
-        irr: valuation.irr,
-        created_at: d.created_at,
-        updated_at: d.updated_at,
-      };
-    });
+    const mapped = (data || []).map((d: any) =>
+      mapDealRowToDealSummary(d, undefined, valuationsMap.get(d.deal_id) || undefined)
+    );
 
     // Enrich with company name
     const companyIds = Array.from(

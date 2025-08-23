@@ -7,6 +7,7 @@
 - **[README.md](./README.md)** - Quick start guide
 - **[DOCS/API.md](./DOCS/API.md)** - API endpoints reference
 - **[DOCS/SUPABASE_SCHEMA.md](./DOCS/SUPABASE_SCHEMA.md)** - Supabase table naming & schema gotchas
+- **[DOCS/DATA_CONTRACTS.md](./DOCS/DATA_CONTRACTS.md)** - Canonical API response shapes and mapping rules
 
 ## ARCHON Fee Engine
 
