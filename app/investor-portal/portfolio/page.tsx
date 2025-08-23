@@ -65,6 +65,8 @@ export default function PortfolioPage() {
   const [data, setData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedView, setSelectedView] = useState<"table" | "cards">("table");
+  const [filterSector, setFilterSector] = useState<string>("all");
+  const [filterType, setFilterType] = useState<string>("all");
 
   const searchParams =
     typeof window !== "undefined"
@@ -111,6 +113,59 @@ export default function PortfolioPage() {
     );
   }
 
+  const sectors = [
+    "all",
+    ...Array.from(new Set(data.allocation.bySector.map((s) => s.sector || "unknown"))),
+  ];
+  const types = [
+    "all",
+    ...Array.from(
+      new Set(data.allocation.byType.map((t) => t.type.replace("_", " ") || "unknown"))
+    ),
+  ];
+
+  const visibleDeals = data.deals.filter((d) => {
+    const sectorOk = filterSector === "all" || d.sector === filterSector;
+    const typeLabel = d.dealType === "fund" ? "partnership" : d.dealType.replace("_", " ");
+    const typeOk = filterType === "all" || typeLabel === filterType;
+    return sectorOk && typeOk;
+  });
+
+  const averageMoic = visibleDeals.length
+    ? visibleDeals.reduce((sum, d) => sum + Number(d.moic || 0), 0) / visibleDeals.length
+    : 1;
+
+  const exportCsv = () => {
+    const header = [
+      "dealId,dealName,companyName,dealType,currency,committed,currentValue,irr,moic,status,sector",
+    ];
+    const rows = visibleDeals.map((d) =>
+      [
+        d.dealId,
+        JSON.stringify(d.dealName),
+        JSON.stringify(d.companyName),
+        d.dealType,
+        d.currency,
+        d.committed,
+        d.currentValue,
+        d.irr,
+        d.moic,
+        d.status,
+        JSON.stringify(d.sector || ""),
+      ].join(",")
+    );
+    const csv = [...header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "portfolio_deals.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const getStatusBadge = (status: string) => {
     const styles = {
       active: "bg-success-500/20 text-success-400 border-success-400/30",
@@ -131,91 +186,107 @@ export default function PortfolioPage() {
         <div className="relative z-10 p-6 lg:p-8 space-y-8">
           {/* Header */}
           <MotionSection>
-          <div className="pb-6 border-b border-surface-border">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
-              Portfolio Overview
-            </h1>
-            <p className="mt-2 text-text-secondary">
-              Detailed view of your investment portfolio
-            </p>
-          </div>
+            <div className="pb-6 border-b border-surface-border">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
+                Portfolio Overview
+              </h1>
+              <p className="mt-2 text-text-secondary">
+                Detailed view of your investment portfolio
+              </p>
+            </div>
           </MotionSection>
 
           {/* Summary Cards */}
           <MotionSection delay={0.05}>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Card variant="gradient" className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-5">
-                <dt className="text-sm font-medium text-text-secondary">
-                  Total Portfolio Value
-                </dt>
-                <dd className="mt-3 text-3xl font-extrabold text-text-primary tracking-tight">
-                  {formatCurrency(data.summary.totalValue)}
-                </dd>
-              </CardContent>
-            </Card>
-            <Card variant="glass" className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-5">
-                <dt className="text-sm font-medium text-text-secondary">
-                  Total Deals
-                </dt>
-                <dd className="mt-3 text-3xl font-bold text-text-primary">
-                  {data.summary.totalDeals}
-                </dd>
-              </CardContent>
-            </Card>
-            <Card variant="glass" className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-5">
-                <dt className="text-sm font-medium text-text-secondary">
-                  Active Deals
-                </dt>
-                <dd className="mt-3 text-3xl font-extrabold text-success-400">
-                  {data.summary.activeDeals}
-                </dd>
-              </CardContent>
-            </Card>
-            <Card variant="glass" className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-5">
-                <dt className="text-sm font-medium text-text-secondary">
-                  Exited Deals
-                </dt>
-                <dd className="mt-3 text-3xl font-extrabold text-info-400">
-                  {data.summary.exitedDeals}
-                </dd>
-              </CardContent>
-            </Card>
-          </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <Card
+                variant="gradient"
+                className="hover:shadow-lg transition-shadow"
+              >
+                <CardContent className="p-5">
+                  <dt className="text-sm font-medium text-text-secondary">
+                    Total Portfolio Value
+                  </dt>
+                  <dd className="mt-3 text-3xl font-extrabold text-text-primary tracking-tight">
+                    {formatCurrency(data.summary.totalValue)}
+                  </dd>
+                </CardContent>
+              </Card>
+              <Card
+                variant="glass"
+                className="hover:shadow-lg transition-shadow"
+              >
+                <CardContent className="p-5">
+                  <dt className="text-sm font-medium text-text-secondary">
+                    Total Deals
+                  </dt>
+                  <dd className="mt-3 text-3xl font-bold text-text-primary">
+                    {data.summary.totalDeals}
+                  </dd>
+                </CardContent>
+              </Card>
+              <Card
+                variant="glass"
+                className="hover:shadow-lg transition-shadow"
+              >
+                <CardContent className="p-5">
+                  <dt className="text-sm font-medium text-text-secondary">
+                    Active Deals
+                  </dt>
+                  <dd className="mt-3 text-3xl font-extrabold text-success-400">
+                    {data.summary.activeDeals}
+                  </dd>
+                </CardContent>
+              </Card>
+              <Card
+                variant="glass"
+                className="hover:shadow-lg transition-shadow"
+              >
+                <CardContent className="p-5">
+                  <dt className="text-sm font-medium text-text-secondary">
+                    Exited Deals
+                  </dt>
+                  <dd className="mt-3 text-3xl font-extrabold text-info-400">
+                    {data.summary.exitedDeals}
+                  </dd>
+                </CardContent>
+              </Card>
+            </div>
           </MotionSection>
 
           {/* NAV Trend */}
           {data.historicalPerformance &&
             data.historicalPerformance.length > 0 && (
-              <MotionSection delay={0.1}><Card variant="glass">
-                <CardHeader>
-                  <CardTitle gradient>NAV Over Last 12 Months</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64">
-                    {/* Lazy import to avoid SSR issues not necessary since page is client */}
-                    {(() => {
-                      const { LineChart } = require("@/components/ui/Charts");
-                      const labels = data.historicalPerformance!.map(
-                        (p) => p.date
-                      );
-                      const values = data.historicalPerformance!.map((p) =>
-                        Math.round(p.nav)
-                      );
-                      return (
-                        <LineChart
-                          labels={labels}
-                          datasets={[{ label: "NAV", data: values, fill: true }]}
-                          height={240}
-                        />
-                      );
-                    })()}
-                  </div>
-                </CardContent>
-              </Card></MotionSection>
+              <MotionSection delay={0.1}>
+                <Card variant="glass">
+                  <CardHeader>
+                    <CardTitle gradient>NAV Over Last 12 Months</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-64">
+                      {/* Lazy import to avoid SSR issues not necessary since page is client */}
+                      {(() => {
+                        const { LineChart } = require("@/components/ui/Charts");
+                        const labels = data.historicalPerformance!.map(
+                          (p) => p.date
+                        );
+                        const values = data.historicalPerformance!.map((p) =>
+                          Math.round(p.nav)
+                        );
+                        return (
+                          <LineChart
+                            labels={labels}
+                            datasets={[
+                              { label: "NAV", data: values, fill: true },
+                            ]}
+                            height={240}
+                          />
+                        );
+                      })()}
+                    </div>
+                  </CardContent>
+                </Card>
+              </MotionSection>
             )}
 
           {/* Allocation Charts */}
@@ -225,6 +296,51 @@ export default function PortfolioPage() {
                 <CardTitle gradient>Allocation by Sector</CardTitle>
               </CardHeader>
               <CardContent>
+                {/* Filters */}
+                <div className="flex justify-between items-center mb-4">
+                  <div className="flex flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-text-secondary">Sector</span>
+                      <div className="flex gap-1 p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                        {sectors.map((s) => (
+                          <button
+                            key={s}
+                            onClick={() => setFilterSector(s)}
+                            className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                              filterSector === s
+                                ? "bg-primary-300 text-white"
+                                : "text-text-secondary hover:text-text-primary"
+                            }`}
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-text-secondary">Type</span>
+                      <div className="flex gap-1 p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                        {types.map((t) => (
+                          <button
+                            key={t}
+                            onClick={() => setFilterType(t)}
+                            className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                              filterType === t
+                                ? "bg-primary-300 text-white"
+                                : "text-text-secondary hover:text-text-primary"
+                            }`}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="glass" size="sm" onClick={() => { setFilterSector("all"); setFilterType("all"); }}>Reset</Button>
+                    <Button variant="primary" size="sm" onClick={exportCsv}>Export CSV</Button>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
                     <BarChart
@@ -322,15 +438,21 @@ export default function PortfolioPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-surface-border">
-                      {data.deals.map((deal) => (
+                      {visibleDeals.map((deal) => (
                         <tr
                           key={deal.dealId}
                           className="hover:bg-surface-hover transition-colors cursor-pointer"
-                          onClick={() => window.location.href = `/investor-portal/deals/${deal.dealId}?investor=${resolveInvestorId()}`}
+                          onClick={() =>
+                            (window.location.href = `/investor-portal/deals/${
+                              deal.dealId
+                            }?investor=${resolveInvestorId()}`)
+                          }
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-primary">
-                            <a 
-                              href={`/investor-portal/deals/${deal.dealId}?investor=${resolveInvestorId()}`}
+                            <a
+                              href={`/investor-portal/deals/${
+                                deal.dealId
+                              }?investor=${resolveInvestorId()}`}
                               className="hover:text-primary-300 transition-colors"
                               onClick={(e) => e.stopPropagation()}
                             >
@@ -375,12 +497,16 @@ export default function PortfolioPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {data.deals.map((deal) => (
+                  {visibleDeals.map((deal) => (
                     <Card
                       key={deal.dealId}
                       variant="gradient"
                       className="hover:shadow-lg transition-shadow cursor-pointer"
-                      onClick={() => window.location.href = `/investor-portal/deals/${deal.dealId}?investor=${resolveInvestorId()}`}
+                      onClick={() =>
+                        (window.location.href = `/investor-portal/deals/${
+                          deal.dealId
+                        }?investor=${resolveInvestorId()}`)
+                      }
                     >
                       <CardContent>
                         <div className="mb-3">
