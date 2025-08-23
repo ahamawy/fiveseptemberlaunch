@@ -106,4 +106,13 @@ docker run --rm --env-file ./.env.local -v "$PWD":/workspace -w /workspace your-
 - **[DOCS/UI_HEALTH_GATE.md](./DOCS/UI_HEALTH_GATE.md)** - Health signals and gating
 - **[DOCS/PLAYWRIGHT_GATES.md](./DOCS/PLAYWRIGHT_GATES.md)** - Test mapping & criteria
 
+## Organization
+
+- **[OPERATING_AGREEMENT.md](./OPERATING_AGREEMENT.md)** - PR/branch/checklist standards
+- **[AREA_OWNERS.md](./AREA_OWNERS.md)** - Directory ownership
+- **[TESTING_GUIDELINES.md](./TESTING_GUIDELINES.md)** - Test selector/wait policy
+- **[FOLDERS_OVERVIEW.md](./FOLDERS_OVERVIEW.md)** - Structure summary
+- **[ROADMAP.md](./ROADMAP.md)** - 72-hour and 1-week actions
+- **[BACKLOG.md](./BACKLOG.md)** - Prioritized tasks
+
 ## Last Updated: 2025-08-23
