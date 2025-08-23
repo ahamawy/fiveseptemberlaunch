@@ -115,24 +115,30 @@ export default function PortfolioPage() {
 
   const sectors = [
     "all",
-    ...Array.from(new Set(data.allocation.bySector.map((s) => s.sector || "unknown"))),
+    ...Array.from(
+      new Set(data.allocation.bySector.map((s) => s.sector || "unknown"))
+    ),
   ];
   const types = [
     "all",
     ...Array.from(
-      new Set(data.allocation.byType.map((t) => t.type.replace("_", " ") || "unknown"))
+      new Set(
+        data.allocation.byType.map((t) => t.type.replace("_", " ") || "unknown")
+      )
     ),
   ];
 
   const visibleDeals = data.deals.filter((d) => {
     const sectorOk = filterSector === "all" || d.sector === filterSector;
-    const typeLabel = d.dealType === "fund" ? "partnership" : d.dealType.replace("_", " ");
+    const typeLabel =
+      d.dealType === "fund" ? "partnership" : d.dealType.replace("_", " ");
     const typeOk = filterType === "all" || typeLabel === filterType;
     return sectorOk && typeOk;
   });
 
   const averageMoic = visibleDeals.length
-    ? visibleDeals.reduce((sum, d) => sum + Number(d.moic || 0), 0) / visibleDeals.length
+    ? visibleDeals.reduce((sum, d) => sum + Number(d.moic || 0), 0) /
+      visibleDeals.length
     : 1;
 
   const exportCsv = () => {
@@ -300,7 +306,9 @@ export default function PortfolioPage() {
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex flex-wrap gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-text-secondary">Sector</span>
+                      <span className="text-xs text-text-secondary">
+                        Sector
+                      </span>
                       <div className="flex gap-1 p-1 bg-surface-elevated rounded-lg border border-surface-border">
                         {sectors.map((s) => (
                           <button
@@ -337,8 +345,19 @@ export default function PortfolioPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="glass" size="sm" onClick={() => { setFilterSector("all"); setFilterType("all"); }}>Reset</Button>
-                    <Button variant="primary" size="sm" onClick={exportCsv}>Export CSV</Button>
+                    <Button
+                      variant="glass"
+                      size="sm"
+                      onClick={() => {
+                        setFilterSector("all");
+                        setFilterType("all");
+                      }}
+                    >
+                      Reset
+                    </Button>
+                    <Button variant="primary" size="sm" onClick={exportCsv}>
+                      Export CSV
+                    </Button>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -450,12 +469,16 @@ export default function PortfolioPage() {
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-primary">
                             <a
-                              href={`/investor-portal/deals/${
-                                deal.dealId
-                              }?investor=${resolveInvestorId()}`}
-                              className="hover:text-primary-300 transition-colors"
+                              href={`/investor-portal/deals/${deal.dealId}?investor=${resolveInvestorId()}`}
+                              className="hover:text-primary-300 transition-colors inline-flex items-center gap-2"
                               onClick={(e) => e.stopPropagation()}
                             >
+                              {"companyLogoUrl" in deal && deal.companyLogoUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={(deal as any).companyLogoUrl} alt="logo" className="w-5 h-5 rounded object-cover border border-surface-border" />
+                              ) : (
+                                <span className="w-5 h-5 rounded bg-surface-elevated border border-surface-border inline-block" />
+                              )}
                               {deal.dealName}
                             </a>
                           </td>
@@ -509,7 +532,13 @@ export default function PortfolioPage() {
                       }
                     >
                       <CardContent>
-                        <div className="mb-3">
+                        <div className="mb-3 flex items-center gap-2">
+                          {"companyLogoUrl" in deal && deal.companyLogoUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={(deal as any).companyLogoUrl} alt="logo" className="w-6 h-6 rounded object-cover border border-surface-border" />
+                          ) : (
+                            <span className="w-6 h-6 rounded bg-surface-elevated border border-surface-border inline-block" />
+                          )}
                           <h4 className="text-sm font-semibold text-text-primary hover:text-primary-300 transition-colors">
                             {deal.dealName}
                           </h4>

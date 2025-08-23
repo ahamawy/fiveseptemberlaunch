@@ -1,52 +1,34 @@
 import { BaseRepo } from "./base.repo";
+import { findCompanyAssetUrls } from "@/lib/utils/storage";
 
 export class InvestorsRepo extends BaseRepo {
   async getDashboard(investorId: number) {
-    // Prefer snapshots if available
+    // Skip analytics schema as it doesn't exist - use transactions directly
     let totalValue = 0;
     let totalCalled = 0;
     let totalDistributed = 0;
     let activeDeals = 0;
 
-    try {
-      const { data: snaps } = await this.db
-        .schema("analytics")
-        .from("mv_investment_snapshots")
-        .select("deal_id, net_capital, current_value")
-        .eq("investor_id", investorId);
-      if (Array.isArray(snaps) && snaps.length > 0) {
-        const dealsSet = new Set<number>();
-        for (const s of snaps) {
-          totalValue += Number(s.current_value || 0);
-          totalCalled += Number(s.net_capital || 0);
-          if (s.deal_id) dealsSet.add(s.deal_id);
-        }
-        activeDeals = dealsSet.size;
-      } else {
-        // Fallback to transactions aggregation (public.transactions)
-        const { data: tx } = await this.db
-          .from("transactions")
-          .select(
-            "deal_id, initial_net_capital, gross_capital, transaction_date, investor_id"
-          )
-          .eq("investor_id", investorId);
-        if (Array.isArray(tx)) {
-          const dealsSet = new Set<number>();
-          for (const t of tx) {
-            const amt =
-              (t.initial_net_capital as number) ??
-              (t.gross_capital as number) ??
-              0;
-            if (amt >= 0) totalCalled += amt;
-            else totalDistributed += amt; // negative
-            if (t.deal_id) dealsSet.add(t.deal_id);
-          }
-          activeDeals = dealsSet.size;
-          totalValue = totalCalled + totalDistributed; // approx NAV
-        }
+    // Use transactions aggregation (public.transactions)
+    const { data: tx } = await this.db
+      .from("transactions")
+      .select(
+        "deal_id, initial_net_capital, gross_capital, transaction_date, investor_id"
+      )
+      .eq("investor_id", investorId);
+    if (Array.isArray(tx)) {
+      const dealsSet = new Set<number>();
+      for (const t of tx) {
+        const amt =
+          (t.initial_net_capital as number) ??
+          (t.gross_capital as number) ??
+          0;
+        if (amt >= 0) totalCalled += amt;
+        else totalDistributed += amt; // negative
+        if (t.deal_id) dealsSet.add(t.deal_id);
       }
-    } catch {
-      // Ignore and keep zeros
+      activeDeals = dealsSet.size;
+      totalValue = totalCalled + totalDistributed; // approx NAV
     }
 
     // Recent activity (last 5)
@@ -87,25 +69,14 @@ export class InvestorsRepo extends BaseRepo {
   }
 
   async getPortfolio(investorId: number) {
-    // Try snapshots per deal
+    // Skip analytics schema as it doesn't exist - go straight to transactions
     let perDeal: Array<{
       deal_id: number;
       net_capital: number;
       current_value: number;
     }> = [];
-    try {
-      const { data: snaps } = await this.db
-        .schema("analytics")
-        .from("mv_investment_snapshots")
-        .select("deal_id, net_capital, current_value")
-        .eq("investor_id", investorId);
-      if (Array.isArray(snaps) && snaps.length > 0) {
-        perDeal = snaps as any;
-      }
-    } catch {
-      // ignore
-    }
 
+    // Always use transactions aggregation since mv_investment_snapshots doesn't exist
     if (perDeal.length === 0) {
       // Fallback: aggregate from transactions by deal
       const { data: tx } = await this.db
@@ -159,6 +130,16 @@ export class InvestorsRepo extends BaseRepo {
         sector: c.company_sector,
       })
     );
+
+    // Resolve company asset URLs (logo/background)
+    const companyIdToAssets = new Map<number, { logo_url: string | null; background_url: string | null }>();
+    for (const cid of companyIds) {
+      try {
+        const comp = companies?.find((c: any) => c.company_id === cid);
+        const assets = await findCompanyAssetUrls(this.db as any, cid as number, comp?.company_name);
+        companyIdToAssets.set(cid, assets);
+      } catch {}
+    }
 
     // Get latest valuations for each deal
     const valuationsMap = new Map<number, { moic: number; irr: number | null }>();
@@ -217,6 +198,7 @@ export class InvestorsRepo extends BaseRepo {
         dealName: d.deal_name || `Deal #${row.deal_id}`,
         companyName: comp?.name || "",
         sector: comp?.sector || "",
+        companyLogoUrl: d.underlying_company_id ? companyIdToAssets.get(d.underlying_company_id || 0)?.logo_url || null : null,
         dealType: (d.deal_type || "direct").toString().toLowerCase(),
         committed: called,
         called,
