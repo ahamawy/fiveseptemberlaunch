@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/theme-utils";
+import { resolveInvestorId } from "@/lib/utils/investor";
 
 interface ProfileData {
   personalInfo: {
@@ -81,7 +82,10 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/api/investors/1");
+        const search = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+        const param = search?.get("investor") || null;
+        const id = resolveInvestorId(param);
+        const res = await fetch(`/api/investors/${encodeURIComponent(id)}`);
         if (!res.ok) {
           setData(null);
           setLoading(false);

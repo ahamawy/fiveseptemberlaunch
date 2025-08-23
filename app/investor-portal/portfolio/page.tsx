@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { formatCurrency, formatPercentage, getStatusColor } from "@/lib/theme-utils";
 import { BarChart } from "@/components/ui/BarChart";
 import { NivoPie } from "@/components/ui/NivoCharts";
+import { resolveInvestorId as resolveId } from "@/lib/utils/investor";
 
 interface DealPerformance {
   dealId: number;
@@ -59,14 +60,7 @@ export default function PortfolioPage() {
       ? new URLSearchParams(window.location.search)
       : null;
   const investorParam = searchParams?.get("investor") || null;
-  const resolveInvestorId = () => {
-    if (investorParam) return investorParam;
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("equitie-current-investor-id");
-      if (stored) return stored;
-    }
-    return "1";
-  };
+  const resolveInvestorId = () => resolveId(investorParam);
 
   useEffect(() => {
     fetchPortfolioData();

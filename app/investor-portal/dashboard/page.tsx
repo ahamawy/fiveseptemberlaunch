@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { useSearchParams } from "next/navigation";
+import { resolveInvestorId as resolveId } from "@/lib/utils/investor";
 
 interface DashboardData {
   portfolio: {
@@ -34,14 +35,7 @@ export default function DashboardPage() {
 
   const searchParams = useSearchParams();
   const investorParam = searchParams.get("investor");
-  const resolveInvestorId = () => {
-    if (investorParam) return investorParam;
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("equitie-current-investor-id");
-      if (stored) return stored;
-    }
-    return "1";
-  };
+  const resolveInvestorId = () => resolveId(investorParam);
 
   useEffect(() => {
     fetchDashboardData();
