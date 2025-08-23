@@ -46,7 +46,12 @@ Usage example (Nivo Pie):
 ```tsx
 import { NivoPie } from "@/components/ui/NivoCharts";
 
-<NivoPie data={[{ id: "Tech", value: 420 }, { id: "Healthcare", value: 210 }]} />
+<NivoPie
+  data={[
+    { id: "Tech", value: 420 },
+    { id: "Healthcare", value: 210 },
+  ]}
+/>;
 ```
 
 ## Service Layer Pattern

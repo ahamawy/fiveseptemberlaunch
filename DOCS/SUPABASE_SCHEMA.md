@@ -21,19 +21,21 @@ Examples (public schema table names):
 
 ```javascript
 // Dot-named tables (public schema)
-await supabase.from("deals.deal").select("*")
-await supabase.from("companies.company").select("*")
+await supabase.from("deals.deal").select("*");
+await supabase.from("companies.company").select("*");
 
 // Regular public tables (no dot in the name)
-await supabase.from("transactions").select("*")
-await supabase.from("deal_valuations").select("deal_id, moic, irr, valuation_date")
+await supabase.from("transactions").select("*");
+await supabase
+  .from("deal_valuations")
+  .select("deal_id, moic, irr, valuation_date");
 ```
 
 ❌ **INCORRECT**:
 
 ```javascript
 // This will fail - "deals" is not a schema here; the dot is part of the table name
-await supabase.schema("deals").from("deal").select("*")
+await supabase.schema("deals").from("deal").select("*");
 ```
 
 ### Key Tables and Their Locations

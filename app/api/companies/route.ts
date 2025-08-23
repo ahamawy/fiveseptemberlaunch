@@ -26,10 +26,10 @@ export async function GET() {
         countsMap.set(cid, (countsMap.get(cid) || 0) + 1);
       });
     }
-    // Enrich with asset URLs from storage bucket `company-assets/{company_id}`
+    // Enrich with asset URLs from storage bucket `company-assets/{company_name_slug}`
     const enriched = await Promise.all(
       (data || []).map(async (c: any) => {
-        const assets = await findCompanyAssetUrls(sb as any, c.company_id);
+        const assets = await findCompanyAssetUrls(sb as any, c.company_id, c.company_name);
         return {
           ...c,
           deal_count: countsMap.get(c.company_id) || 0,

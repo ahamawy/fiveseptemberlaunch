@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function InvestorPortalIndex() {
-  redirect("/investor-portal/select");
+  redirect("/investor-portal/dashboard");
 }

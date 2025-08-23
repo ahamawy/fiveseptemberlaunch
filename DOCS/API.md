@@ -145,7 +145,9 @@ Cross-schema and dot-named tables:
 ```ts
 // Dot-named public tables
 const { data: deals } = await supabase.from("deals.deal").select("*");
-const { data: companies } = await supabase.from("companies.company").select("*");
+const { data: companies } = await supabase
+  .from("companies.company")
+  .select("*");
 
 // Regular public tables
 const { data: tx } = await supabase.from("transactions").select("*");
@@ -165,11 +167,11 @@ const { data: valuations } = await supabase
   .order("valuation_date", { ascending: false });
 
 const valuationsMap = new Map<number, { moic: number; irr: number | null }>();
-(valuations || []).forEach(v => {
+(valuations || []).forEach((v) => {
   if (!valuationsMap.has(v.deal_id)) {
     valuationsMap.set(v.deal_id, {
       moic: parseFloat(v.moic as any) || 1.0,
-      irr: v.irr ? parseFloat(v.irr as any) : null
+      irr: v.irr ? parseFloat(v.irr as any) : null,
     });
   }
 });

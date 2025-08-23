@@ -328,7 +328,42 @@ const PAGE_ROUTES: PageRoute[] = [
     ],
   },
   {
-    category: "Development",
+    category: "Quick Data (API)",
+    pages: [
+      {
+        name: "Deals API",
+        path: "/api/deals?limit=10",
+        icon: Icons.link,
+        description: "Supabase-backed deals list (with valuations)",
+      },
+      {
+        name: "Transactions API",
+        path: "/api/transactions?limit=10",
+        icon: Icons.link,
+        description: "Latest transactions (deal/investor names)",
+      },
+      {
+        name: "Investor 1 Portfolio API",
+        path: "/api/investors/1/portfolio",
+        icon: Icons.link,
+        description: "Holdings, MOIC/IRR, allocations",
+      },
+      {
+        name: "Investor 1 Transactions API",
+        path: "/api/investors/1/transactions",
+        icon: Icons.link,
+        description: "Investor-specific transactions",
+      },
+      {
+        name: "Companies API",
+        path: "/api/companies?limit=20",
+        icon: Icons.link,
+        description: "Companies with storage asset URLs",
+      },
+    ],
+  },
+  {
+    category: "Development / Tests",
     pages: [
       {
         name: "Style Guide",
