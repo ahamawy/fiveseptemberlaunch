@@ -3,9 +3,15 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { formatCurrency, formatPercentage, getStatusColor } from "@/lib/theme-utils";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import {
+  formatCurrency,
+  formatPercentage,
+  getStatusColor,
+} from "@/lib/theme-utils";
 import { BarChart } from "@/components/ui/BarChart";
 import { NivoPie } from "@/components/ui/NivoCharts";
+import { MotionSection } from "@/components/ui/Motion";
 import { resolveInvestorId as resolveId } from "@/lib/utils/investor";
 
 interface DealPerformance {
@@ -47,7 +53,12 @@ interface PortfolioData {
     exitedDeals: number;
     totalValue: number;
   };
-  historicalPerformance?: Array<{ date: string; nav: number; irr: number; moic: number }>;
+  historicalPerformance?: Array<{
+    date: string;
+    nav: number;
+    irr: number;
+    moic: number;
+  }>;
 }
 
 export default function PortfolioPage() {
@@ -119,6 +130,7 @@ export default function PortfolioPage() {
 
         <div className="relative z-10 p-6 lg:p-8 space-y-8">
           {/* Header */}
+          <MotionSection>
           <div className="pb-6 border-b border-surface-border">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
               Portfolio Overview
@@ -127,21 +139,23 @@ export default function PortfolioPage() {
               Detailed view of your investment portfolio
             </p>
           </div>
+          </MotionSection>
 
           {/* Summary Cards */}
+          <MotionSection delay={0.05}>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Card variant="glass" className="hover:shadow-lg transition-shadow">
-              <CardContent>
+            <Card variant="gradient" className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-5">
                 <dt className="text-sm font-medium text-text-secondary">
                   Total Portfolio Value
                 </dt>
-                <dd className="mt-3 text-3xl font-bold text-text-primary">
+                <dd className="mt-3 text-3xl font-extrabold text-text-primary tracking-tight">
                   {formatCurrency(data.summary.totalValue)}
                 </dd>
               </CardContent>
             </Card>
             <Card variant="glass" className="hover:shadow-lg transition-shadow">
-              <CardContent>
+              <CardContent className="p-5">
                 <dt className="text-sm font-medium text-text-secondary">
                   Total Deals
                 </dt>
@@ -151,52 +165,58 @@ export default function PortfolioPage() {
               </CardContent>
             </Card>
             <Card variant="glass" className="hover:shadow-lg transition-shadow">
-              <CardContent>
+              <CardContent className="p-5">
                 <dt className="text-sm font-medium text-text-secondary">
                   Active Deals
                 </dt>
-                <dd className="mt-3 text-3xl font-bold text-success-400">
+                <dd className="mt-3 text-3xl font-extrabold text-success-400">
                   {data.summary.activeDeals}
                 </dd>
               </CardContent>
             </Card>
             <Card variant="glass" className="hover:shadow-lg transition-shadow">
-              <CardContent>
+              <CardContent className="p-5">
                 <dt className="text-sm font-medium text-text-secondary">
                   Exited Deals
                 </dt>
-                <dd className="mt-3 text-3xl font-bold text-info-400">
+                <dd className="mt-3 text-3xl font-extrabold text-info-400">
                   {data.summary.exitedDeals}
                 </dd>
               </CardContent>
             </Card>
           </div>
+          </MotionSection>
 
           {/* NAV Trend */}
-          {data.historicalPerformance && data.historicalPerformance.length > 0 && (
-            <Card variant="glass">
-              <CardHeader>
-                <CardTitle gradient>NAV Over Last 12 Months</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  {/* Lazy import to avoid SSR issues not necessary since page is client */}
-                  {(() => {
-                    const { LineChart } = require("@/components/ui/Charts");
-                    const labels = data.historicalPerformance!.map((p) => p.date);
-                    const values = data.historicalPerformance!.map((p) => Math.round(p.nav));
-                    return (
-                      <LineChart
-                        labels={labels}
-                        datasets={[{ label: "NAV", data: values }]}
-                        height={240}
-                      />
-                    );
-                  })()}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {data.historicalPerformance &&
+            data.historicalPerformance.length > 0 && (
+              <MotionSection delay={0.1}><Card variant="glass">
+                <CardHeader>
+                  <CardTitle gradient>NAV Over Last 12 Months</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    {/* Lazy import to avoid SSR issues not necessary since page is client */}
+                    {(() => {
+                      const { LineChart } = require("@/components/ui/Charts");
+                      const labels = data.historicalPerformance!.map(
+                        (p) => p.date
+                      );
+                      const values = data.historicalPerformance!.map((p) =>
+                        Math.round(p.nav)
+                      );
+                      return (
+                        <LineChart
+                          labels={labels}
+                          datasets={[{ label: "NAV", data: values, fill: true }]}
+                          height={240}
+                        />
+                      );
+                    })()}
+                  </div>
+                </CardContent>
+              </Card></MotionSection>
+            )}
 
           {/* Allocation Charts */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -209,13 +229,18 @@ export default function PortfolioPage() {
                   <div>
                     <BarChart
                       labels={data.allocation.bySector.map((s) => s.sector)}
-                      values={data.allocation.bySector.map((s) => Math.round(s.value))}
+                      values={data.allocation.bySector.map((s) =>
+                        Math.round(s.value)
+                      )}
                       maxBars={10}
                     />
                   </div>
                   <div>
                     <NivoPie
-                      data={data.allocation.bySector.map((s) => ({ id: s.sector || "unknown", value: Math.round(s.value) }))}
+                      data={data.allocation.bySector.map((s) => ({
+                        id: s.sector || "unknown",
+                        value: Math.round(s.value),
+                      }))}
                       height={240}
                     />
                   </div>
@@ -229,8 +254,12 @@ export default function PortfolioPage() {
               </CardHeader>
               <CardContent>
                 <BarChart
-                  labels={data.allocation.byType.map((t) => t.type.replace("_", " "))}
-                  values={data.allocation.byType.map((t) => Math.round(t.value))}
+                  labels={data.allocation.byType.map((t) =>
+                    t.type.replace("_", " ")
+                  )}
+                  values={data.allocation.byType.map((t) =>
+                    Math.round(t.value)
+                  )}
                   maxBars={6}
                 />
               </CardContent>
@@ -296,10 +325,17 @@ export default function PortfolioPage() {
                       {data.deals.map((deal) => (
                         <tr
                           key={deal.dealId}
-                          className="hover:bg-surface-hover transition-colors"
+                          className="hover:bg-surface-hover transition-colors cursor-pointer"
+                          onClick={() => window.location.href = `/investor-portal/deals/${deal.dealId}?investor=${resolveInvestorId()}`}
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-primary">
-                            {deal.dealName}
+                            <a 
+                              href={`/investor-portal/deals/${deal.dealId}?investor=${resolveInvestorId()}`}
+                              className="hover:text-primary-300 transition-colors"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {deal.dealName}
+                            </a>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
                             {deal.companyName}
@@ -343,11 +379,12 @@ export default function PortfolioPage() {
                     <Card
                       key={deal.dealId}
                       variant="gradient"
-                      className="hover:shadow-lg transition-shadow"
+                      className="hover:shadow-lg transition-shadow cursor-pointer"
+                      onClick={() => window.location.href = `/investor-portal/deals/${deal.dealId}?investor=${resolveInvestorId()}`}
                     >
                       <CardContent>
                         <div className="mb-3">
-                          <h4 className="text-sm font-semibold text-text-primary">
+                          <h4 className="text-sm font-semibold text-text-primary hover:text-primary-300 transition-colors">
                             {deal.dealName}
                           </h4>
                           <p className="text-xs text-text-secondary">
@@ -393,7 +430,7 @@ export default function PortfolioPage() {
                             </span>
                           </div>
                         </div>
-                        <div className="mt-3">
+                        <div className="mt-3 flex items-center justify-between">
                           <span
                             className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusBadge(
                               deal.status
@@ -401,6 +438,7 @@ export default function PortfolioPage() {
                           >
                             {deal.status}
                           </span>
+                          <ChevronRightIcon className="w-4 h-4 text-text-tertiary" />
                         </div>
                       </CardContent>
                     </Card>

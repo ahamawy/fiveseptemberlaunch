@@ -11,7 +11,7 @@ const nextConfig = {
   webpack: (config, { dev }) => {
     if (dev) {
       // Match Next.js default to avoid warnings
-      config.devtool = 'eval-source-map';
+      config.devtool = "eval-source-map";
     }
     return config;
   },
@@ -22,6 +22,15 @@ const nextConfig = {
     },
   },
   // Remove deprecated experimental flags to avoid warnings
-}
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**.supabase.co",
+        pathname: "/storage/**",
+      },
+    ],
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
