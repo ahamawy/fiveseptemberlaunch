@@ -1,0 +1,15 @@
+node_modules/
+.next/
+playwright-report/
+e2e/
+tests/
+TEST_RESULTS_REPORT.md
+PLAYWRIGHT_TEST_REPORT.md
+test-*.ts
+test-setup.ts
+test-documents/
+ultrathink/
+UI_FALLBACKS/
+TOOLING/
+*.log
+*.tsbuildinfo
