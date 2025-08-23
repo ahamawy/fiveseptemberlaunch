@@ -7,7 +7,9 @@
 - **[README.md](./README.md)** - Quick start guide
 - **[DOCS/API.md](./DOCS/API.md)** - API endpoints reference
 - **[DOCS/SUPABASE_SCHEMA.md](./DOCS/SUPABASE_SCHEMA.md)** - Supabase table naming & schema gotchas
-- **[DOCS/DATA_CONTRACTS.md](./DOCS/DATA_CONTRACTS.md)** - Canonical API response shapes and mapping rules
+- **[DOCS/INVESTOR_CONTRACTS_INDEX.md](./DOCS/INVESTOR_CONTRACTS_INDEX.md)** - Canonical investor contracts
+- **[DOCS/SUPABASE_READ_POLICY.md](./DOCS/SUPABASE_READ_POLICY.md)** - Read patterns and guardrails
+- **[DOCS/API_OWNERSHIP_MATRIX.md](./DOCS/API_OWNERSHIP_MATRIX.md)** - Route → Repo → Contract → Owner
 
 ## ARCHON Fee Engine
 
@@ -99,4 +101,9 @@ docker run --rm --env-file ./.env.local -v "$PWD":/workspace -w /workspace your-
 - Motion helper: `components/ui/Motion.tsx`
 - Drag & Drop: `components/ui/DnD.tsx`
 
-## Last Updated: 2025-08-22
+## Governance & Test Gates
+
+- **[DOCS/UI_HEALTH_GATE.md](./DOCS/UI_HEALTH_GATE.md)** - Health signals and gating
+- **[DOCS/PLAYWRIGHT_GATES.md](./DOCS/PLAYWRIGHT_GATES.md)** - Test mapping & criteria
+
+## Last Updated: 2025-08-23
