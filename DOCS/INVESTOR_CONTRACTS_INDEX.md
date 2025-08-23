@@ -5,12 +5,14 @@ Location: `lib/contracts/**`
 Canonical shapes consumed by investor pages and API routes. Pages/components must not infer fields from API responses directly.
 
 DashboardSummary
+
 - portfolio: { totalValue: number; totalCommitted: number; totalDistributed: number; unrealizedGain: number }
 - performance: { irr: number; moic: number; dpi: number; tvpi: number }
 - recentActivity: Array<{ id: string; type: string; description: string; amount?: number; date: string }>
 - activeDeals: number
 
 PortfolioResponse
+
 - deals: PortfolioDeal[]
 - allocation:
   - bySector: Array<{ sector: string; value: number; percentage: number; dealCount: number }>
@@ -19,6 +21,7 @@ PortfolioResponse
 - historicalPerformance?: Array<{ date: string; nav: number }>
 
 PortfolioDeal
+
 - dealId: number
 - dealName: string
 - companyName: string
@@ -37,6 +40,7 @@ PortfolioDeal
 - companyLogoUrl?: string | null
 
 TransactionItem
+
 - transaction_id: number
 - deal_id: number
 - investor_id: number
@@ -50,6 +54,7 @@ TransactionItem
 - documents_count: number
 
 DealListItem (excerpt)
+
 - id: number
 - name: string
 - stage: string
@@ -65,7 +70,6 @@ DealListItem (excerpt)
 - company_background_url?: string | null
 
 Notes
+
 - All money rounded to 2 decimals in UI; don’t mutate server values.
 - Discounts negative; precedence in fees handled elsewhere, not part of these contracts.
-
-

@@ -14,9 +14,9 @@
 | POST   | `/api/deals/[id]/calculate`        | Execute calculation and store audit    | `{ investorId?, transactionId? }` → `{ success, data, auditId }` |
 | GET    | `/api/deals/[id]/calculate`        | Calculation history for a deal         | `{ success, data: Audit[] }`                                     |
 | GET    | `/api/investors/[id]`              | Get investor profile (id or public_id) | `{ data: Investor }`                                             |
-| GET    | `/api/investors/[id]/dashboard`    | Dashboard metrics                      | `{ ... }`                                                        |
-| GET    | `/api/investors/[id]/portfolio`    | Portfolio holdings                     | `{ ... }`                                                        |
-| GET    | `/api/investors/[id]/transactions` | Transaction history                    | `{ data: Transaction[] }`                                        |
+| GET    | `/api/investors/[id]/dashboard`    | Dashboard metrics                      | `{ success, data: DashboardSummary }`                             |
+| GET    | `/api/investors/[id]/portfolio`    | Portfolio holdings                     | `{ success, data: PortfolioResponse }`                            |
+| GET    | `/api/investors/[id]/transactions` | Transaction history                    | `{ success, data: Transaction[] }`                               |
 | GET    | `/api/investors/[id]/commitments`  | Commitments                            | `{ ... }`                                                        |
 | GET    | `/api/transactions`                | All transactions                       | `{ data: Transaction[] }`                                        |
 | POST   | `/api/transactions`                | Create transaction (server-only)       | `{ success, data: Transaction }`                                 |
@@ -92,7 +92,7 @@ Fallback order used by UI pages:
 ?sort=created_at&order=desc
 ```
 
-## Response Formats
+## Response Formats (Investor Portal)
 
 ### Success Response
 
@@ -100,7 +100,7 @@ Fallback order used by UI pages:
 {
   "success": true,
   "data": {...},
-  "meta": {
+  "metadata": {
     "page": 1,
     "limit": 20,
     "total": 100
@@ -117,6 +117,12 @@ Fallback order used by UI pages:
   "code": "ERROR_CODE"
 }
 ```
+
+## Test Alignment
+
+- Playwright quick gates assert on the `data` property of the standard envelope.
+- Investor routes under `/api/investors/[id]/*` use repos and return contracts listed in `DOCS/INVESTOR_CONTRACTS_INDEX.md`.
+- Avoid introducing new top-level keys; prefer `data` with `metadata` when needed.
 
 ## Authentication
 
