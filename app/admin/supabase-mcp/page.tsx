@@ -515,7 +515,7 @@ export default function SupabaseMCPPage() {
                         <p className="text-white font-medium">Configure Environment</p>
                         <code className="block mt-1 p-2 bg-surface-base rounded text-xs">
                           {`SUPABASE_URL=your-url
-SUPABASE_SERVICE_ROLE_KEY=your-key
+SUPABASE_SERVICE_ROLE_KEY=[REDACTED]
 MCP_SERVER_PORT=3001`}
                         </code>
                       </div>
