@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import PortalSwitcher from '@/components/PortalSwitcher';
 
 interface InvestorPortalLayoutProps {
   children: ReactNode;
@@ -23,6 +24,7 @@ export default function InvestorPortalLayout({ children }: InvestorPortalLayoutP
 
   return (
     <div className="min-h-screen bg-background-deep">
+      <PortalSwitcher />
       <nav className="bg-white dark:bg-background-surface/80 backdrop-blur-md shadow-md dark:shadow-glow-purple/10 border-b border-gray-200 dark:border-surface-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">

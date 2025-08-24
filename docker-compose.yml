@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # MCP Supabase Server - Official Supabase MCP integration
+  mcp-supabase:
+    image: node:20-alpine
+    container_name: equitie-mcp-supabase
+    working_dir: /app
+    volumes:
+      - ./.mcp:/app/.mcp
+      - ./lib/mcp:/app/lib/mcp
+    environment:
+      - SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - NODE_ENV=development
+    command: npx @supabase/mcp
+    ports:
+      - "3100:3100"
+    networks:
+      - equitie-network
+    restart: unless-stopped
+
+  # Custom Equitie MCP Server - Domain-specific tools
+  mcp-equitie:
+    image: node:20-alpine
+    container_name: equitie-mcp-custom
+    working_dir: /app
+    volumes:
+      - ./lib/mcp:/app/lib/mcp
+      - ./lib/services:/app/lib/services
+      - ./lib/db:/app/lib/db
+    environment:
+      - SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - NODE_ENV=development
+    command: node lib/mcp/equitie-server.mjs
+    ports:
+      - "3101:3101"
+    networks:
+      - equitie-network
+    restart: unless-stopped
+
+  # PostgreSQL for local development (optional - can connect to Supabase directly)
+  postgres-local:
+    image: postgres:15-alpine
+    container_name: equitie-postgres
+    environment:
+      - POSTGRES_DB=equitie
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=cnd9BGR7!!!!
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./DB/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - equitie-network
+    profiles:
+      - local-db
+
+  # Migration runner - Runs DB migrations safely
+  migration-runner:
+    image: migrate/migrate:latest
+    container_name: equitie-migrations
+    volumes:
+      - ./DB/migrations:/migrations
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    command: -path=/migrations -database "$DATABASE_URL" up
+    networks:
+      - equitie-network
+    profiles:
+      - migrate
+    depends_on:
+      - postgres-local
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: equitie-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - equitie-network
+    profiles:
+      - cache
+
+networks:
+  equitie-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

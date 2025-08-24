@@ -123,6 +123,10 @@ export class UnifiedSupabaseAdapter implements IDataClient {
       );
     }
 
+    // Debug: Log which key format is being used (first 20 chars only for security)
+    const keyPreview = supabaseKey.substring(0, 20) + "...";
+    logger.info(`Using Supabase key: ${keyPreview}`);
+
     this.client = createClient<Database>(supabaseUrl, supabaseKey);
     this.useViews = options?.useViews ?? true; // Default to using views for simplicity
 

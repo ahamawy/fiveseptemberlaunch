@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import PortalSwitcher from "@/components/PortalSwitcher";
 
 export default function AdminLayout({
   children,
@@ -22,6 +23,7 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-background-deep">
+      <PortalSwitcher />
       <nav className="sticky top-0 z-30 bg-white/80 dark:bg-background-surface/80 backdrop-blur-md border-b border-surface-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-14 flex items-center justify-between">
