@@ -128,7 +128,7 @@ export function DashboardSkeleton() {
 // Portfolio page skeleton
 export function PortfolioSkeleton() {
   return (
-    <div className="min-h-screen bg-background-deep p-6 lg:p-8">
+    <div className="min-h-screen bg-background p-6 lg:p-8">
       <DashboardSkeleton />
     </div>
   );

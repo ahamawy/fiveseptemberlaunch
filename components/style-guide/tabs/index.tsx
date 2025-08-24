@@ -3,9 +3,11 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input, Textarea, Select } from '@/components/ui/Input';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
-import { colors } from '@/BRANDING/tokens/colors';
-import { typography } from '@/BRANDING/tokens/typography';
-import { animations } from '@/BRANDING/tokens/animations';
+const demoColors = {
+  primary: { DEFAULT: 'hsl(var(--primary))', 300: '#C898FF' },
+  accent: { DEFAULT: 'hsl(var(--accent))', blue: '#66D0FF' },
+  semantic: { success: '#22C55E', warning: '#F59E0B', error: '#EF4444', info: '#06B6D4' },
+};
 
 export function OverviewSection() {
   return (
@@ -50,9 +52,9 @@ export function OverviewSection() {
 
 export function ColorsSection() {
   const colorCategories = {
-    primary: colors.primary,
-    accent: colors.accent,
-    semantic: colors.semantic,
+    primary: demoColors.primary as Record<string, string>,
+    accent: demoColors.accent as Record<string, string>,
+    semantic: demoColors.semantic as Record<string, string>,
   };
 
   return (

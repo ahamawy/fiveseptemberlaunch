@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DevTools } from "@/components/DevTools";
@@ -7,10 +7,20 @@ import { DevToolbar } from "@/components/dev/DevToolbar";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { HealthBanner } from "@/components/dev/HealthBanner";
 
-const inter = Inter({ subsets: ["latin"] });
+const jetbrainsMono = JetBrains_Mono({ 
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({ 
+  subsets: ["latin"],
+  variable: "--font-space",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Equitie Investor Portal",
+  title: "EquiTie Investor Portal",
   description: "Manage your investment portfolio",
 };
 
@@ -22,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.className} bg-background-deep text-text-primary min-h-screen`}
+        className={`${jetbrainsMono.variable} ${spaceGrotesk.variable} font-sans bg-background text-foreground min-h-screen`}
         suppressHydrationWarning
       >
         <ThemeProvider defaultTheme="dark" storageKey="equitie-theme">

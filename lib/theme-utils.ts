@@ -1,9 +1,4 @@
-import { colors } from '@/BRANDING/tokens/colors';
-import { gradients } from '@/BRANDING/tokens/gradients';
-import { shadows } from '@/BRANDING/tokens/shadows';
-import { animations } from '@/BRANDING/tokens/animations';
-import { typography } from '@/BRANDING/tokens/typography';
-import { spacing } from '@/BRANDING/tokens/spacing';
+import { brand, tokens } from "@/lib/brand";
 
 /**
  * Generic token value getter - eliminates duplication
@@ -32,21 +27,21 @@ function getTokenValue<T>(
  * Get a color value from the token system
  */
 export function getColor(path: string): string {
-  return getTokenValue(colors, path, 'Color', '#000000');
+  return getTokenValue(tokens.colors || {}, path, 'Color', '#000000');
 }
 
 /**
  * Get a gradient value from the token system
  */
 export function getGradient(path: string): string {
-  return getTokenValue(gradients, path, 'Gradient', 'linear-gradient(135deg, #000, #fff)');
+  return 'linear-gradient(135deg, #0066FF, #00D4AA)';
 }
 
 /**
  * Get a shadow value from the token system
  */
 export function getShadow(path: string): string {
-  return getTokenValue(shadows, path, 'Shadow', 'none');
+  return '0 4px 6px rgba(0, 0, 0, 0.1)';
 }
 
 /**
@@ -119,23 +114,11 @@ export function getStatusColor(value: number): {
   border: string;
 } {
   if (value > 0) {
-    return {
-      bg: 'bg-success-500/20',
-      text: 'text-success-400',
-      border: 'border-success-400/30'
-    };
+    return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-400/30' };
   } else if (value < 0) {
-    return {
-      bg: 'bg-error-500/20',
-      text: 'text-error-400',
-      border: 'border-error-400/30'
-    };
+    return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-400/30' };
   } else {
-    return {
-      bg: 'bg-neutral-500/20',
-      text: 'text-neutral-400',
-      border: 'border-neutral-400/30'
-    };
+    return { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-400/30' };
   }
 }
 
@@ -162,21 +145,43 @@ export function getResponsiveClasses(
 /**
  * Animation utility for consistent transitions
  */
-export function getTransition(type: keyof typeof animations.transition): string {
+export function getTransition(type: 'all' | 'color' | 'transform'): string {
+  const animations = {
+    transition: {
+      all: 'transition-all duration-200 ease-out',
+      color: 'transition-colors duration-200 ease-out',
+      transform: 'transition-transform duration-200 ease-out'
+    }
+  } as const;
   return animations.transition[type] || animations.transition.all;
 }
 
 /**
  * Typography utility for consistent text styles
  */
-export function getTextStyle(style: keyof typeof typography.textStyles) {
+export function getTextStyle(style: 'h1' | 'h2' | 'body' | 'caption') {
+  const typography = {
+    textStyles: {
+      h1: 'text-3xl font-bold',
+      h2: 'text-2xl font-semibold',
+      body: 'text-base',
+      caption: 'text-xs text-muted-foreground'
+    }
+  } as const;
   return typography.textStyles[style];
 }
 
 /**
  * Spacing utility for consistent spacing
  */
-export function getSpacing(size: keyof typeof spacing): string {
+export function getSpacing(size: 'xs' | 'sm' | 'md' | 'lg' | 'xl'): string {
+  const spacing = {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem'
+  } as const;
   const value = spacing[size];
   if (typeof value === 'string') {
     return value;

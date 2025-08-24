@@ -77,8 +77,8 @@ export default function EnhancedStyleGuidePage() {
             <div className="p-6 lg:p-8">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h1 className="text-5xl font-bold bg-gradient-to-r from-[#C898FF] via-[#66D0FF] to-[#34D399] bg-clip-text text-transparent">
-                    Equitie Design System
+                  <h1 className="text-5xl font-bold bg-gradient-to-r from-[#C898FF] via-[#66D0FF] to-[#34D399] bg-clip-text text-transparent font-heading">
+                    EquiTie Design System
                   </h1>
                   <p className="mt-3 text-lg" style={{ color: currentTheme.text.secondary }}>
                     Comprehensive style guide with Figma integration and modular patterns

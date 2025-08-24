@@ -4,3 +4,4 @@ export abstract class BaseRepo {
   protected db = getServiceClient();
 }
 
+

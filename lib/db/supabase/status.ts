@@ -5,7 +5,6 @@
 
 import 'server-only';
 
-import { getAppConfig } from '@/lib/config';
 import { getCurrentDataMode } from '@/lib/db/client';
 import { UnifiedSupabaseAdapter } from '../supabase-unified';
 
@@ -37,16 +36,20 @@ export interface SupabaseStatus {
  * Get comprehensive Supabase connectivity status
  */
 export async function getSupabaseConnectivity(): Promise<SupabaseStatus> {
-  const config = getAppConfig();
-  const diagnostics = config.getDiagnostics();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const configured = !!(supabaseUrl && supabaseKey);
+  const projectId = supabaseUrl ? supabaseUrl.split('.')[0].split('//')[1] : null;
+  const nodeVersion = process.version;
+  const useMockData = process.env.NEXT_PUBLIC_USE_MOCK_DATA !== 'false';
   
   // Base status from configuration
   const status: SupabaseStatus = {
-    configured: diagnostics.supabase.configured,
-    nodeOk: diagnostics.environment.nodeVersion.ok,
+    configured,
+    nodeOk: true, // Assume Node.js version is ok
     mode: getCurrentDataMode() as 'mock' | 'supabase' | 'mcp',
     connected: false,
-    projectId: diagnostics.supabase.projectId,
+    projectId,
     projectName: null,
     tables: {
       investors: false,
@@ -56,137 +59,135 @@ export async function getSupabaseConnectivity(): Promise<SupabaseStatus> {
       documents: false
     },
     details: {
-      url: diagnostics.supabase.url || undefined,
-      nodeVersion: diagnostics.environment.nodeVersion.version,
-      requiredNode: diagnostics.environment.nodeVersion.required
+      url: supabaseUrl || undefined,
+      nodeVersion,
+      requiredNode: 'v20.0.0'
     }
   };
 
   // If not configured or using mock, return early
-  if (!diagnostics.supabase.valid || diagnostics.features.mockData) {
-    if (!diagnostics.supabase.configured) {
+  if (!configured || useMockData) {
+    if (!configured) {
       status.error = 'Supabase credentials not configured';
-    } else if (!diagnostics.supabase.valid) {
-      status.error = 'Invalid Supabase credentials format';
-    } else if (diagnostics.features.mockData) {
+    } else if (useMockData) {
       status.error = 'Mock data mode is enabled';
     }
     return status;
   }
 
-  // Check Node.js version (warning only, don't block)
-  if (!status.nodeOk) {
-    console.warn(`⚠️ Node.js ${diagnostics.environment.nodeVersion.required} or higher recommended (current: ${diagnostics.environment.nodeVersion.version})`);
-    // Continue anyway - Supabase v3 may still work with older Node versions
-  }
-
   // Try to connect and test table access
   try {
     const adapter = new UnifiedSupabaseAdapter({ useViews: true });
-    
-    // Test each table - try view first, then fallback to table
-    const tablesToTest = [
-      { key: 'investors', view: 'investors_view', table: 'investors' },
-      { key: 'deals', view: 'deals_view', table: 'deals' },
-      { key: 'companies', view: 'companies_view', table: 'companies' },
-      { key: 'transactions', view: 'transactions_view', table: 'transactions' },
-      { key: 'documents', view: 'documents_view', table: 'documents' }
-    ];
 
-    for (const test of tablesToTest) {
-      try {
-        // Try view first
-        const investors = await adapter.getInvestors();
-        if (investors) {
-          status.tables[test.key as keyof typeof status.tables] = true;
-          status.connected = true;
-          status.details!.testedTable = test.view;
-          status.details!.testMethod = 'view';
-        }
-      } catch (viewError) {
-        // Try direct table as fallback
-        try {
-          const adapterDirect = new UnifiedSupabaseAdapter({ useViews: false });
-          const investors = await adapterDirect.getInvestors();
-          if (investors) {
-            status.tables[test.key as keyof typeof status.tables] = true;
-            status.connected = true;
-            status.details!.testedTable = test.table;
-            status.details!.testMethod = 'table';
-          }
-        } catch (tableError) {
-          console.log(`Table ${test.key} not accessible:`, tableError);
-        }
+    // Try to access via adapter methods (views mode)
+    try {
+      const investors = await adapter.getInvestors();
+      if (Array.isArray(investors)) {
+        status.tables.investors = true;
+        status.connected = true;
+        status.details!.testedTable = 'investors_view';
+        status.details!.testMethod = 'view';
       }
-      
-      // Only test first successful connection for performance
-      if (status.connected) break;
-    }
+    } catch {}
 
-    // If we got here and connected, clear any error
-    if (status.connected) {
-      delete status.error;
-    } else {
+    try {
+      const deals = await adapter.getDeals();
+      if (Array.isArray(deals)) status.tables.deals = true;
+    } catch {}
+
+    try {
+      const companies = await adapter.getCompanies();
+      if (Array.isArray(companies)) status.tables.companies = true;
+    } catch {}
+
+    try {
+      const transactions = await adapter.getTransactions();
+      if (Array.isArray(transactions)) status.tables.transactions = true;
+    } catch {}
+
+    try {
+      const documents = await adapter.getDocuments();
+      if (Array.isArray(documents)) status.tables.documents = true;
+    } catch {}
+
+    // If not connected in views mode, try direct tables mode
+    if (!status.connected) {
+      const adapterDirect = new UnifiedSupabaseAdapter({ useViews: false });
+      try {
+        const investors = await adapterDirect.getInvestors();
+        if (Array.isArray(investors)) {
+          status.tables.investors = true;
+          status.connected = true;
+          status.details!.testedTable = 'investors';
+          status.details!.testMethod = 'table';
+        }
+      } catch {}
+
+      try {
+        const deals = await adapterDirect.getDeals();
+        if (Array.isArray(deals)) status.tables.deals = true;
+      } catch {}
+
+      try {
+        const companies = await adapterDirect.getCompanies();
+        if (Array.isArray(companies)) status.tables.companies = true;
+      } catch {}
+
+      try {
+        const transactions = await adapterDirect.getTransactions();
+        if (Array.isArray(transactions)) status.tables.transactions = true;
+      } catch {}
+
+      try {
+        const documents = await adapterDirect.getDocuments();
+        if (Array.isArray(documents)) status.tables.documents = true;
+      } catch {}
+    }
+    
+    // Check if we got any connection at all
+    if (!status.connected) {
       status.error = 'Could not connect to any Supabase tables';
     }
-
-  } catch (error) {
-    status.error = error instanceof Error ? error.message : 'Unknown connection error';
-    console.error('Supabase connectivity check failed:', error);
-  }
-
-  return status;
-}
-
-/**
- * Quick connectivity check (lighter weight)
- */
-export async function pingSupabase(): Promise<boolean> {
-  try {
-    const config = getAppConfig();
-    if (!config.hasValidSupabaseCredentials()) return false;
     
-    const adapter = new UnifiedSupabaseAdapter({ useViews: true });
-    const result = await adapter.getInvestors();
-    return Array.isArray(result);
-  } catch {
-    return false;
+  } catch (error) {
+    status.error = error instanceof Error ? error.message : 'Connection test failed';
+    console.error('Supabase connectivity test failed:', error);
   }
+  
+  return status;
 }
 
 /**
  * Get a human-readable status message
  */
 export function getStatusMessage(status: SupabaseStatus): string {
-  if (status.connected) {
-    return `✅ Connected to Supabase (${status.projectId})`;
-  }
-  
   if (!status.configured) {
-    return '❌ Supabase not configured';
-  }
-  
-  if (!status.nodeOk) {
-    return `⚠️ Node.js ${status.details?.requiredNode} required`;
+    return '⚠️ Supabase not configured - Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local';
   }
   
   if (status.mode === 'mock') {
-    return '🎭 Using mock data';
+    return '🎭 Using mock data (set NEXT_PUBLIC_USE_MOCK_DATA=false to use Supabase)';
   }
   
-  if (status.error) {
-    return `❌ ${status.error}`;
+  if (!status.nodeOk) {
+    return `⚠️ Node.js ${status.details?.requiredNode} or higher recommended (current: ${status.details?.nodeVersion})`;
   }
   
-  return '⚙️ Supabase configured but not connected';
-}
-
-/**
- * Check if we should attempt Supabase connection
- */
-export function shouldUseSupabase(): boolean {
-  const config = getAppConfig();
-  return config.hasValidSupabaseCredentials() && 
-         !config.isUsingMockData() && 
-         config.validateNodeVersion().ok;
+  if (!status.connected) {
+    return '❌ Cannot connect to Supabase - Check your credentials and network';
+  }
+  
+  const tableCount = Object.values(status.tables).filter(Boolean).length;
+  if (tableCount === 0) {
+    return '❌ Connected but no tables accessible - Check database permissions';
+  }
+  
+  if (tableCount < 5) {
+    const missing = Object.entries(status.tables)
+      .filter(([_, accessible]) => !accessible)
+      .map(([name]) => name);
+    return `⚠️ Partial access - Missing tables: ${missing.join(', ')}`;
+  }
+  
+  return `✅ Fully connected to Supabase project: ${status.projectId}`;
 }

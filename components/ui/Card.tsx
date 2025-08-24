@@ -1,38 +1,71 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { ReactNode } from 'react';
+import { ReactNode, HTMLAttributes } from 'react';
+import { motion, HTMLMotionProps } from 'framer-motion';
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'glass' | 'gradient' | 'elevated' | 'default' | 'outline';
+interface CardProps extends HTMLMotionProps<"div"> {
+  variant?: 'glass' | 'gradient' | 'elevated' | 'default' | 'outline' | 'hero';
   children: ReactNode;
+  glow?: boolean;
+  animate?: boolean;
 }
 
 export function Card({ 
   variant = 'default', 
   className, 
   children,
+  glow = false,
+  animate = true,
   ...props 
 }: CardProps) {
   const variants = {
-    default: 'bg-surface border border-surface-border',
-    glass: 'bg-glass-medium backdrop-blur-xl border border-glass-border',
-    gradient: 'bg-gradient-to-br from-primary-300/10 via-surface to-secondary-blue/10 border border-primary-300/20',
-    elevated: 'bg-surface-elevated border border-surface-border shadow-elevated',
-    outline: 'bg-transparent border border-surface-border'
+    default: 'bg-card border border-surface-border',
+    glass: 'glass-card-hover',
+    gradient: 'bg-gradient-hero text-white border border-border',
+    elevated: 'bg-card border border-surface-border shadow-elevated',
+    outline: 'bg-transparent border border-surface-border',
+    hero: 'bg-gradient-mesh border border-border backdrop-blur-xl'
   };
 
+  const Component: any = animate ? motion.div : 'div';
+  const componentProps: any = animate ? {
+    whileHover: { scale: 1.02, transition: { duration: 0.2 } },
+    whileTap: { scale: 0.98 },
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.3 },
+    ...props
+  } : props;
+
   return (
-    <div
+    <Component
       className={cn(
-        'rounded-xl p-6 transition-all duration-200',
+        'relative rounded-xl p-6 transition-all duration-300 overflow-hidden',
         variants[variant],
+        glow && 'hover:shadow-glow-primary',
+        animate && 'hover:scale-[1.02] hover:shadow-xl',
         className
       )}
-      {...props}
+      {...componentProps}
     >
-      {children}
-    </div>
+      {/* Glow effect overlay */}
+      {glow && (
+        <div className="absolute -inset-px bg-gradient-to-r from-primary-300 to-accent-blue opacity-0 hover:opacity-20 transition-opacity duration-500 rounded-xl blur-sm pointer-events-none" />
+      )}
+      
+      {/* Background gradient for hero variant */}
+      {variant === 'hero' && (
+        <>
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary-300/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-accent-blue/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        </>
+      )}
+      
+      <div className="relative z-10">
+        {children}
+      </div>
+    </Component>
   );
 }
 
@@ -55,13 +88,13 @@ interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
 export function CardTitle({
   className,
   children,
-  gradient,
+  gradient = true,
   ...props
 }: CardTitleProps) {
-  const base = 'text-xl font-semibold text-white';
+  const base = 'text-xl font-bold font-heading tracking-tight';
   const gradientClass = gradient
-    ? 'bg-gradient-to-r from-primary-300 to-accent-blue text-gradient'
-    : '';
+    ? 'text-gradient bg-gradient-hero animate-gradient'
+    : 'text-foreground';
   return (
     <h3 className={cn(base, gradientClass, className)} {...props}>
       {children}

@@ -1,158 +1,130 @@
-# Claude Code Project Context
+# CLAUDE.md - Your Guide to This Codebase
 
-## 🚀 LATEST UPDATES (Session 2025-08-24)
+## Quick Start
 
-### Architecture Complete ✅
-1. **MCP Integration**: Full IDE database access via MCP servers (port 3101)
-2. **Portal Navigation**: Seamless switching with `PortalSwitcher` component
-3. **Database as Truth**: Migration tracking via `schema_migrations` table
-4. **RLS Enabled**: Security policies on `documents` and `user_profiles`
-5. **Docker Services**: MCP containers running (`docker ps | grep mcp`)
-
-### Quick Health Check
 ```bash
-curl http://localhost:3101          # MCP server ✅
-npm run dev                          # Next.js on port 3001
+npm run dev                    # Start app on http://localhost:3000
+node SCRIPTS/health-check.js  # Verify all endpoints work
 ```
 
-## Project Overview
+## Supabase Setup
 
-Equitie investment portal - Next.js dashboard with ARCHON Fee Engine.
-
-## Tech Stack
-
-- **Framework**: Next.js 14 with App Router
-- **Database**: Supabase (project: ikezqzljrupkzmyytgok)
-- **Testing**: Playwright + Vitest
-- **MCP**: Docker containers for database tools
-- **Auth**: Supabase Auth with RLS
-
-## ⚠️ CRITICAL: NO EMOJIS IN CODE
-
-- **NEVER** use emoji characters in code or UI
-- **ALWAYS** use SVG icons from Heroicons or Lucide React
-- Icons must be monochrome using `currentColor`
-
-## Database Tables (IMPORTANT)
-
-### Dot-Named Tables (the dot IS part of the name)
-- `investors.investor` - 202 rows, 16 FKs point here ✅
-- `deals.deal` - Investment opportunities
-- `companies.company` - Company profiles
-- `transactions.transaction.primary` - Investments
-
-### Regular Tables
-- `documents` - RLS enabled
-- `user_profiles` - RLS enabled
-- `schema_migrations` - Tracks migrations
-
-## Service Layer Pattern
-
-```typescript
-import { mcpBridge } from "@/lib/services/mcp-bridge.service";
-import { dealsService, investorsService } from "@/lib/services";
-
-// Direct database query via MCP
-const result = await mcpBridge.executeSQL('SELECT * FROM "investors.investor"');
-
-// Service layer methods
-const deals = await dealsService.getActiveDeals();
-```
-
-## MCP Bridge API
-
-```text
-GET  /api/mcp/status       # Health check
-GET  /api/mcp/tables       # List database tables
-POST /api/mcp/query        # Execute SQL (admin only)
-GET  /api/mcp/migrations   # Migration status
-```
-
-## Configuration
+**Project ID**: `ikezqzljrupkzmyytgok`  
+**URL**: `https://ikezqzljrupkzmyytgok.supabase.co`
 
 ### Required Environment Variables (.env.local)
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://ikezqzljrupkzmyytgok.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-key
-SUPABASE_SERVICE_KEY=your-service-key  # Same as above
-DATABASE_URL=postgresql://connection-string
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<get from Supabase dashboard>
+SUPABASE_SERVICE_ROLE_KEY=<get from Supabase dashboard>
 ```
 
-### Docker Environment (.env)
-```env
-SUPABASE_SERVICE_ROLE_KEY=your-service-key
-OPENROUTER_API_KEY=your-openrouter-key
+## MCP Tools Available
+
+You have access to Supabase MCP tools. Use them like this:
+
+```typescript
+// List all tables
+mcp__supabase__list_tables({ project_id: "ikezqzljrupkzmyytgok" })
+
+// Execute SQL
+mcp__supabase__execute_sql({ 
+  project_id: "ikezqzljrupkzmyytgok",
+  query: "SELECT * FROM investors.investor LIMIT 5"
+})
+
+// Get logs for debugging
+mcp__supabase__get_logs({
+  project_id: "ikezqzljrupkzmyytgok", 
+  service: "api"
+})
 ```
 
-## Quick Commands
+## Database Structure
+
+### Main Tables (with dots in names!)
+- `investors.investor` - Investor profiles
+- `deals.deal` - Investment opportunities  
+- `companies.company` - Company data
+- `transactions.transaction.primary` - Transaction records
+
+### How to Query
+```typescript
+// In API routes, use the service layer:
+import { dealsService } from "@/lib/services";
+const deals = await dealsService.getActiveDeals();
+
+// Or direct Supabase:
+import { getServiceClient } from "@/lib/db/supabase/server-client";
+const sb = getServiceClient();
+const { data } = await sb.from("deals.deal").select("*");
+```
+
+## Project Structure
+
+```
+/app                  # Next.js pages and API routes
+  /api               # API endpoints
+  /admin             # Admin portal pages  
+  /investor-portal   # Investor portal pages
+
+/lib
+  /services          # Business logic services
+  /db                # Database adapters and types
+  
+/components          # React components
+
+/SCRIPTS            # Utility scripts (health check, etc)
+```
+
+## Key Services
+
+- `dealsService` - Deal operations
+- `investorsService` - Investor data
+- `transactionsService` - Transaction handling
+- `documentsService` - Document management
+- `feesService` - Fee calculations
+
+## Testing & Health
 
 ```bash
-# Development
-npm run dev                    # Start Next.js
-docker-compose up -d mcp-equitie  # Start MCP servers
+# Check if everything works
+node SCRIPTS/health-check.js
 
-# Testing
-npx playwright test            # Run all tests
-npx playwright test investor-portal.spec.ts  # Portal tests
-
-# Database
-npm run db:migrate:up          # Apply migrations
-npm run db:migrate:status      # Check status
-
-# Git
-git push -u origin feat/guardrails-and-tests  # Push branch
+# Run tests
+npm test
+npm run test:e2e
 ```
 
-## File Structure
+## Common Tasks
 
-```
-/
-├── .vscode/settings.json      # MCP IDE config
-├── docker-compose.yml         # Container setup
-├── middleware.ts              # Auth middleware
-│
-├── /components/
-│   └── PortalSwitcher.tsx     # Navigation
-│
-├── /lib/
-│   ├── /middleware/
-│   │   └── portal-auth.ts     # Authentication
-│   ├── /services/
-│   │   └── mcp-bridge.service.ts  # MCP bridge
-│   └── /mcp/
-│       └── equitie-server.mjs # Custom MCP server
-│
-└── /app/api/mcp/              # MCP API endpoints
-```
+### Add a new API endpoint
+1. Create route in `/app/api/your-endpoint/route.ts`
+2. Use services from `/lib/services`
+3. Return NextResponse.json()
 
-## RLS Helper Functions
+### Query the database
+1. Import the service you need
+2. Call the method
+3. Handle errors with try/catch
 
-```sql
-public.get_user_role()     -- Returns: 'admin'|'investor'|'anon'
-public.is_admin()          -- Returns: true/false
-public.get_investor_id()   -- Returns: investor ID or null
-```
+### Debug issues
+1. Check browser console
+2. Check terminal for server errors
+3. Use MCP tools to check database directly
 
-## Testing Checklist
+## Important Rules
 
-- [ ] MCP server running: `curl http://localhost:3101`
-- [ ] Database connected: API returns 200
-- [ ] Portal switcher visible in UI
-- [ ] RLS policies working on documents table
-- [ ] Migrations tracked in schema_migrations
+1. NO emoji in code files
+2. Use dot-named tables exactly as shown
+3. Always handle errors properly
+4. Use TypeScript types from `/lib/types`
 
-## Documentation
+## Need Help?
 
-- **Quick Guide**: `/DOCS/QUICK_ARCHITECTURE_GUIDE.md`
-- **Full Details**: `/DOCS/ARCHITECTURE_IMPROVEMENTS.md`
-
-## Important Notes
-
-1. Always use `investors.investor` (not `investors`)
-2. Service key must be in `.env.local` for server operations
-3. Restart Cursor IDE after MCP config changes
-4. Docker uses `.env` file (not `.env.local`)
+- Health not passing? Check `.env.local` has all keys
+- Database errors? Verify table names (dots matter!)
+- Import errors? Use `@/` for absolute imports
 
 ---
-*Last Updated: 2025-08-24*
+*Keep it simple. Ship features. Don't over-engineer.*

@@ -1,3 +1,0 @@
--- RLS placeholders (enable and define per table as you adopt)
--- alter table deals.deal enable row level security;
--- create policy p_deals_owner_read on deals.deal for select using (true /* tighten later */);

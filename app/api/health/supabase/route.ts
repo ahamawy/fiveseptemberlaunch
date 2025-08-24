@@ -3,13 +3,25 @@ import {
   getSupabaseConnectivity,
   getStatusMessage,
 } from "@/lib/db/supabase/status";
-import { config } from "@/lib/config";
 
 export async function GET() {
   try {
     // Get comprehensive status
     const status = await getSupabaseConnectivity();
-    const diagnostics = config.getDiagnostics();
+    const diagnostics = {
+      environment: {
+        dataSource: process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'false' ? 'supabase' : 'mock',
+        mode: process.env.NODE_ENV || 'development'
+      },
+      features: {
+        mockData: process.env.NEXT_PUBLIC_USE_MOCK_DATA !== 'false',
+        mcp: true,
+        devTools: process.env.NEXT_PUBLIC_ENABLE_DEVTOOLS === 'true'
+      },
+      supabase: {
+        enabled: !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+      }
+    };
 
     // Build response with all details
     const response = {

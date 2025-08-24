@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "features": {
+    "fees": {
+      "routes": ["/admin/fees"],
+      "apis": ["/api/admin/fees/*"],
+      "keyFiles": [
+        "lib/services/fee-engine/enhanced-service.ts",
+        "lib/services/fee-engine/enhanced-calculator.ts"
+      ],
+      "invariants": [
+        "precedence ordering",
+        "discounts negative",
+        "audit notes",
+        "round money to 2 decimals",
+        "units are integers"
+      ]
+    },
+    "deals": {
+      "routes": [
+        "/admin/deals",
+        "/investor-portal/deals",
+        "/investor-portal/deals/[id]"
+      ],
+      "apis": ["/api/deals", "/api/deals/[id]"],
+      "keyFiles": ["components/deals/DealsList.tsx", "lib/db/supabase-unified.ts"]
+    },
+    "investors": {
+      "routes": [
+        "/investor-portal/dashboard",
+        "/investor-portal/portfolio",
+        "/investor-portal/profile"
+      ],
+      "apis": [
+        "/api/investors/[id]",
+        "/api/investors/[id]/dashboard",
+        "/api/investors/[id]/portfolio",
+        "/api/investors/[id]/transactions"
+      ],
+      "keyFiles": ["app/investor-portal/*", "lib/db/*"]
+    },
+    "transactions": {
+      "routes": ["/admin/transactions", "/investor-portal/transactions"],
+      "apis": ["/api/transactions/*"],
+      "keyFiles": ["app/*/transactions/*", "lib/db/supabase-unified.ts"]
+    },
+    "companies": {
+      "routes": ["/admin/companies"],
+      "apis": ["/api/companies"],
+      "keyFiles": ["app/admin/companies/*", "lib/db/supabase-unified.ts"]
+    },
+    "documents": {
+      "routes": ["/investor-portal/documents"],
+      "apis": ["/api/documents"],
+      "keyFiles": ["app/investor-portal/documents/page.tsx", "lib/db/supabase-unified.ts"]
+    },
+    "health": {
+      "routes": [],
+      "apis": ["/api/health", "/api/health/supabase"],
+      "keyFiles": [
+        "app/api/health/route.ts",
+        "app/api/health/supabase/route.ts",
+        "lib/db/supabase/status.ts",
+        "SCRIPTS/health-check.js"
+      ]
+    },
+    "chat": {
+      "routes": [],
+      "apis": ["/api/admin/chat"],
+      "keyFiles": ["app/api/admin/chat/route.ts"]
+    }
+  }
+}

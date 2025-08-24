@@ -11,7 +11,6 @@ export { InvestorsService, investorsService } from './investors.service';
 export { DocumentsService, documentsService } from './documents.service';
 export { TransactionsService, transactionsService } from './transactions.service';
 export { FeesService, feesService } from './fees.service';
-export { RouterService, routerService } from './router.service';
 
 // Re-export types for convenience
 export type {
@@ -31,7 +30,6 @@ import { InvestorsService } from './investors.service';
 import { DocumentsService } from './documents.service';
 import { TransactionsService } from './transactions.service';
 import { FeesService } from './fees.service';
-import { RouterService } from './router.service';
 
 // Service factory for creating new instances if needed
 export class ServiceFactory {
@@ -54,10 +52,6 @@ export class ServiceFactory {
   static createFeesService() {
     return new FeesService();
   }
-
-  static createRouterService() {
-    return new RouterService();
-  }
 }
 
 // Import singleton instances for services object
@@ -66,7 +60,6 @@ import { investorsService } from './investors.service';
 import { documentsService } from './documents.service';
 import { transactionsService } from './transactions.service';
 import { feesService } from './fees.service';
-import { routerService } from './router.service';
 
 // Export default services object for easy access
 export const services = {
@@ -74,8 +67,7 @@ export const services = {
   investors: investorsService,
   documents: documentsService,
   transactions: transactionsService,
-  fees: feesService,
-  router: routerService
+  fees: feesService
 } as const;
 
 export default services;

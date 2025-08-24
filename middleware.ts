@@ -2,11 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { portalAuthMiddleware } from '@/lib/middleware/portal-auth';
 
 export async function middleware(request: NextRequest) {
-  // Temporarily bypass auth for testing
-  if (request.nextUrl.pathname.startsWith('/admin/deals-list') || 
-      request.nextUrl.pathname.startsWith('/api/deals-list')) {
-    return NextResponse.next();
+  // Development mode: bypass auth for all routes
+  if (process.env.NODE_ENV === 'development') {
+    // Skip auth in development but keep headers for testing
+    const response = NextResponse.next();
+    response.headers.set('x-user-role', 'admin');
+    response.headers.set('x-user-id', 'dev-user');
+    return response;
   }
+  
+  // Production: use full auth
   return portalAuthMiddleware(request);
 }
 

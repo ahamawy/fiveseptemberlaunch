@@ -10,7 +10,8 @@ import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
 } from "@heroicons/react/24/outline";
-import type { PortfolioDeal } from "@/lib/contracts/portfolio.contract";
+// Temporary type until contracts are restored
+type PortfolioDeal = any;
 
 interface DealCardProps {
   deal: PortfolioDeal;

@@ -15,7 +15,7 @@ import {
   TimeScale,
 } from "chart.js";
 import { Line, Doughnut, Bar } from "react-chartjs-2";
-import { BRAND_CONFIG } from "@/BRANDING/brand.config";
+import { BRAND_CONFIG } from "@/lib/brand"
 
 ChartJS.register(
   CategoryScale,

@@ -19,6 +19,8 @@ export default function AdminLayout({
     { href: "/admin/companies", label: "Companies" },
     { href: "/admin/formulas", label: "Formulas" },
     { href: "/admin/fees", label: "Fees" },
+    { href: "/admin/monitoring", label: "Monitoring" },
+    { href: "/admin/api-docs", label: "API Docs" },
   ];
 
   return (
@@ -52,4 +54,5 @@ export default function AdminLayout({
     </div>
   );
 }
+
 

@@ -5,17 +5,23 @@
 
 import { getDataClient, simulateDelay } from '../db/client';
 import type { IDataClient } from '../db/client';
+import { getCacheAdapter, ICacheAdapter, InMemoryCacheAdapter } from '../infrastructure/cache/redis-adapter';
+import { CacheKeyGenerator, CacheStrategies, cacheManager } from '../infrastructure/cache/strategies';
 
 export interface ServiceOptions {
   enableCache?: boolean;
   cacheTime?: number;
   enableLogging?: boolean;
+  cacheStrategy?: string;
+  useRedis?: boolean;
 }
 
 export abstract class BaseService {
   protected dataClient: IDataClient;
-  protected cache: Map<string, { data: any; timestamp: number }> = new Map();
+  protected cache: ICacheAdapter | null = null;
+  protected fallbackCache: Map<string, { data: any; timestamp: number }> = new Map();
   protected options: ServiceOptions;
+  private cacheInitPromise: Promise<void> | null = null;
 
   constructor(options: ServiceOptions = {}) {
     this.dataClient = getDataClient();
@@ -23,27 +29,97 @@ export abstract class BaseService {
       enableCache: true,
       cacheTime: 5 * 60 * 1000, // 5 minutes default
       enableLogging: process.env.NODE_ENV === 'development',
+      useRedis: process.env.USE_REDIS === 'true',
+      cacheStrategy: 'hot-data',
       ...options
     };
+
+    // Initialize cache adapter asynchronously
+    if (this.options.enableCache) {
+      this.initializeCache();
+    }
+  }
+
+  /**
+   * Initialize cache adapter
+   */
+  private async initializeCache(): Promise<void> {
+    if (this.cacheInitPromise) {
+      return this.cacheInitPromise;
+    }
+
+    this.cacheInitPromise = (async () => {
+      try {
+        if (this.options.useRedis) {
+          this.cache = await getCacheAdapter();
+        } else {
+          this.cache = new InMemoryCacheAdapter();
+          await this.cache.connect();
+        }
+      } catch (error) {
+        console.error('Failed to initialize cache adapter:', error);
+        // Fall back to in-memory cache
+        this.cache = new InMemoryCacheAdapter();
+        await this.cache.connect();
+      }
+    })();
+
+    return this.cacheInitPromise;
+  }
+
+  /**
+   * Ensure cache is initialized
+   */
+  protected async ensureCache(): Promise<ICacheAdapter | null> {
+    if (!this.options.enableCache) return null;
+    
+    if (!this.cache && this.cacheInitPromise) {
+      await this.cacheInitPromise;
+    }
+    
+    return this.cache;
   }
 
   /**
    * Get cached data if available and not expired
    */
-  protected getCached<T>(key: string): T | null {
+  protected async getCached<T>(key: string): Promise<T | null> {
     if (!this.options.enableCache) return null;
 
-    const cached = this.cache.get(key);
+    const cache = await this.ensureCache();
+    
+    if (cache) {
+      try {
+        const result = await cache.get<T>(key);
+        if (result !== null && this.options.enableLogging) {
+          console.log(`📦 Cache hit: ${key}`);
+        }
+        return result;
+      } catch (error) {
+        console.error('Cache get error:', error);
+        // Fall back to local cache
+        return this.getFallbackCached<T>(key);
+      }
+    }
+
+    return this.getFallbackCached<T>(key);
+  }
+
+  /**
+   * Get from fallback cache
+   */
+  private getFallbackCached<T>(key: string): T | null {
+    const cached = this.fallbackCache.get(key);
     if (!cached) return null;
 
     const now = Date.now();
     if (now - cached.timestamp > (this.options.cacheTime || 0)) {
-      this.cache.delete(key);
+      this.fallbackCache.delete(key);
       return null;
     }
 
     if (this.options.enableLogging) {
-      console.log(`📦 Cache hit: ${key}`);
+      console.log(`📦 Fallback cache hit: ${key}`);
     }
 
     return cached.data as T;
@@ -52,27 +128,123 @@ export abstract class BaseService {
   /**
    * Set cache data
    */
-  protected setCache(key: string, data: any): void {
+  protected async setCache(key: string, data: any, tags?: string[]): Promise<void> {
     if (!this.options.enableCache) return;
 
-    this.cache.set(key, {
+    const cache = await this.ensureCache();
+    
+    if (cache) {
+      try {
+        const strategy = cacheManager.getOptionsForStrategy(
+          this.options.cacheStrategy || 'hot-data'
+        );
+        
+        await cache.set(key, data, {
+          ...strategy,
+          ttl: Math.floor((this.options.cacheTime || 300000) / 1000),
+          tags: tags || strategy.tags
+        });
+
+        if (this.options.enableLogging) {
+          console.log(`💾 Cache set: ${key}`);
+        }
+      } catch (error) {
+        console.error('Cache set error:', error);
+        // Fall back to local cache
+        this.setFallbackCache(key, data);
+      }
+    } else {
+      this.setFallbackCache(key, data);
+    }
+  }
+
+  /**
+   * Set fallback cache
+   */
+  private setFallbackCache(key: string, data: any): void {
+    this.fallbackCache.set(key, {
       data,
       timestamp: Date.now()
     });
 
     if (this.options.enableLogging) {
-      console.log(`💾 Cache set: ${key}`);
+      console.log(`💾 Fallback cache set: ${key}`);
     }
   }
 
   /**
    * Clear cache
    */
-  clearCache(): void {
-    this.cache.clear();
+  async clearCache(): Promise<void> {
+    const cache = await this.ensureCache();
+    
+    if (cache) {
+      try {
+        await cache.clear();
+      } catch (error) {
+        console.error('Cache clear error:', error);
+      }
+    }
+    
+    this.fallbackCache.clear();
+    
     if (this.options.enableLogging) {
       console.log('🗑️ Cache cleared');
     }
+  }
+
+  /**
+   * Delete cache by pattern
+   */
+  protected async clearCacheByPattern(pattern: string): Promise<void> {
+    const cache = await this.ensureCache();
+    
+    if (cache) {
+      try {
+        await cache.deleteByPattern(pattern);
+      } catch (error) {
+        console.error('Cache delete by pattern error:', error);
+      }
+    }
+  }
+
+  /**
+   * Delete cache by tags
+   */
+  protected async clearCacheByTags(tags: string[]): Promise<void> {
+    const cache = await this.ensureCache();
+    
+    if (cache) {
+      try {
+        await cache.deleteByTags(tags);
+      } catch (error) {
+        console.error('Cache delete by tags error:', error);
+      }
+    }
+  }
+
+  /**
+   * Get cache statistics
+   */
+  async getCacheStats(): Promise<any> {
+    const cache = await this.ensureCache();
+    
+    if (cache) {
+      try {
+        return await cache.getStats();
+      } catch (error) {
+        console.error('Failed to get cache stats:', error);
+      }
+    }
+    
+    return {
+      hits: 0,
+      misses: 0,
+      sets: 0,
+      deletes: 0,
+      size: this.fallbackCache.size,
+      hitRate: 0
+    };
   }
 
   /**

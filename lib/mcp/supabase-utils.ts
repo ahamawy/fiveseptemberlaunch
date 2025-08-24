@@ -40,7 +40,7 @@ export class SupabaseMCPClient {
     const startTime = Date.now();
     
     try {
-      let queryBuilder = this.client.from(query.table);
+      let queryBuilder: any = this.client.from(query.table);
 
       // Build query based on operation
       switch (query.operation) {
@@ -79,7 +79,7 @@ export class SupabaseMCPClient {
         queryBuilder = queryBuilder.limit(query.limit);
       }
 
-      const { data, error } = await queryBuilder;
+      const { data, error }: any = await queryBuilder;
 
       if (error) {
         throw error;

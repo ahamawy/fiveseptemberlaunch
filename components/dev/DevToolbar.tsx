@@ -183,16 +183,16 @@ const PAGE_ROUTES: PageRoute[] = [
         description: "Main investor dashboard with metrics",
       },
       {
-        name: "Select Investor",
-        path: "/investor-portal/select",
-        icon: Icons.user,
-        description: "Pick an investor (ID or public_id) to view",
-      },
-      {
         name: "Portfolio",
         path: "/investor-portal/portfolio",
         icon: Icons.chart,
         description: "Investment portfolio overview",
+      },
+      {
+        name: "Deals",
+        path: "/investor-portal/deals",
+        icon: Icons.chart,
+        description: "Available investment deals",
       },
       {
         name: "Transactions",
@@ -207,87 +207,80 @@ const PAGE_ROUTES: PageRoute[] = [
         description: "Document management",
       },
       {
-        name: "Deals",
-        path: "/investor-portal/deals",
-        icon: Icons.chart,
-        description: "Available investment deals",
-      },
-      {
         name: "Profile",
         path: "/investor-portal/profile",
         icon: Icons.user,
         description: "User profile and settings",
       },
+      {
+        name: "Select Investor",
+        path: "/investor-portal/select",
+        icon: Icons.user,
+        description: "Pick an investor to view",
+      },
     ],
   },
   {
-    category: "Admin Tools",
+    category: "Admin Dashboard",
     pages: [
       {
-        name: "Admin Dashboard",
+        name: "Overview",
         path: "/admin/dashboard",
         icon: Icons.home,
         description: "Platform metrics overview",
       },
       {
-        name: "EQUITIE Bot Chat",
-        path: "/admin/chat",
-        icon: Icons.code,
-        description: "AI assistant for document analysis",
+        name: "Deals",
+        path: "/admin/deals",
+        icon: Icons.chart,
+        description: "Manage all deals",
       },
+      {
+        name: "Investors",
+        path: "/admin/investors",
+        icon: Icons.user,
+        description: "Manage all investors",
+      },
+      {
+        name: "Transactions",
+        path: "/admin/transactions",
+        icon: Icons.dollar,
+        description: "View all transactions",
+      },
+      {
+        name: "Companies",
+        path: "/admin/companies",
+        icon: Icons.document,
+        description: "Manage companies",
+      },
+      {
+        name: "Monitoring",
+        path: "/admin/monitoring",
+        icon: Icons.chart,
+        description: "System monitoring dashboard",
+      },
+      {
+        name: "API Docs",
+        path: "/admin/api-docs",
+        icon: Icons.document,
+        description: "Interactive API documentation",
+      },
+    ],
+  },
+  {
+    category: "Fee Management",
+    pages: [
       {
         name: "Fees Hub",
         path: "/admin/fees",
         icon: Icons.settings,
-        description: "Central dashboard for all fee tools",
-      },
-      {
-        name: "All Deals",
-        path: "/admin/deals",
-        icon: Icons.chart,
-        description: "Admin list of all deals",
-      },
-      {
-        name: "All Investors",
-        path: "/admin/investors",
-        icon: Icons.user,
-        description: "Admin list of all investors",
-      },
-      {
-        name: "All Transactions",
-        path: "/admin/transactions",
-        icon: Icons.dollar,
-        description: "Admin list of all transactions",
-      },
-      {
-        name: "All Companies",
-        path: "/admin/companies",
-        icon: Icons.document,
-        description: "Admin list of all companies",
-      },
-      {
-        name: "Formula System",
-        path: "/admin/formulas",
-        icon: Icons.dollar,
-        description: "Manage formula templates and assignments",
-      },
-      {
-        name: "Formula Builder",
-        path: "/admin/formula-manager",
-        icon: Icons.chart,
-        description: "Visual formula builder and editor",
+        description: "Central fee management",
       },
       {
         name: "Fee Profiles",
         path: "/admin/fees/profiles",
         icon: Icons.settings,
-        description: "Configure fee calculation profiles",
-      },
-      {
-        name: "Fee Import V2",
-        path: "/admin/fees/import-v2",
-        icon: Icons.document,
-        description: "Enhanced fee import tool",
+        description: "Configure fee profiles",
       },
       {
         name: "Smart Import",
@@ -296,16 +289,16 @@ const PAGE_ROUTES: PageRoute[] = [
         description: "AI-assisted CSV mapping",
       },
       {
-        name: "Legacy Import",
+        name: "Import Tool",
         path: "/admin/fees/import",
         icon: Icons.document,
-        description: "Original CSV import tool",
+        description: "Import fee data",
       },
       {
         name: "Fee Editor",
         path: "/admin/fees/editor",
         icon: Icons.code,
-        description: "Direct fee schedule editor",
+        description: "Direct fee editing",
       },
       {
         name: "Bespoke Import",
@@ -313,105 +306,51 @@ const PAGE_ROUTES: PageRoute[] = [
         icon: Icons.document,
         description: "Custom import interface",
       },
-      {
-        name: "ARCHON Fee Engine",
-        path: "/admin/equitie-fee-engine",
-        icon: Icons.dollar,
-        description: "Interactive fee calculator",
-      },
-      {
-        name: "Deal Equations",
-        path: "/admin/deal-equations",
-        icon: Icons.chart,
-        description: "Manage deal-specific equations",
-      },
     ],
   },
   {
-    category: "Quick Data (API)",
+    category: "Quick API Access",
     pages: [
       {
         name: "Deals API",
         path: "/api/deals?limit=10",
         icon: Icons.link,
-        description: "Supabase-backed deals list (with valuations)",
+        description: "View deals data",
       },
       {
         name: "Transactions API",
         path: "/api/transactions?limit=10",
         icon: Icons.link,
-        description: "Latest transactions (deal/investor names)",
+        description: "View transactions",
       },
       {
-        name: "Investor 1 Portfolio API",
-        path: "/api/investors/1/portfolio",
+        name: "Dashboard API",
+        path: "/api/dashboard",
         icon: Icons.link,
-        description: "Holdings, MOIC/IRR, allocations",
-      },
-      {
-        name: "Investor 1 Transactions API",
-        path: "/api/investors/1/transactions",
-        icon: Icons.link,
-        description: "Investor-specific transactions",
+        description: "Dashboard metrics",
       },
       {
         name: "Companies API",
-        path: "/api/companies?limit=20",
+        path: "/api/companies?limit=10",
         icon: Icons.link,
-        description: "Companies with storage asset URLs",
+        description: "View companies",
       },
     ],
   },
   {
-    category: "Development / Tests",
+    category: "Development",
     pages: [
       {
         name: "Style Guide",
         path: "/style-guide",
         icon: Icons.palette,
-        description: "Component library and design system",
-      },
-      {
-        name: "Dashboard (Simple)",
-        path: "/investor-portal/dashboard-simple",
-        icon: Icons.home,
-        description: "Lightweight dashboard variant",
+        description: "Component library",
       },
       {
         name: "Test Hub",
-        path: "/test",
-        icon: Icons.link,
-        description: "Test landing page",
-      },
-      {
-        name: "Test Deals",
-        path: "/test-deals",
-        icon: Icons.chart,
-        description: "Deals test page",
-      },
-      {
-        name: "Test Transactions",
-        path: "/test-transactions",
-        icon: Icons.dollar,
-        description: "Transactions test page",
-      },
-      {
-        name: "Test Summary",
-        path: "/test-summary",
-        icon: Icons.document,
-        description: "Summary test page",
-      },
-      {
-        name: "Test Real Data",
-        path: "/test-real-data",
-        icon: Icons.link,
-        description: "Real data validation page",
-      },
-      {
-        name: "Test Aggregated Portfolio",
-        path: "/test-aggregated-portfolio",
-        icon: Icons.chart,
-        description: "Aggregated portfolio test",
+        path: "/test-hub",
+        icon: Icons.code,
+        description: "Consolidated testing suite",
       },
     ],
   },
@@ -425,6 +364,7 @@ export function DevToolbar() {
   const [currentScheme, setCurrentScheme] = useState("purple");
   const [useMockData, setUseMockData] = useState(true);
   const [supabaseStatus, setSupabaseStatus] = useState<string>("Checking...");
+  const [pageHealthStatus, setPageHealthStatus] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     // Only show in development
@@ -445,6 +385,8 @@ export function DevToolbar() {
 
     // Check Supabase status
     checkSupabaseStatus();
+    // Check page health status
+    checkPageHealthStatus();
   }, []);
 
   const checkSupabaseStatus = async () => {
@@ -462,6 +404,29 @@ export function DevToolbar() {
     } catch (error) {
       setSupabaseStatus("❌ Error");
     }
+  };
+
+  const checkPageHealthStatus = async () => {
+    // Quick health check for critical pages
+    const criticalPages = [
+      "/investor-portal/dashboard",
+      "/admin/dashboard",
+      "/api/deals",
+      "/api/transactions",
+    ];
+    
+    const healthMap: Record<string, boolean> = {};
+    
+    for (const page of criticalPages) {
+      try {
+        const response = await fetch(page, { method: "HEAD" });
+        healthMap[page] = response.ok;
+      } catch {
+        healthMap[page] = false;
+      }
+    }
+    
+    setPageHealthStatus(healthMap);
   };
 
   const handleThemeChange = (theme: string) => {
@@ -555,6 +520,8 @@ export function DevToolbar() {
                     <div className="space-y-1">
                       {category.pages.map((page) => {
                         const isActive = currentPath === page.path;
+                        const isHealthChecked = pageHealthStatus.hasOwnProperty(page.path);
+                        const isHealthy = pageHealthStatus[page.path];
 
                         return (
                           <button
@@ -576,8 +543,15 @@ export function DevToolbar() {
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium text-sm">
-                                {page.name}
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-sm">
+                                  {page.name}
+                                </span>
+                                {isHealthChecked && (
+                                  <span className={`text-xs ${isHealthy ? "text-green-500" : "text-red-500"}`}>
+                                    {isHealthy ? "●" : "○"}
+                                  </span>
+                                )}
                               </div>
                               {page.description && (
                                 <div className="text-xs text-text-secondary mt-0.5">

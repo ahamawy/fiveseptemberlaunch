@@ -2,7 +2,7 @@
 
 import React from "react";
 import { VictoryChart, VictoryLine, VictoryTheme, VictoryArea, VictoryPie, VictoryAxis } from "victory";
-import { BRAND_CONFIG } from "@/BRANDING/brand.config";
+import { BRAND_CONFIG } from "@/lib/brand"
 
 const victoryTheme = {
   ...VictoryTheme.material,

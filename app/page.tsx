@@ -1,47 +1,28 @@
-import Hero from "@/components/landing/Hero";
-import Stats from "@/components/landing/Stats";
-import CTA from "@/components/landing/CTA";
-import Background from "@/components/landing/Background";
-import Nav from "@/components/landing/Nav";
-import Footer from "@/components/landing/Footer";
-import Positioning from "@/components/landing/Positioning";
-import ConvictionLibrary from "@/components/landing/ConvictionLibrary";
-import { Button } from "@/components/ui/Button";
+import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 
 export default function HomePage() {
   return (
-    <main
-      className="bg-[color:var(--bg,#0B071A)]"
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(180deg, #0B071A 0%, #040210 100%)",
-      }}
-    >
-      <Background />
-      <Nav />
-      <Hero />
-      {/* Primary Access Buttons */}
-      <section className="relative z-10 px-6 lg:px-8 mt-8">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="/investor-portal/select">
-            <Button size="lg" variant="primary">
-              Investor Access
+    <div className="relative min-h-screen bg-background text-foreground flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-mesh opacity-20 pointer-events-none" />
+      <div className="text-center space-y-8 px-6">
+        <h1 className="text-5xl md:text-6xl font-bold mx-auto max-w-3xl">
+          <span className="text-gradient bg-gradient-hero animate-gradient">EquiTie</span>
+        </h1>
+        <p className="text-lg md:text-xl text-muted-foreground">A modern investor portal for portfolios, deals, and performance.</p>
+        <div className="flex gap-4 justify-center">
+          <Link href="/investor-portal/dashboard">
+            <Button variant="gradient" size="lg" glow>
+              Investor Portal
             </Button>
-          </a>
-          <a href="/admin/deals">
-            <Button size="lg" variant="glass">
-              Admin Access
+          </Link>
+          <Link href="/admin/dashboard">
+            <Button variant="glass" size="lg">
+              Admin Dashboard
             </Button>
-          </a>
+          </Link>
         </div>
-      </section>
-      <div className="mt-4" />
-      <Stats />
-      <Positioning />
-      <ConvictionLibrary />
-      <div className="mt-8" />
-      <CTA />
-      <Footer />
-    </main>
+      </div>
+    </div>
   );
 }

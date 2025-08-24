@@ -27,44 +27,38 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       relative inline-flex items-center justify-center
       font-semibold rounded-lg
       transition-all duration-150
-      focus:outline-none focus:ring-2 focus:ring-primary-300/50 focus:ring-offset-2 focus:ring-offset-background-deep
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background
       disabled:opacity-50 disabled:cursor-not-allowed
     `;
     
     const variants = {
       primary: `
-        bg-primary-500 text-white dark:bg-primary-300 dark:text-background-deep
-        hover:bg-primary-600 dark:hover:bg-primary-400 hover:shadow-buttonHover
+        bg-primary text-primary-foreground
+        hover:bg-primary/90
         active:scale-[0.98]
       `,
       secondary: `
-        bg-secondary-500 text-white
-        hover:bg-secondary-600 hover:shadow-buttonHover
+        bg-secondary text-secondary-foreground
+        hover:bg-secondary/90
         active:scale-[0.98]
       `,
       outline: `
-        border-2 border-primary-500 dark:border-primary-300/50 
-        text-primary-600 dark:text-primary-300
-        hover:bg-primary-50 dark:hover:bg-primary-300/10 
-        hover:border-primary-600 dark:hover:border-primary-300
+        border border-input text-foreground
+        hover:bg-accent hover:text-accent-foreground
         active:scale-[0.98]
       `,
       ghost: `
-        text-gray-600 dark:text-text-secondary
-        hover:text-gray-900 dark:hover:text-text-primary 
-        hover:bg-gray-100 dark:hover:bg-surface-hover
-        active:bg-gray-200 dark:active:bg-surface-active
+        text-muted-foreground
+        hover:bg-accent hover:text-accent-foreground
       `,
       glass: `
-        glass-adaptive text-gray-700 dark:text-text-primary
-        hover:bg-gray-50 dark:hover:bg-white/10 hover:shadow-buttonHover
-        active:scale-[0.98]
-        border border-gray-200 dark:border-transparent
+        glass-card text-foreground
+        hover:shadow-glow-purpleSubtle active:scale-[0.98]
+        border border-border
       `,
       gradient: `
-        bg-gradient-primary text-white
-        hover:shadow-buttonHover hover:brightness-110
-        active:scale-[0.98]
+        bg-gradient-hero text-white animate-gradient
+        hover:shadow-glow-purple active:scale-[0.98]
       `,
     };
     

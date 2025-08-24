@@ -30,7 +30,16 @@
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:mcp": "docker-compose up mcp-supabase mcp-equitie -d",
-    "docker:migrate": "docker-compose --profile migrate up migration-runner"
+    "docker:migrate": "docker-compose --profile migrate up migration-runner",
+    "health": "node SCRIPTS/health-check.js",
+    "mcp:up": "docker-compose up -d mcp-supabase mcp-equitie",
+    "mcp:down": "docker-compose stop mcp-supabase mcp-equitie",
+    "generate:feature": "node scripts/generate-feature.js",
+    "redis:up": "docker-compose -f docker-compose.redis.yml up -d redis",
+    "redis:down": "docker-compose -f docker-compose.redis.yml down",
+    "redis:logs": "docker-compose -f docker-compose.redis.yml logs -f redis",
+    "redis:cli": "docker exec -it equitie-redis redis-cli",
+    "redis:commander": "docker-compose -f docker-compose.redis.yml --profile debug up -d"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
@@ -55,6 +64,7 @@
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
+    "redis": "^4.6.10",
     "sharp": "^0.34.3",
     "tailwind-merge": "^3.3.1",
     "tesseract.js": "^6.0.1",

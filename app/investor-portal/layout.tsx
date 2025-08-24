@@ -23,12 +23,21 @@ export default function InvestorPortalLayout({ children }: InvestorPortalLayoutP
   ];
 
   return (
-    <div className="min-h-screen bg-background-deep">
+    <div className="relative min-h-screen bg-background">
+      <div className="absolute inset-0 bg-gradient-mesh opacity-10 pointer-events-none" />
       <PortalSwitcher />
-      <nav className="bg-white dark:bg-background-surface/80 backdrop-blur-md shadow-md dark:shadow-glow-purple/10 border-b border-gray-200 dark:border-surface-border">
+      <nav className="bg-white dark:bg-background-surface/80 backdrop-blur-md shadow-md dark:shadow-glow-purple/10 border-b border-gray-200 dark:border-surface-border relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
+              {process.env.NEXT_PUBLIC_LOGO_URL ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={process.env.NEXT_PUBLIC_LOGO_URL}
+                  alt="logo"
+                  className="w-6 h-6 rounded border border-surface-border object-contain"
+                />
+              ) : null}
               <h1 className="text-xl font-semibold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
                 Investor Portal
               </h1>
@@ -55,7 +64,7 @@ export default function InvestorPortalLayout({ children }: InvestorPortalLayoutP
           </div>
         </div>
       </nav>
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="relative z-10 max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {children}
       </main>
     </div>

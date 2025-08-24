@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getColorSchemeVars, DEFAULT_COLOR_SCHEME } from '@/BRANDING/tokens/color-schemes';
+import { brand, DEFAULT_COLOR_SCHEME } from "@/lib/brand";
 
 type Theme = 'dark' | 'light';
 type ColorScheme = 'purple' | 'blue' | 'green' | 'monochrome';
@@ -32,6 +32,21 @@ export function ThemeProvider({
   const [theme, setThemeState] = useState<Theme>(defaultTheme);
   const [colorScheme, setColorSchemeState] = useState<ColorScheme>(defaultColorScheme);
   const [mounted, setMounted] = useState(false);
+
+  function getColorSchemeVars(scheme: ColorScheme): Record<string, string> {
+    // Minimal scheme mapping – extend as needed
+    switch (scheme) {
+      case 'blue':
+        return { '--primary': '221 83% 53%' };
+      case 'green':
+        return { '--primary': '142 71% 45%' };
+      case 'monochrome':
+        return { '--primary': '0 0% 100%' };
+      case 'purple':
+      default:
+        return { '--primary': '263 70% 50%' };
+    }
+  }
 
   useEffect(() => {
     setMounted(true);

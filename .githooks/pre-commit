@@ -1,0 +1,72 @@
+#!/bin/sh
+
+# Pre-commit hook for size and secret detection
+
+echo "🔍 Running pre-commit checks..."
+
+# 1. Check for large files
+MAX_SIZE=1000000  # 1MB limit
+files=$(git diff --cached --name-only)
+
+for file in $files; do
+  if [ -f "$file" ]; then
+    size=$(wc -c < "$file")
+    if [ "$size" -gt "$MAX_SIZE" ]; then
+      echo "❌ Error: $file exceeds size limit ($(($size/1024))KB > $(($MAX_SIZE/1024))KB)"
+      echo "Consider using Git LFS or external storage for large files"
+      exit 1
+    fi
+  fi
+done
+
+# 2. Check for secrets/tokens
+echo "🔐 Scanning for exposed secrets..."
+
+# Common secret patterns
+patterns=(
+  "sk-or-v1-[a-zA-Z0-9]+"  # OpenRouter
+  "eyJhbGciOiJIUzI1NiI"     # JWT tokens
+  "SUPABASE_SERVICE_ROLE_KEY"
+  "OPENROUTER_API_KEY"
+  "github_pat_"
+  "ghp_"
+  "ghs_"
+  "glpat-"
+)
+
+for file in $files; do
+  if [ -f "$file" ]; then
+    for pattern in "${patterns[@]}"; do
+      if grep -qE "$pattern" "$file"; then
+        echo "❌ Potential secret detected in $file"
+        echo "Pattern matched: $pattern"
+        echo "Remove the secret or add the file to .gitignore"
+        exit 1
+      fi
+    done
+  fi
+done
+
+# 3. Check that .env files are not being committed
+for file in $files; do
+  case "$file" in
+    *.env|*.env.*)
+      if [[ "$file" != *.example ]]; then
+        echo "❌ Error: Attempting to commit environment file: $file"
+        echo "Environment files should never be committed"
+        exit 1
+      fi
+      ;;
+  esac
+done
+
+# 4. Verify critical files exist
+critical_files=("package.json" "tsconfig.json" ".gitignore")
+for cfile in "${critical_files[@]}"; do
+  if [ ! -f "$cfile" ]; then
+    echo "⚠️  Warning: Critical file missing: $cfile"
+  fi
+done
+
+echo "✅ Pre-commit checks passed"
+exit 0

@@ -169,7 +169,9 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background-deep p-6 lg:p-8">
+    <div className="relative min-h-screen bg-background p-6 lg:p-8">
+      <div className="absolute inset-0 bg-gradient-mesh opacity-10 pointer-events-none" />
+      <div className="relative z-10">
       {/* Top bar: Lead + Guest Mode */}
       <div className="flex items-start justify-between pb-6 border-b border-surface-border mb-8">
         <div>
@@ -540,6 +542,7 @@ function DashboardContent() {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

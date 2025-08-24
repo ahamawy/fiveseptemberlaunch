@@ -4,7 +4,7 @@ import React from "react";
 import { ResponsiveLine } from "@nivo/line";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
-import { BRAND_CONFIG } from "@/BRANDING/brand.config";
+import { BRAND_CONFIG } from "@/lib/brand"
 
 const chartTheme = {
   background: "transparent",

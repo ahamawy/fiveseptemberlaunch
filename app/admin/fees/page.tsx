@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { 
   CalculatorIcon, 
   DocumentTextIcon,
@@ -8,9 +9,12 @@ import {
   BeakerIcon,
   ChartBarIcon,
   SparklesIcon,
-  DocumentDuplicateIcon
+  DocumentDuplicateIcon,
+  FunnelIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { Badge } from '@/components/ui/Badge';
 
 interface FeeToolCard {
   title: string;

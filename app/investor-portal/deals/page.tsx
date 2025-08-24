@@ -215,7 +215,9 @@ function DealsContent() {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="relative space-y-8">
+      <div className="absolute inset-0 bg-gradient-mesh opacity-10 pointer-events-none" />
+      <div className="relative z-10">
       {/* Header */}
       <div className="pb-6 border-b border-surface-border">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
@@ -481,6 +483,7 @@ function DealsContent() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

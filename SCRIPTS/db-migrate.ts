@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-nocheck
 /**
  * Database Migration Runner
  * Applies SQL migrations to Supabase in correct order

@@ -1,1 +1,0 @@
--- Create core tables by schema — copy from DB/schema.sql into environment-managed migrations.
