@@ -1,0 +1,192 @@
+version: '3.8'
+
+services:
+  # ===== CORE MCP SERVERS =====
+  
+  # Supabase MCP - Database operations
+  mcp-supabase:
+    image: node:20-alpine
+    container_name: mcp-supabase
+    working_dir: /app
+    environment:
+      - SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    command: npx @supabase/mcp
+    ports:
+      - "3100:3100"
+    networks:
+      - mcp-network
+    restart: unless-stopped
+
+  # Custom Equitie MCP - Domain logic
+  mcp-equitie:
+    image: node:20-alpine
+    container_name: mcp-equitie
+    working_dir: /app
+    volumes:
+      - ./lib/mcp:/app/lib/mcp
+      - ./lib/services:/app/lib/services
+    environment:
+      - SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    command: node lib/mcp/equitie-server.mjs
+    ports:
+      - "3101:3101"
+    networks:
+      - mcp-network
+    restart: unless-stopped
+
+  # ===== WORKFLOW ACCELERATION MCPs =====
+
+  # Context7 MCP - Intelligent context management
+  mcp-context7:
+    image: node:20-alpine
+    container_name: mcp-context7
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - ./FEATURES:/app/context
+    environment:
+      - CONTEXT_PATH=/app/context
+      - FEATURE_TREE=/app/context/FEATURE_TREE.md
+    command: |
+      sh -c "
+      npm install -g @context7/mcp-server
+      context7-mcp --path /app --features /app/context/FEATURE_TREE.md
+      "
+    ports:
+      - "3102:3102"
+    networks:
+      - mcp-network
+
+  # GitHub MCP - Repository operations
+  mcp-github:
+    image: node:20-alpine
+    container_name: mcp-github
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_OWNER=ahamawy
+      - GITHUB_REPO=equitie-investor-portal
+    command: npx @modelcontextprotocol/server-github
+    ports:
+      - "3103:3103"
+    networks:
+      - mcp-network
+
+  # Filesystem MCP - Advanced file operations
+  mcp-filesystem:
+    image: node:20-alpine
+    container_name: mcp-filesystem
+    volumes:
+      - ./:/workspace
+    command: npx @modelcontextprotocol/server-filesystem --path /workspace
+    ports:
+      - "3104:3104"
+    networks:
+      - mcp-network
+
+  # Memory MCP - Persistent context across sessions
+  mcp-memory:
+    image: node:20-alpine
+    container_name: mcp-memory
+    volumes:
+      - ./mcp-memory:/data
+    environment:
+      - MEMORY_PATH=/data/memory.json
+    command: npx @modelcontextprotocol/server-memory
+    ports:
+      - "3105:3105"
+    networks:
+      - mcp-network
+
+  # Puppeteer MCP - Browser automation for testing
+  mcp-puppeteer:
+    image: node:20-alpine
+    container_name: mcp-puppeteer
+    command: |
+      sh -c "
+      apk add --no-cache chromium
+      npm install -g @modelcontextprotocol/server-puppeteer
+      mcp-puppeteer
+      "
+    ports:
+      - "3106:3106"
+    networks:
+      - mcp-network
+    environment:
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+  # Search MCP - Code search and analysis
+  mcp-search:
+    image: node:20-alpine
+    container_name: mcp-search
+    volumes:
+      - ./:/workspace
+    command: npx @modelcontextprotocol/server-search --path /workspace
+    ports:
+      - "3107:3107"
+    networks:
+      - mcp-network
+
+  # ===== FEATURE DEVELOPMENT MCPs =====
+
+  # Feature Generator MCP - Auto-generate boilerplate
+  mcp-feature-gen:
+    build:
+      context: .
+      dockerfile: |
+        FROM node:20-alpine
+        WORKDIR /app
+        COPY lib/mcp/feature-generator.mjs .
+        CMD ["node", "feature-generator.mjs"]
+    container_name: mcp-feature-gen
+    volumes:
+      - ./FEATURES:/features
+      - ./app:/app
+      - ./components:/components
+    ports:
+      - "3108:3108"
+    networks:
+      - mcp-network
+
+  # Test Generator MCP - Auto-generate tests
+  mcp-test-gen:
+    image: node:20-alpine
+    container_name: mcp-test-gen
+    volumes:
+      - ./:/workspace
+    environment:
+      - TEST_FRAMEWORK=playwright
+    command: |
+      sh -c "
+      npm install -g @mcp/test-generator
+      mcp-test-gen --framework playwright --path /workspace
+      "
+    ports:
+      - "3109:3109"
+    networks:
+      - mcp-network
+
+  # API Generator MCP - Generate API routes from specs
+  mcp-api-gen:
+    image: node:20-alpine
+    container_name: mcp-api-gen
+    volumes:
+      - ./app/api:/api
+      - ./lib/contracts:/contracts
+    command: |
+      sh -c "
+      npm install -g @mcp/api-generator
+      mcp-api-gen --contracts /contracts --output /api
+      "
+    ports:
+      - "3110:3110"
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
+
+volumes:
+  mcp-memory:
