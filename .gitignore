@@ -91,3 +91,6 @@ supabase/.temp
 *.dart
 *.flutter
 *.dartanalyzer
+dev-server.log
+*.log
+equitie_app/scripts/figma_raw_data.json
