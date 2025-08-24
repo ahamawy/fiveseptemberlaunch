@@ -208,12 +208,19 @@ POST /api/admin/formulas/test
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://ikezqzljrupkzmyytgok.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key                    # Old JWT format
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_xxx  # New 2025+ format
 NEXT_PUBLIC_USE_MOCK_DATA=false
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-jwt     # server-only writes
-ADMIN_API_KEY=your-admin-api-key                    # required in prod for write endpoints
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-jwt          # server-only writes
+ADMIN_API_KEY=your-admin-api-key                         # required in prod for write endpoints
 OPENROUTER_API_KEY=your-key
+DATABASE_URL=postgresql://postgres.project:password@region.pooler.supabase.com:6543/postgres
 ```
+
+**Supabase Connection Notes:**
+- Supports both old JWT and new publishable key formats (auto-detected)
+- Node.js 20+ recommended (v18 shows deprecation warnings but still works)
+- Database password required for direct connections (migrations/scripts)
 
 ## Quick Commands
 

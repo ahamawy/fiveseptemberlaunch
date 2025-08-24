@@ -114,11 +114,12 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         ? process.env.SUPABASE_SERVICE_KEY ||
           process.env.SUPABASE_SERVICE_ROLE_KEY
         : undefined) ||
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error(
-        "Missing Supabase configuration. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY"
+        "Missing Supabase configuration. Please set NEXT_PUBLIC_SUPABASE_URL and (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY)"
       );
     }
 

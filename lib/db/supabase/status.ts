@@ -74,10 +74,10 @@ export async function getSupabaseConnectivity(): Promise<SupabaseStatus> {
     return status;
   }
 
-  // Check Node.js version
+  // Check Node.js version (warning only, don't block)
   if (!status.nodeOk) {
-    status.error = `Node.js ${diagnostics.environment.nodeVersion.required} or higher required (current: ${diagnostics.environment.nodeVersion.version})`;
-    return status;
+    console.warn(`⚠️ Node.js ${diagnostics.environment.nodeVersion.required} or higher recommended (current: ${diagnostics.environment.nodeVersion.version})`);
+    // Continue anyway - Supabase v3 may still work with older Node versions
   }
 
   // Try to connect and test table access

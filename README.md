@@ -29,9 +29,18 @@ npm run dev   # http://localhost:3000
 # .env.local
 NEXT_PUBLIC_SUPABASE_URL=your-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
+# New API key format (2025+) - both formats supported
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_xxx
 NEXT_PUBLIC_USE_MOCK_DATA=false
 OPENROUTER_API_KEY=your-key
+# Database connection (for migrations/scripts)
+DATABASE_URL=postgresql://postgres.project:password@region.pooler.supabase.com:6543/postgres
 ```
+
+**Important Notes:**
+- Node.js 20+ recommended (warnings shown for v18 and below)
+- Supabase supports both old JWT format and new publishable key format (sb_publishable_*)
+- The system automatically detects and uses the appropriate key format
 
 ### Supabase Schema Access
 

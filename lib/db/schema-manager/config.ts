@@ -73,9 +73,16 @@ export class SchemaConfig {
   }
 
   /**
-   * Get Supabase anonymous key
+   * Get Supabase anonymous key (supports both old and new format)
    */
   getSupabaseAnonKey(): string {
+    // Try new 2025 format first
+    const publishableKey = this.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
+    if (publishableKey && publishableKey.startsWith('sb_publishable_')) {
+      return publishableKey;
+    }
+    
+    // Fall back to old format
     const key = this.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     if (!key) throw new Error("Supabase anon key not configured");
     // Return placeholder if not enabled
