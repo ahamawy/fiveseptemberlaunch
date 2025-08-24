@@ -24,7 +24,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching formula template:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to fetch formula template' },
       { status: 500 }
     );
   }
@@ -48,7 +48,7 @@ export async function PUT(
   } catch (error) {
     console.error('Error updating formula template:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to update formula template' },
       { status: 500 }
     );
   }
@@ -75,7 +75,7 @@ export async function DELETE(
   } catch (error) {
     console.error('Error deleting formula template:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to delete formula template' },
       { status: 500 }
     );
   }

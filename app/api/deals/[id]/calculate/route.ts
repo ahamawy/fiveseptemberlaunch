@@ -28,7 +28,7 @@ export async function POST(
   } catch (error) {
     console.error('Error calculating deal economics:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to calculate deal economics' },
       { status: 500 }
     );
   }
@@ -57,7 +57,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching calculation history:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to fetch calculation history' },
       { status: 500 }
     );
   }

@@ -3,33 +3,38 @@ import { findCompanyAssetUrls } from "@/lib/utils/storage";
 
 export class InvestorsRepo extends BaseRepo {
   async getDashboard(investorId: number) {
-    // Skip analytics schema as it doesn't exist - use transactions directly
-    let totalValue = 0;
+    // Get real portfolio values from the database analytics table
+    const { data: analytics } = await this.db
+      .from("portfolio_analytics")
+      .select(
+        "total_aum, total_portfolio_value, active_deals_count, average_moic, irr_portfolio"
+      )
+      .order("calculation_date", { ascending: false })
+      .limit(1)
+      .single();
+
+    // Get investor-specific transaction summary from the proper table
+    const { data: txSummary } = await this.db
+      .from("transactions.transaction.primary")
+      .select("gross_capital, initial_net_capital")
+      .eq("investor_id", investorId);
+
     let totalCalled = 0;
     let totalDistributed = 0;
-    let activeDeals = 0;
 
-    // Use transactions aggregation (public.transactions)
-    const { data: tx } = await this.db
-      .from("transactions")
-      .select(
-        "deal_id, initial_net_capital, gross_capital, transaction_date, investor_id"
-      )
-      .eq("investor_id", investorId);
-    if (Array.isArray(tx)) {
-      const dealsSet = new Set<number>();
-      for (const t of tx) {
-        const amt =
-          (t.initial_net_capital as number) ??
-          (t.gross_capital as number) ??
-          0;
-        if (amt >= 0) totalCalled += amt;
-        else totalDistributed += amt; // negative
-        if (t.deal_id) dealsSet.add(t.deal_id);
-      }
-      activeDeals = dealsSet.size;
-      totalValue = totalCalled + totalDistributed; // approx NAV
+    if (Array.isArray(txSummary)) {
+      totalCalled = txSummary.reduce(
+        (sum, t) => sum + parseFloat(t.gross_capital || "0"),
+        0
+      );
+      totalDistributed = 0; // Will be calculated from actual distributions when available
     }
+
+    // Use real database values, not frontend calculations
+    const totalValue = analytics?.total_portfolio_value || totalCalled;
+    const activeDeals = analytics?.active_deals_count || 0;
+    const portfolioMOIC = analytics?.average_moic || 1.0;
+    const portfolioIRR = analytics?.irr_portfolio || 0;
 
     // Recent activity (last 5)
     const { data: recent } = await this.db
@@ -50,9 +55,6 @@ export class InvestorsRepo extends BaseRepo {
       date: t.transaction_date,
     }));
 
-    const portfolioMOIC = totalCalled > 0 ? totalValue / totalCalled : 0;
-    const portfolioIRR = 0; // placeholder (requires cashflow timing)
-
     return {
       summary: {
         totalCommitted: totalCalled,
@@ -69,7 +71,16 @@ export class InvestorsRepo extends BaseRepo {
   }
 
   async getPortfolio(investorId: number) {
-    // Skip analytics schema as it doesn't exist - go straight to transactions
+    // Prefer analytics snapshot for portfolio-level metrics
+    const { data: analytics } = await this.db
+      .from("portfolio_analytics")
+      .select(
+        "total_portfolio_value, average_moic, irr_portfolio, active_deals_count"
+      )
+      .order("calculation_date", { ascending: false })
+      .limit(1)
+      .single();
+
     let perDeal: Array<{
       deal_id: number;
       net_capital: number;
@@ -131,31 +142,50 @@ export class InvestorsRepo extends BaseRepo {
       })
     );
 
-    // Resolve company asset URLs (logo/background)
-    const companyIdToAssets = new Map<number, { logo_url: string | null; background_url: string | null }>();
-    for (const cid of companyIds) {
+    // Resolve company asset URLs (logo/background) in parallel
+    const companyIdToAssets = new Map<
+      number,
+      { logo_url: string | null; background_url: string | null }
+    >();
+
+    // Batch fetch all asset URLs in parallel
+    const assetPromises = Array.from(companyIds).map(async (cid) => {
       try {
         const comp = companies?.find((c: any) => c.company_id === cid);
-        const assets = await findCompanyAssetUrls(this.db as any, cid as number, comp?.company_name);
-        companyIdToAssets.set(cid, assets);
-      } catch {}
-    }
+        const assets = await findCompanyAssetUrls(
+          this.db as any,
+          cid as number,
+          comp?.company_name
+        );
+        return { cid, assets };
+      } catch {
+        return { cid, assets: { logo_url: null, background_url: null } };
+      }
+    });
+
+    const assetResults = await Promise.all(assetPromises);
+    assetResults.forEach(({ cid, assets }) => {
+      companyIdToAssets.set(cid, assets);
+    });
 
     // Get latest valuations for each deal
-    const valuationsMap = new Map<number, { moic: number; irr: number | null }>();
+    const valuationsMap = new Map<
+      number,
+      { moic: number; irr: number | null }
+    >();
     if (dealIds.length > 0) {
       const { data: valuations } = await this.db
         .from("deal_valuations")
         .select("deal_id, moic, irr, valuation_date")
         .in("deal_id", dealIds)
         .order("valuation_date", { ascending: false });
-      
+
       // Keep only the latest valuation per deal
       (valuations || []).forEach((v: any) => {
         if (!valuationsMap.has(v.deal_id)) {
           valuationsMap.set(v.deal_id, {
             moic: parseFloat(v.moic) || 1.0,
-            irr: v.irr ? parseFloat(v.irr) : null
+            irr: v.irr ? parseFloat(v.irr) : null,
           });
         }
       });
@@ -164,9 +194,8 @@ export class InvestorsRepo extends BaseRepo {
     // Documents count per deal for this investor
     const docsByDeal = new Map<number, number>();
     try {
-      const { data: docs } = await (this.db as any)
-        .schema("documents")
-        .from("document")
+      const { data: docs } = await this.db
+        .from("documents")
         .select("deal_id")
         .in("deal_id", dealIds)
         .eq("investor_id", investorId);
@@ -177,6 +206,28 @@ export class InvestorsRepo extends BaseRepo {
       });
     } catch {}
 
+    // Get investor count per deal
+    const investorsByDeal = new Map<number, number>();
+    try {
+      const { data: investors } = await this.db
+        .from("transactions")
+        .select("deal_id, investor_id")
+        .in("deal_id", dealIds);
+
+      const dealInvestorMap = new Map<number, Set<number>>();
+      (investors || []).forEach((t: any) => {
+        if (!t.deal_id) return;
+        if (!dealInvestorMap.has(t.deal_id)) {
+          dealInvestorMap.set(t.deal_id, new Set());
+        }
+        dealInvestorMap.get(t.deal_id)!.add(t.investor_id);
+      });
+
+      dealInvestorMap.forEach((investorSet, dealId) => {
+        investorsByDeal.set(dealId, investorSet.size);
+      });
+    } catch {}
+
     const dealsOut = perDeal.map((row) => {
       const d = dealIdToDeal.get(row.deal_id) || {};
       const comp = d.underlying_company_id
@@ -184,37 +235,70 @@ export class InvestorsRepo extends BaseRepo {
         : undefined;
       const called = Number(row.net_capital || 0);
       const cur = Number(row.current_value || 0);
-      
+
       // Use valuation MOIC if available, otherwise calculate from current value
       const valuation = valuationsMap.get(row.deal_id);
-      const moic = valuation ? valuation.moic : (called > 0 ? cur / called : 1.0);
+      const moic = valuation ? valuation.moic : called > 0 ? cur / called : 1.0;
       const irr = valuation?.irr || 0;
-      
+
       // Apply MOIC to current value for proper valuation
       const currentValue = called * moic;
-      
+
+      // Normalize enums to API contract
+      const rawType = (d.deal_type || "direct").toString().toLowerCase();
+      const normalizedType =
+        rawType === "partnership"
+          ? "fund"
+          : rawType === "facilitated_direct"
+          ? "direct"
+          : rawType;
+
+      const rawCurrency = (d.deal_currency || "USD").toString().toUpperCase();
+      const allowedCurrencies = new Set([
+        "USD",
+        "EUR",
+        "GBP",
+        "JPY",
+        "CHF",
+        "CAD",
+        "AUD",
+        "SGD",
+      ]);
+      const normalizedCurrency = allowedCurrencies.has(rawCurrency)
+        ? rawCurrency
+        : "USD";
+
       return {
         dealId: row.deal_id,
         dealName: d.deal_name || `Deal #${row.deal_id}`,
         companyName: comp?.name || "",
         sector: comp?.sector || "",
-        companyLogoUrl: d.underlying_company_id ? companyIdToAssets.get(d.underlying_company_id || 0)?.logo_url || null : null,
-        dealType: (d.deal_type || "direct").toString().toLowerCase(),
-        committed: called,
+        companyLogoUrl: d.underlying_company_id
+          ? companyIdToAssets.get(d.underlying_company_id || 0)?.logo_url ||
+            null
+          : null,
+        dealType: normalizedType,
+        committed: called, // TODO: replace with committed once available from DB view
         called,
-        distributed: 0,
+        distributed: 0, // TODO: replace with actual distributions when available from DB view
         currentValue,
         irr,
         moic,
         status: (d.deal_status || "active").toString().toLowerCase(),
-        currency: d.deal_currency || "USD",
+        currency: normalizedCurrency,
         stage: d.deal_status || "active",
         documentsCount: docsByDeal.get(row.deal_id) || 0,
+        investorsCount: investorsByDeal.get(row.deal_id) || 1, // At least this investor
+        valuationCount: valuationsMap.has(row.deal_id) ? 1 : 0, // Simplified for now
         // asset urls resolved at consumer via /api/companies if needed
       };
     });
 
-    const totalValue = dealsOut.reduce((s, d) => s + d.currentValue, 0);
+    const totalValueCalculated = dealsOut.reduce(
+      (s, d) => s + d.currentValue,
+      0
+    );
+    const totalValue = analytics?.total_portfolio_value ?? totalValueCalculated;
     const bySectorMap = new Map<string, { value: number; dealCount: number }>();
     const byTypeMap = new Map<string, { value: number; dealCount: number }>();
     dealsOut.forEach((d) => {
@@ -238,6 +322,18 @@ export class InvestorsRepo extends BaseRepo {
         dealCount: v.dealCount,
       }));
 
+    // Aggregate summary fields (to be replaced by DB views when available)
+    const totalCalled = dealsOut.reduce((s, d) => s + (d.called || 0), 0);
+    const totalCommitted = dealsOut.reduce((s, d) => s + (d.committed || 0), 0);
+    const totalDistributed = dealsOut.reduce(
+      (s, d) => s + (d.distributed || 0),
+      0
+    );
+    const portfolioMOIC =
+      analytics?.average_moic ??
+      (totalCalled > 0 ? totalValue / totalCalled : 1.0);
+    const portfolioIRR = analytics?.irr_portfolio ?? 0;
+
     return {
       deals: dealsOut,
       allocation: {
@@ -259,6 +355,11 @@ export class InvestorsRepo extends BaseRepo {
         activeDeals: dealsOut.filter((d) => d.status === "active").length,
         exitedDeals: dealsOut.filter((d) => d.status === "exited").length,
         totalValue,
+        totalCommitted,
+        totalCalled,
+        totalDistributed,
+        portfolioIRR,
+        portfolioMOIC,
       },
     };
   }

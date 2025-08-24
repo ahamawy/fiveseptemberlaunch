@@ -1,5 +1,17 @@
 # Claude Code Project Context
 
+## 🚨 URGENT ISSUES (Session 2025-08-23)
+1. **Files too large**: `app/style-guide/enhanced-page.tsx` is 1,425 lines! Split immediately
+2. **Type safety**: 1,214 `any` types found - use proper TypeScript types
+3. **Logging mess**: 497 console.log statements - use `logger` from `/lib/utils/improved-logger.ts`
+4. **API errors**: Portfolio API returns 500 - check historicalPerformance in `/app/api/investors/[id]/portfolio/route.ts`
+
+## New Tools Available (Created 2025-08-23)
+- **Common Components**: `/components/common/` - LoadingState, ErrorState, EmptyState, DataTable
+- **Hooks**: `/hooks/useFetch.ts` - Replaces useEffect + fetch pattern
+- **Logger**: `/lib/utils/improved-logger.ts` - Replaces console.log
+- **API Contracts**: `/lib/contracts/api/` - Zod schemas for all APIs
+
 ## Project Overview
 
 Equitie investment portal - Next.js web dashboard with ARCHON Fee Engine for complex fee calculations.

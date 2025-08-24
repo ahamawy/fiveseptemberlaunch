@@ -3,8 +3,8 @@
  * Aggregates portfolio data across multiple investors for consolidated views
  */
 
-import { BaseService } from './base.service';
-import { investorsService } from './investors.service';
+import { BaseService } from "./base.service";
+import { investorsService } from "./investors.service";
 
 export interface AggregatedPortfolio {
   investors: number[];
@@ -25,14 +25,16 @@ export class PortfolioAggregatorService extends BaseService {
    * Get aggregated portfolio across multiple investors
    * Useful for family offices or related investor groups
    */
-  async getAggregatedPortfolio(investorIds: number[]): Promise<AggregatedPortfolio> {
-    const cacheKey = `aggregated-portfolio:${investorIds.join('-')}`;
+  async getAggregatedPortfolio(
+    investorIds: number[]
+  ): Promise<AggregatedPortfolio> {
+    const cacheKey = `aggregated-portfolio:${investorIds.join("-")}`;
     const cached = this.getCached<AggregatedPortfolio>(cacheKey);
     if (cached) return cached;
 
     try {
-      this.log('getAggregatedPortfolio', { investorIds });
-      
+      this.log("getAggregatedPortfolio", { investorIds });
+
       // Get all investor names
       const investorNames: string[] = [];
       for (const id of investorIds) {
@@ -41,13 +43,15 @@ export class PortfolioAggregatorService extends BaseService {
           investorNames.push(investor.name);
         }
       }
-      
+
       // Get portfolio holdings for each investor
       const allHoldings: any[] = [];
       const dealMap = new Map<number, any>();
-      
+
       for (const investorId of investorIds) {
-        const holdings = await investorsService.getPortfolioHoldings(investorId);
+        const holdings = (await investorsService.getPortfolioHoldings(
+          investorId
+        )) as any;
         if (holdings?.data) {
           for (const holding of holdings.data) {
             // Aggregate by deal
@@ -66,23 +70,33 @@ export class PortfolioAggregatorService extends BaseService {
             } else {
               dealMap.set(holding.dealId, {
                 ...holding,
-                investors: [investorId]
+                investors: [investorId],
               });
             }
           }
         }
       }
-      
+
       // Convert map to array and sort by current value
-      const aggregatedDeals = Array.from(dealMap.values())
-        .sort((a, b) => b.currentValue - a.currentValue);
-      
+      const aggregatedDeals = Array.from(dealMap.values()).sort(
+        (a, b) => b.currentValue - a.currentValue
+      );
+
       // Calculate summary
-      const totalInvested = aggregatedDeals.reduce((sum, d) => sum + d.called, 0);
-      const currentValue = aggregatedDeals.reduce((sum, d) => sum + d.currentValue, 0);
-      const unrealizedGain = aggregatedDeals.reduce((sum, d) => sum + d.unrealizedGain, 0);
+      const totalInvested = aggregatedDeals.reduce(
+        (sum, d) => sum + d.called,
+        0
+      );
+      const currentValue = aggregatedDeals.reduce(
+        (sum, d) => sum + d.currentValue,
+        0
+      );
+      const unrealizedGain = aggregatedDeals.reduce(
+        (sum, d) => sum + d.unrealizedGain,
+        0
+      );
       const avgMOIC = totalInvested > 0 ? currentValue / totalInvested : 0;
-      
+
       // Calculate weighted average IRR
       let totalWeightedIRR = 0;
       let totalWeight = 0;
@@ -93,7 +107,7 @@ export class PortfolioAggregatorService extends BaseService {
         }
       }
       const avgIRR = totalWeight > 0 ? totalWeightedIRR / totalWeight : 0;
-      
+
       const result: AggregatedPortfolio = {
         investors: investorIds,
         investorNames,
@@ -104,14 +118,14 @@ export class PortfolioAggregatorService extends BaseService {
           totalDeals: aggregatedDeals.length,
           avgMOIC: Math.round(avgMOIC * 100) / 100,
           avgIRR: Math.round(avgIRR * 10) / 10,
-          unrealizedGain
-        }
+          unrealizedGain,
+        },
       };
-      
+
       this.setCache(cacheKey, result);
       return result;
     } catch (error) {
-      this.handleError(error, 'getAggregatedPortfolio');
+      this.handleError(error, "getAggregatedPortfolio");
       return {
         investors: investorIds,
         investorNames: [],
@@ -122,8 +136,8 @@ export class PortfolioAggregatorService extends BaseService {
           totalDeals: 0,
           avgMOIC: 0,
           avgIRR: 0,
-          unrealizedGain: 0
-        }
+          unrealizedGain: 0,
+        },
       };
     }
   }
@@ -134,19 +148,21 @@ export class PortfolioAggregatorService extends BaseService {
   async getRelatedInvestors(investorId: number): Promise<number[]> {
     // This would typically check relationships in the database
     // For now, return known related investors based on analysis
-    
+
     if (investorId === 1) {
       // Ahmed Youseph Khidr Al Sharif's related investors
       return [1, 12, 34, 21]; // Including Nur Alsharif (family), EWT, and Ahmed Tarek
     }
-    
+
     return [investorId];
   }
 
   /**
    * Get consolidated portfolio for an investor including related accounts
    */
-  async getConsolidatedPortfolio(investorId: number): Promise<AggregatedPortfolio> {
+  async getConsolidatedPortfolio(
+    investorId: number
+  ): Promise<AggregatedPortfolio> {
     const relatedInvestors = await this.getRelatedInvestors(investorId);
     return this.getAggregatedPortfolio(relatedInvestors);
   }

@@ -500,7 +500,11 @@ export class FormulaManager {
 
       return { success: true, result };
     } catch (error) {
-      return { success: false, error: error.message };
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "Failed to test formula",
+      };
     }
   }
 

@@ -26,7 +26,7 @@ export default function Stats() {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.83, 0, 0.17, 1],
+        ease: [0.83, 0, 0.17, 1] as [number, number, number, number],
       },
     },
   };
@@ -66,7 +66,7 @@ export default function Stats() {
                 className="mt-2 text-2xl font-semibold text-white"
                 initial={{ opacity: 0, scale: 0.5 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 + i * 0.05 }}
+                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] as [number, number, number, number], delay: 0.1 + i * 0.05 }}
                 viewport={{ once: true }}
               >
                 {formatNumber(s.value, s.format)}

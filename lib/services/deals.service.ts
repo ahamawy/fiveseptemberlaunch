@@ -3,16 +3,20 @@
  * Handles all deal-related operations
  */
 
-import { BaseService } from './base.service';
-import { dealEquationExecutor, DealEquation } from './fee-engine/deal-equation-executor';
-import type { 
-  Deal, 
-  Company, 
+import { BaseService } from "./base.service";
+import {
+  dealEquationExecutor,
+  DealEquation,
+  DealEquationExecutor,
+} from "./fee-engine/deal-equation-executor";
+import type {
+  Deal,
+  Company,
   Commitment,
   DealFilters,
   DealStage,
-  DealType 
-} from '../db/types';
+  DealType,
+} from "../db/types";
 
 export interface DealWithCompany extends Deal {
   company?: Company;
@@ -28,8 +32,8 @@ export interface DealDetails extends DealWithCompany {
 export interface DealListOptions {
   page?: number;
   limit?: number;
-  sortBy?: 'name' | 'opening_date' | 'stage' | 'current_raise';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "name" | "opening_date" | "stage" | "current_raise";
+  sortOrder?: "asc" | "desc";
   search?: string;
   stage?: DealStage;
   type?: DealType;
@@ -45,13 +49,13 @@ export class DealsService extends BaseService {
     if (cached) return cached;
 
     try {
-      this.log('getDeals', options);
+      this.log("getDeals", options);
       await this.delay();
 
       const filters: DealFilters = {
         stage: options.stage,
         type: options.type,
-        search: options.search
+        search: options.search,
       };
 
       let deals = await this.dataClient.getDeals(filters);
@@ -59,12 +63,12 @@ export class DealsService extends BaseService {
       // Enrich with company data
       const dealsWithCompanies: DealWithCompany[] = await Promise.all(
         deals.map(async (deal) => {
-          const company = deal.company_id 
+          const company = deal.company_id
             ? await this.dataClient.getCompanyById(deal.company_id)
             : null;
           return {
             ...deal,
-            company: company || undefined
+            company: company || undefined,
           };
         })
       );
@@ -75,10 +79,10 @@ export class DealsService extends BaseService {
           const field = options.sortBy!;
           const aVal = a[field as keyof Deal];
           const bVal = b[field as keyof Deal];
-          
+
           if (aVal === bVal) return 0;
-          
-          if (options.sortOrder === 'desc') {
+
+          if (options.sortOrder === "desc") {
             return aVal! > bVal! ? -1 : 1;
           } else {
             return aVal! < bVal! ? -1 : 1;
@@ -94,13 +98,13 @@ export class DealsService extends BaseService {
       );
 
       const result = this.formatResponse(paginated.data, {
-        pagination: paginated.pagination
+        pagination: paginated.pagination,
       });
 
       this.setCache(cacheKey, result);
       return result;
     } catch (error) {
-      this.handleError(error, 'getDeals');
+      this.handleError(error, "getDeals");
     }
   }
 
@@ -113,7 +117,7 @@ export class DealsService extends BaseService {
     if (cached) return cached;
 
     try {
-      this.log('getDealById', { id });
+      this.log("getDealById", { id });
       await this.delay();
 
       const deal = await this.dataClient.getDealById(id);
@@ -121,16 +125,24 @@ export class DealsService extends BaseService {
 
       // Get related data
       const [company, commitments] = await Promise.all([
-        deal.company_id ? this.dataClient.getCompanyById(deal.company_id) : null,
-        this.dataClient.getCommitmentsByDealId(id)
+        deal.company_id
+          ? this.dataClient.getCompanyById(deal.company_id)
+          : null,
+        this.dataClient.getCommitmentsByDealId(id),
       ]);
 
       // Calculate aggregates
-      const signedCommitments = commitments.filter(c => c.status === 'signed');
-      const totalCommitted = signedCommitments.reduce((sum, c) => sum + c.amount, 0);
-      const investorCount = new Set(signedCommitments.map(c => c.investor_id)).size;
-      const percentageRaised = deal.target_raise 
-        ? (totalCommitted / deal.target_raise) * 100 
+      const signedCommitments = commitments.filter(
+        (c) => c.status === "signed"
+      );
+      const totalCommitted = signedCommitments.reduce(
+        (sum, c) => sum + c.amount,
+        0
+      );
+      const investorCount = new Set(signedCommitments.map((c) => c.investor_id))
+        .size;
+      const percentageRaised = deal.target_raise
+        ? (totalCommitted / deal.target_raise) * 100
         : 0;
 
       const dealDetails: DealDetails = {
@@ -139,13 +151,13 @@ export class DealsService extends BaseService {
         commitments,
         totalCommitted,
         investorCount,
-        percentageRaised
+        percentageRaised,
       };
 
       this.setCache(cacheKey, dealDetails);
       return dealDetails;
     } catch (error) {
-      this.handleError(error, 'getDealById');
+      this.handleError(error, "getDealById");
     }
   }
 
@@ -158,7 +170,7 @@ export class DealsService extends BaseService {
     if (cached) return cached;
 
     try {
-      this.log('getDealBySlug', { slug });
+      this.log("getDealBySlug", { slug });
       await this.delay();
 
       const deal = await this.dataClient.getDealBySlug(slug);
@@ -166,11 +178,11 @@ export class DealsService extends BaseService {
 
       // Get full details using getDealById
       const dealDetails = await this.getDealById(deal.id);
-      
+
       this.setCache(cacheKey, dealDetails);
       return dealDetails;
     } catch (error) {
-      this.handleError(error, 'getDealBySlug');
+      this.handleError(error, "getDealBySlug");
     }
   }
 
@@ -183,24 +195,24 @@ export class DealsService extends BaseService {
     if (cached) return cached;
 
     try {
-      this.log('getDealsByInvestor', { investorId });
+      this.log("getDealsByInvestor", { investorId });
       await this.delay();
 
       // Get investor's commitments
       const commitments = await this.dataClient.getCommitments(investorId);
-      const dealIds = [...new Set(commitments.map(c => c.deal_id))];
+      const dealIds = [...new Set(commitments.map((c) => c.deal_id))];
 
       // Get deals
       const deals = await Promise.all(
-        dealIds.map(id => this.getDealById(id))
+        dealIds.map((id) => this.getDealById(id))
       );
 
-      const validDeals = deals.filter(d => d !== null) as DealDetails[];
+      const validDeals = deals.filter((d) => d !== null) as DealDetails[];
 
       this.setCache(cacheKey, validDeals);
       return this.formatResponse(validDeals);
     } catch (error) {
-      this.handleError(error, 'getDealsByInvestor');
+      this.handleError(error, "getDealsByInvestor");
     }
   }
 
@@ -209,10 +221,10 @@ export class DealsService extends BaseService {
    */
   async getActiveDeals() {
     return this.getDeals({
-      stage: 'active',
-      sortBy: 'opening_date',
-      sortOrder: 'desc',
-      limit: 6
+      stage: "active",
+      sortBy: "opening_date",
+      sortOrder: "desc",
+      limit: 6,
     });
   }
 
@@ -222,14 +234,14 @@ export class DealsService extends BaseService {
   async getFeaturedDeals() {
     const result = await this.getDeals({
       limit: 3,
-      sortBy: 'current_raise',
-      sortOrder: 'desc'
+      sortBy: "current_raise",
+      sortOrder: "desc",
     });
 
     // Filter to only show deals in active or closing stage
-    if (result && 'data' in result && Array.isArray(result.data)) {
-      result.data = result.data.filter((d: any) => 
-        d.stage === 'active' || d.stage === 'closing'
+    if (result && "data" in result && Array.isArray(result.data)) {
+      result.data = result.data.filter(
+        (d: any) => d.stage === "active" || d.stage === "closing"
       );
     }
 
@@ -245,8 +257,8 @@ export class DealsService extends BaseService {
     if (cached) return cached;
 
     try {
-      this.log('getDealMetrics', { dealId });
-      
+      this.log("getDealMetrics", { dealId });
+
       const deal = await this.getDealById(dealId);
       if (!deal) return null;
 
@@ -261,14 +273,14 @@ export class DealsService extends BaseService {
         percentageRaised: deal.percentageRaised || 0,
         daysRemaining: this.calculateDaysRemaining(deal.closing_date),
         minimumInvestment: deal.minimum_investment || 0,
-        currency: deal.currency
+        currency: deal.currency,
       };
 
       const result = this.formatResponse(metrics);
       this.setCache(cacheKey, result);
       return result;
     } catch (error) {
-      this.handleError(error, 'getDealMetrics');
+      this.handleError(error, "getDealMetrics");
     }
   }
 
@@ -278,7 +290,7 @@ export class DealsService extends BaseService {
   async searchDeals(query: string) {
     return this.getDeals({
       search: query,
-      limit: 20
+      limit: 20,
     });
   }
 
@@ -298,44 +310,54 @@ export class DealsService extends BaseService {
     fee_structure_type?: string;
   }) {
     try {
-      this.log('createDeal', input);
-      
-      // Create the deal
+      this.log("createDeal", input);
+
+      // Create the deal via data layer (no mocks)
       const deal = await this.dataClient.createDeal({
-        ...input,
+        name: input.name,
+        company_id: input.company_id ?? null,
+        stage: input.stage,
+        type: input.type,
+        currency: input.currency,
+        opening_date: input.opening_date ?? null,
+        closing_date: input.closing_date ?? null,
+        target_raise: input.target_raise ?? null,
+        current_raise: 0,
+        minimum_investment: input.minimum_investment ?? null,
         slug: this.generateSlug(input.name),
-        current_raise: 0
       });
-      
+
       // Attach fee equation based on deal type
-      const equationName = input.fee_structure_type || this.getDefaultEquationType(input.type);
-      const templates = dealEquationExecutor.constructor.getEquationTemplates();
-      const template = templates[equationName] || templates['STANDARD_PRIMARY_V1'];
-      
+      const equationName =
+        input.fee_structure_type || this.getDefaultEquationType(input.type);
+      const templates = DealEquationExecutor.getEquationTemplates();
+      const template =
+        templates[equationName] || templates["STANDARD_PRIMARY_V1"];
+
       const equation: DealEquation = {
         deal_id: deal.id,
         equation_name: equationName,
         rules: template.rules || {},
         metadata: {
-          party_type: 'investor',
-          effective_date: new Date()
-        }
+          party_type: "investor",
+          effective_date: new Date(),
+        },
       };
-      
+
       // Save equation configuration
       await dealEquationExecutor.saveEquation(equation);
-      
-      this.log('Deal created with equation', {
+
+      this.log("Deal created with equation", {
         deal_id: deal.id,
-        equation: equationName
+        equation: equationName,
       });
-      
+
       // Clear cache
       this.clearCache();
-      
+
       return deal;
     } catch (error) {
-      this.handleError(error, 'createDeal');
+      this.handleError(error, "createDeal");
     }
   }
 
@@ -344,33 +366,33 @@ export class DealsService extends BaseService {
    */
   async updateDealEquation(dealId: number, equationType: string) {
     try {
-      const templates = dealEquationExecutor.constructor.getEquationTemplates();
+      const templates = DealEquationExecutor.getEquationTemplates();
       const template = templates[equationType];
-      
+
       if (!template) {
         throw new Error(`Unknown equation type: ${equationType}`);
       }
-      
+
       const equation: DealEquation = {
         deal_id: dealId,
         equation_name: equationType,
         rules: template.rules || {},
         metadata: {
-          party_type: 'investor',
-          effective_date: new Date()
-        }
+          party_type: "investor",
+          effective_date: new Date(),
+        },
       };
-      
+
       await dealEquationExecutor.saveEquation(equation);
-      
-      this.log('Deal equation updated', {
+
+      this.log("Deal equation updated", {
         deal_id: dealId,
-        equation: equationType
+        equation: equationType,
       });
-      
+
       return equation;
     } catch (error) {
-      this.handleError(error, 'updateDealEquation');
+      this.handleError(error, "updateDealEquation");
     }
   }
 
@@ -379,14 +401,13 @@ export class DealsService extends BaseService {
    */
   private getDefaultEquationType(dealType: DealType): string {
     const mapping: Record<DealType, string> = {
-      'primary': 'STANDARD_PRIMARY_V1',
-      'secondary': 'SECONDARY_MARKET_V1',
-      'advisory': 'ADVISORY_V1',
-      'fund': 'CARRY_FUND_V1',
-      'co-invest': 'STANDARD_PRIMARY_V1'
+      primary: "STANDARD_PRIMARY_V1",
+      secondary: "SECONDARY_MARKET_V1",
+      direct: "STANDARD_PRIMARY_V1",
+      fund: "CARRY_FUND_V1",
     };
-    
-    return mapping[dealType] || 'STANDARD_PRIMARY_V1';
+
+    return mapping[dealType] || "STANDARD_PRIMARY_V1";
   }
 
   /**
@@ -395,8 +416,8 @@ export class DealsService extends BaseService {
   private generateSlug(name: string): string {
     return name
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
   }
 
   /**
@@ -404,13 +425,13 @@ export class DealsService extends BaseService {
    */
   private calculateDaysRemaining(closingDate: string | null): number | null {
     if (!closingDate) return null;
-    
+
     const closing = new Date(closingDate);
     const now = new Date();
     const diff = closing.getTime() - now.getTime();
-    
+
     if (diff < 0) return 0;
-    
+
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
 }

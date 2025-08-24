@@ -4,6 +4,8 @@
  * No MCP overhead - maximum performance for feature shipping
  */
 
+import 'server-only';
+
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { SchemaConfig } from "../schema-manager/config";
 

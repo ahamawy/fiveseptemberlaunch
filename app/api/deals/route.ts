@@ -114,6 +114,9 @@ export async function GET(request: NextRequest) {
 
     const enriched = mapped.map((m: any) => ({
       ...m,
+      // Flatten valuation to top level for backwards compatibility
+      moic: m.valuation?.moic ?? 1.0,
+      irr: m.valuation?.irr ?? null,
       company_name: m.company_id
         ? companyIdToName.get(m.company_id) || null
         : null,

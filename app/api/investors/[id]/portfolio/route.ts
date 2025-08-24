@@ -1,50 +1,66 @@
 import { NextRequest, NextResponse } from "next/server";
 import { investorsRepo } from "@/lib/db/repos/investors.repo";
+import { apiSuccess, apiError } from "@/lib/utils/api-response";
+import { PortfolioDataSchema } from "@/lib/contracts/api/portfolio";
+import * as crypto from "crypto";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const startTime = Date.now();
+  const correlationId = crypto.randomUUID();
+
   try {
+    // Basic request context
     const investorId = parseInt(params.id);
+    if (isNaN(investorId)) {
+      return apiError(
+        new Error("Invalid investor ID"),
+        400,
+        "Invalid investor ID format"
+      );
+    }
 
+    // Fetch typed portfolio data (already aligned to contract)
     const portfolio = await investorsRepo.getPortfolio(investorId);
-    // Generate historical performance (still mocked based on NAV)
-    const historicalPerformance = generateHistoricalPerformance(
-      portfolio.summary.totalValue
-    );
-    return NextResponse.json({ ...portfolio, historicalPerformance });
-  } catch (error) {
-    console.error("Error fetching portfolio data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch portfolio data" },
-      { status: 500 }
-    );
-  }
-}
 
-function generateHistoricalPerformance(currentValue: number) {
-  // Generate 12 months of historical data
-  const months = 12;
-  const data = [];
-  const baseValue = currentValue * 0.85; // Start at 85% of current value
+    // Validate response data with Zod
+    const validatedData = PortfolioDataSchema.parse(portfolio);
 
-  for (let i = 0; i < months; i++) {
-    const date = new Date();
-    date.setMonth(date.getMonth() - (months - i - 1));
+    // Calculate response time
+    const responseTime = Date.now() - startTime;
 
-    const progress = i / (months - 1);
-    const value = baseValue + (currentValue - baseValue) * progress;
-    const moic = value / baseValue;
-    const irr = 10 + progress * 7; // IRR from 10% to 17%
-
-    data.push({
-      date: date.toISOString().split("T")[0],
-      nav: Math.round(value),
-      irr: Math.round(irr * 10) / 10,
-      moic: Math.round(moic * 100) / 100,
+    // Create successful response with metadata
+    const response = apiSuccess(validatedData, {
+      correlationId,
+      responseTime,
+      dealsCount: validatedData.deals?.length || 0,
     });
-  }
 
-  return data;
+    // Add cache headers for performance
+    response.headers.set(
+      "Cache-Control",
+      "s-maxage=60, stale-while-revalidate=300"
+    );
+    response.headers.set("X-Correlation-Id", correlationId);
+
+    return response;
+  } catch (error) {
+    console.error(`[Portfolio API] Error for investor ${params.id}`, {
+      error,
+      correlationId,
+      duration: Date.now() - startTime,
+    });
+
+    // Handle Zod validation errors specifically
+    if (error instanceof Error && error.name === "ZodError") {
+      const details = (error as any).errors
+        ? JSON.stringify((error as any).errors)
+        : "Portfolio data validation failed";
+      return apiError(error, 500, details);
+    }
+
+    return apiError(error, 500, "Failed to fetch portfolio data");
+  }
 }

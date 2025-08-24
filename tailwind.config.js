@@ -101,6 +101,14 @@ module.exports = {
           disabled: 'rgba(var(--surface-border) / var(--surface-disabled-opacity))',
         },
         
+        // Glass colors for glass morphism effects
+        glass: {
+          light: 'rgba(255, 255, 255, 0.08)',
+          medium: 'rgba(255, 255, 255, 0.12)',
+          dark: 'rgba(0, 0, 0, 0.4)',
+          border: 'rgba(255, 255, 255, 0.1)',
+        },
+        
         // Keep static brand colors for reference
         'equitie-purple': '#C898FF',
         'equitie-purple-dark': '#8F4AD2',
@@ -123,12 +131,52 @@ module.exports = {
         ...shadows.glow,
         ...shadows.glass,
         ...shadows.component,
+        'elevated': '0 10px 40px rgba(0, 0, 0, 0.3)',
+        'glow': '0 0 32px rgba(200, 152, 255, 0.35)',
+        'glow-primary': '0 0 24px rgba(200, 152, 255, 0.4)',
+        'glow-subtle': '0 0 16px rgba(200, 152, 255, 0.2)',
       },
       
       textShadow: shadows.text,
       
-      animation: animations.animation,
-      keyframes: animations.keyframes,
+      animation: {
+        ...animations.animation,
+        'gradient': 'gradient 8s ease infinite',
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'shimmer': 'shimmer 2s linear infinite',
+        'fade-in': 'fadeIn 0.5s ease-in',
+        'slide-up': 'slideUp 0.5s ease-out',
+      },
+      keyframes: {
+        ...animations.keyframes,
+        gradient: {
+          '0%, 100%': {
+            'background-size': '200% 200%',
+            'background-position': 'left center'
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'right center'
+          },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        shimmer: {
+          '0%': { 'background-position': '-200% 0' },
+          '100%': { 'background-position': '200% 0' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+      },
       transitionTimingFunction: animations.easing,
       transitionDuration: animations.duration,
       
@@ -139,6 +187,7 @@ module.exports = {
         'gradient-hero-radial': 'radial-gradient(circle at 30% 30%, #C898FF 0%, #66D0FF 50%, #040210 100%)',
         'gradient-sunset': 'linear-gradient(135deg, #FF9A62 0%, #FF62E3 50%, #C898FF 100%)',
         'gradient-ocean': 'linear-gradient(135deg, #0B5B7D 0%, #66D0FF 50%, #62FF7F 100%)',
+        'gradient-radial': 'radial-gradient(1000px 600px at 20% -10%, rgba(200,152,255,0.25), transparent)',
         
         // Background mesh gradient
         'gradient-mesh': `
@@ -154,6 +203,15 @@ module.exports = {
         'glass-medium': 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)',
         'glass-purple': 'linear-gradient(135deg, rgba(200, 152, 255, 0.15) 0%, rgba(200, 152, 255, 0.05) 100%)',
       },
+      
+      backgroundColor: theme => ({
+        ...theme('colors'),
+        'surface': 'rgb(var(--bg-surface) / <alpha-value>)',
+        'surface-elevated': 'rgb(var(--bg-elevated) / <alpha-value>)',
+        'glass-light': 'rgba(255, 255, 255, 0.08)',
+        'glass-medium': 'rgba(255, 255, 255, 0.12)',
+        'glass-dark': 'rgba(0, 0, 0, 0.4)',
+      }),
       
       backdropBlur: {
         xs: '2px',

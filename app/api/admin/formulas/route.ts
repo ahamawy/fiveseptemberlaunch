@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching formula templates:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to fetch formula templates' },
       { status: 500 }
     );
   }
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating formula template:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to create formula template' },
       { status: 500 }
     );
   }

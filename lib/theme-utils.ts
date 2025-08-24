@@ -6,57 +6,47 @@ import { typography } from '@/BRANDING/tokens/typography';
 import { spacing } from '@/BRANDING/tokens/spacing';
 
 /**
- * Get a color value from the token system
+ * Generic token value getter - eliminates duplication
  */
-export function getColor(path: string): string {
+function getTokenValue<T>(
+  tokenObject: any,
+  path: string,
+  tokenType: string,
+  fallback: T
+): T {
   const keys = path.split('.');
-  let current: any = colors;
+  let current: any = tokenObject;
   
   for (const key of keys) {
     if (current[key] === undefined) {
-      console.warn(`Color not found: ${path}`);
-      return '#000000';
+      console.warn(`${tokenType} not found: ${path}`);
+      return fallback;
     }
     current = current[key];
   }
   
-  return current;
+  return current as T;
+}
+
+/**
+ * Get a color value from the token system
+ */
+export function getColor(path: string): string {
+  return getTokenValue(colors, path, 'Color', '#000000');
 }
 
 /**
  * Get a gradient value from the token system
  */
 export function getGradient(path: string): string {
-  const keys = path.split('.');
-  let current: any = gradients;
-  
-  for (const key of keys) {
-    if (current[key] === undefined) {
-      console.warn(`Gradient not found: ${path}`);
-      return 'linear-gradient(135deg, #000, #fff)';
-    }
-    current = current[key];
-  }
-  
-  return current;
+  return getTokenValue(gradients, path, 'Gradient', 'linear-gradient(135deg, #000, #fff)');
 }
 
 /**
  * Get a shadow value from the token system
  */
 export function getShadow(path: string): string {
-  const keys = path.split('.');
-  let current: any = shadows;
-  
-  for (const key of keys) {
-    if (current[key] === undefined) {
-      console.warn(`Shadow not found: ${path}`);
-      return 'none';
-    }
-    current = current[key];
-  }
-  
-  return current;
+  return getTokenValue(shadows, path, 'Shadow', 'none');
 }
 
 /**

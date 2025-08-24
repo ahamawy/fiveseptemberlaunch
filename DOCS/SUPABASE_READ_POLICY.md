@@ -27,7 +27,7 @@ References
 
 - `DOCS/SUPABASE_SCHEMA.md` — dot-named table notes and examples
 - `DOCS/API.md` — endpoints and cross-schema patterns
- 
+
 External assets & CI
 
 - Storage images are served via Supabase Storage and may be blocked in CI (ORB). Do not couple tests to successful image network loads.

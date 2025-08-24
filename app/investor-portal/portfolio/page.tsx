@@ -18,6 +18,7 @@ interface DealPerformance {
   dealId: number;
   dealName: string;
   companyName: string;
+  companyLogoUrl?: string;
   sector: string;
   dealType: string;
   committed: number;
@@ -29,6 +30,9 @@ interface DealPerformance {
   status: "active" | "exited" | "written_off";
   currency: string;
   stage: string;
+  documentsCount?: number;
+  investorsCount?: number;
+  valuationCount?: number;
 }
 
 interface PortfolioData {
@@ -85,7 +89,10 @@ export default function PortfolioPage() {
       const investorId = resolveInvestorId();
       const response = await fetch(`/api/investors/${investorId}/portfolio`);
       if (!response.ok) throw new Error("Failed to load portfolio");
-      const portfolioData = await response.json();
+      const responseData = await response.json();
+
+      // Handle both old and new API response formats for backward compatibility
+      const portfolioData = responseData.data || responseData;
       setData(portfolioData);
     } catch (error) {
       console.error("Error fetching portfolio data:", error);
@@ -213,7 +220,10 @@ export default function PortfolioPage() {
                   <dt className="text-sm font-medium text-text-secondary">
                     Total Portfolio Value
                   </dt>
-                  <dd className="mt-3 text-3xl font-extrabold text-text-primary tracking-tight">
+                  <dd
+                    className="mt-3 text-3xl font-extrabold text-text-primary tracking-tight"
+                    data-testid="portfolio-total-value"
+                  >
                     {formatCurrency(data.summary.totalValue)}
                   </dd>
                 </CardContent>
@@ -297,7 +307,7 @@ export default function PortfolioPage() {
 
           {/* Allocation Charts */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <Card variant="glass">
+            <Card variant="glass" data-testid="portfolio-allocation-by-sector">
               <CardHeader>
                 <CardTitle gradient>Allocation by Sector</CardTitle>
               </CardHeader>
@@ -383,7 +393,7 @@ export default function PortfolioPage() {
               </CardContent>
             </Card>
 
-            <Card variant="glass">
+            <Card variant="glass" data-testid="portfolio-allocation-by-type">
               <CardHeader>
                 <CardTitle gradient>Allocation by Type</CardTitle>
               </CardHeader>
@@ -426,7 +436,10 @@ export default function PortfolioPage() {
             </CardHeader>
             <CardContent>
               {selectedView === "table" ? (
-                <div className="overflow-x-auto">
+                <div
+                  className="overflow-x-auto"
+                  data-testid="portfolio-deals-table"
+                >
                   <table className="min-w-full">
                     <thead>
                       <tr className="border-b border-surface-border">
@@ -469,17 +482,38 @@ export default function PortfolioPage() {
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-primary">
                             <a
-                              href={`/investor-portal/deals/${deal.dealId}?investor=${resolveInvestorId()}`}
+                              href={`/investor-portal/deals/${
+                                deal.dealId
+                              }?investor=${resolveInvestorId()}`}
                               className="hover:text-primary-300 transition-colors inline-flex items-center gap-2"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              {"companyLogoUrl" in deal && deal.companyLogoUrl ? (
+                              {deal.companyLogoUrl ? (
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={(deal as any).companyLogoUrl} alt="logo" className="w-5 h-5 rounded object-cover border border-surface-border" />
+                                <img
+                                  src={deal.companyLogoUrl}
+                                  alt="logo"
+                                  className="w-5 h-5 rounded object-cover border border-surface-border"
+                                />
                               ) : (
                                 <span className="w-5 h-5 rounded bg-surface-elevated border border-surface-border inline-block" />
                               )}
                               {deal.dealName}
+                              {/* Quick info badges */}
+                              <div className="flex gap-1">
+                                {deal.investorsCount &&
+                                  deal.investorsCount > 5 && (
+                                    <span className="px-1.5 py-0.5 text-[10px] bg-primary-300/20 text-primary-300 rounded">
+                                      {deal.investorsCount} investors
+                                    </span>
+                                  )}
+                                {deal.documentsCount &&
+                                  deal.documentsCount > 0 && (
+                                    <span className="px-1.5 py-0.5 text-[10px] bg-info-500/20 text-info-400 rounded">
+                                      {deal.documentsCount} docs
+                                    </span>
+                                  )}
+                              </div>
                             </a>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
@@ -532,16 +566,40 @@ export default function PortfolioPage() {
                       }
                     >
                       <CardContent>
-                        <div className="mb-3 flex items-center gap-2">
-                          {"companyLogoUrl" in deal && deal.companyLogoUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={(deal as any).companyLogoUrl} alt="logo" className="w-6 h-6 rounded object-cover border border-surface-border" />
-                          ) : (
-                            <span className="w-6 h-6 rounded bg-surface-elevated border border-surface-border inline-block" />
-                          )}
-                          <h4 className="text-sm font-semibold text-text-primary hover:text-primary-300 transition-colors">
-                            {deal.dealName}
-                          </h4>
+                        <div className="mb-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            {deal.companyLogoUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={deal.companyLogoUrl}
+                                alt="logo"
+                                className="w-6 h-6 rounded object-cover border border-surface-border"
+                              />
+                            ) : (
+                              <span className="w-6 h-6 rounded bg-surface-elevated border border-surface-border inline-block" />
+                            )}
+                            <h4 className="text-sm font-semibold text-text-primary hover:text-primary-300 transition-colors flex-1">
+                              {deal.dealName}
+                            </h4>
+                          </div>
+                          {/* Info badges */}
+                          <div className="flex gap-1 flex-wrap">
+                            {deal.investorsCount && deal.investorsCount > 1 && (
+                              <span className="px-1.5 py-0.5 text-[10px] bg-primary-300/20 text-primary-300 rounded">
+                                {deal.investorsCount} investors
+                              </span>
+                            )}
+                            {deal.documentsCount && deal.documentsCount > 0 && (
+                              <span className="px-1.5 py-0.5 text-[10px] bg-info-500/20 text-info-400 rounded">
+                                {deal.documentsCount} docs
+                              </span>
+                            )}
+                            {deal.valuationCount && deal.valuationCount > 0 && (
+                              <span className="px-1.5 py-0.5 text-[10px] bg-success-500/20 text-success-400 rounded">
+                                {deal.valuationCount} valuations
+                              </span>
+                            )}
+                          </div>
                           <p className="text-xs text-text-secondary">
                             {deal.companyName}
                             <span className="ml-2 px-2 py-0.5 rounded-full border border-white/10 text-[10px] uppercase tracking-wide text-white/70">

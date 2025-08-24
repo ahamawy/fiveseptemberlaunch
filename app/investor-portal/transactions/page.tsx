@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -51,7 +51,7 @@ interface TransactionsData {
   };
 }
 
-export default function TransactionsPage() {
+function TransactionsContent() {
   const [data, setData] = useState<TransactionsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<string>("");
@@ -72,17 +72,10 @@ export default function TransactionsPage() {
       if (filterType) params.append("type", filterType);
       if (filterStatus) params.append("status", filterStatus);
       params.append("page", currentPage.toString());
-      params.append("limit", "10");
+      params.append("limit", "20");
 
-      const investorId =
-        investorParam ||
-        (typeof window !== "undefined"
-          ? localStorage.getItem("equitie-current-investor-id")
-          : null) ||
-        "1";
-      const response = await fetch(
-        `/api/investors/${investorId}/transactions?${params.toString()}`
-      );
+      // Use general transactions API which has the actual data (301 transactions)
+      const response = await fetch(`/api/transactions?${params.toString()}`);
       const result = await response.json();
 
       // Transform the API response to the expected structure
@@ -134,7 +127,7 @@ export default function TransactionsPage() {
 
       setData(transactionsData);
     } catch (error) {
-      console.error("Error fetching transactions data:", error);
+      // Error is handled by setting loading state
     } finally {
       setLoading(false);
     }
@@ -551,5 +544,19 @@ export default function TransactionsPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function TransactionsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-64 text-text-secondary">
+          Loading transactions…
+        </div>
+      }
+    >
+      <TransactionsContent />
+    </Suspense>
   );
 }

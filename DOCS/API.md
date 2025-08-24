@@ -14,8 +14,8 @@
 | POST   | `/api/deals/[id]/calculate`        | Execute calculation and store audit    | `{ investorId?, transactionId? }` → `{ success, data, auditId }` |
 | GET    | `/api/deals/[id]/calculate`        | Calculation history for a deal         | `{ success, data: Audit[] }`                                     |
 | GET    | `/api/investors/[id]`              | Get investor profile (id or public_id) | `{ data: Investor }`                                             |
-| GET    | `/api/investors/[id]/dashboard`    | Dashboard metrics                      | `{ success, data: DashboardSummary }`                             |
-| GET    | `/api/investors/[id]/portfolio`    | Portfolio holdings                     | `{ success, data: PortfolioResponse }`                            |
+| GET    | `/api/investors/[id]/dashboard`    | Dashboard metrics                      | `{ success, data: DashboardSummary }`                            |
+| GET    | `/api/investors/[id]/portfolio`    | Portfolio holdings                     | `{ success, data: PortfolioResponse }`                           |
 | GET    | `/api/investors/[id]/transactions` | Transaction history                    | `{ success, data: Transaction[] }`                               |
 | GET    | `/api/investors/[id]/commitments`  | Commitments                            | `{ ... }`                                                        |
 | GET    | `/api/transactions`                | All transactions                       | `{ data: Transaction[] }`                                        |

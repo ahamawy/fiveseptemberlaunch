@@ -20,9 +20,9 @@ result = engine.calculate_for_investor(
     investor_name="API User",
     gross_capital=gross_capital,
     unit_price=unit_price,
-    structuring_discount_percent=Decimal('50'),
+    structuring_discount_percent=Decimal('150'),
     management_discount_percent=Decimal('0'),
-    admin_discount_percent=Decimal('100')
+    admin_discount_percent=Decimal('0')
 )
 
 output = {

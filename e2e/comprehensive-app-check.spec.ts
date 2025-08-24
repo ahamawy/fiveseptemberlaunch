@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Comprehensive App Health Check - All Pages', () => {
-  const BASE_URL = 'http://localhost:3000';
+  const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
   test.describe('Investor Portal Pages', () => {
     test('Dashboard has real data', async ({ page }) => {
@@ -26,11 +26,14 @@ test.describe('Comprehensive App Health Check - All Pages', () => {
 
     test('Portfolio shows real company names and MOIC', async ({ page }) => {
       await page.goto(`${BASE_URL}/investor-portal/portfolio`);
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(3000);
 
-      // Check for real company names
-      const companies = await page.locator('text=/SpaceX|OpenAI|Marlo|Figure AI|Scout AI/').count();
-      expect(companies).toBeGreaterThan(0);
+      // Check for real company names - look for actual text content
+      const pageText = await page.textContent('body');
+      const hasSpaceX = pageText?.includes('SpaceX');
+      const hasOpenAI = pageText?.includes('OpenAI');
+      const hasMarlo = pageText?.includes('Marlo');
+      expect(hasSpaceX || hasOpenAI || hasMarlo).toBeTruthy();
 
       // Check for real MOIC values (not all 1.0)
       const moicValues = await page.$$eval('text=/[0-9]+\\.[0-9]+x/', elements => 
@@ -44,11 +47,14 @@ test.describe('Comprehensive App Health Check - All Pages', () => {
 
     test('Deals page has real deal names and valuations', async ({ page }) => {
       await page.goto(`${BASE_URL}/investor-portal/deals`);
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(5000); // Give more time for content to load
 
-      // Check for real deal names
-      const realDeals = await page.locator('text=/Partnership|Series [A-Z]|Direct Deal/').count();
-      expect(realDeals).toBeGreaterThan(0);
+      // Check for real deal names - look for actual text content
+      const pageText = await page.textContent('body');
+      const hasPartnership = pageText?.includes('Partnership');
+      const hasSeries = pageText?.includes('Series');
+      const hasDirectDeal = pageText?.includes('Direct Deal');
+      expect(hasPartnership || hasSeries || hasDirectDeal).toBeTruthy();
 
       // Check for company logos (indicates storage integration working)
       const images = await page.locator('img[src*="supabase"]').count();

@@ -5,19 +5,24 @@
 
 import { BaseService } from "./base.service";
 import type {
+  Commitment as EntityCommitment,
+  InvestorUnit,
+  PortfolioHolding,
+} from "../types";
+import type {
   Investor,
   DashboardData,
   PortfolioData,
-  Commitment,
   Transaction,
-  InvestorType,
+  Deal,
+  Company,
+  Commitment as DbCommitment,
 } from "../db/types";
 
+type InvestorType = "individual" | "institutional" | "family_office" | "fund";
+
 export interface InvestorProfile extends Investor {
-  totalCommitted?: number;
-  totalCalled?: number;
   activeDeals?: number;
-  portfolioValue?: number;
 }
 
 export interface InvestorListOptions {
@@ -91,10 +96,7 @@ export class InvestorsService extends BaseService {
 
       const profile: InvestorProfile = {
         ...investor,
-        totalCommitted,
-        totalCalled,
         activeDeals: signedCommitments.length,
-        portfolioValue: totalCommitted * 1.25, // Mock 25% appreciation
       };
 
       this.setCache(cacheKey, profile);
@@ -118,7 +120,7 @@ export class InvestorsService extends BaseService {
       this.log("getInvestorByPublicId", { publicId });
       await this.delay();
 
-      const adapter: any = this.dataClient as any;
+      const adapter = this.dataClient;
       const investor = await adapter.getInvestorByPublicId(publicId);
       if (!investor) return null;
 
@@ -142,10 +144,7 @@ export class InvestorsService extends BaseService {
 
       const profile: InvestorProfile = {
         ...investor,
-        totalCommitted,
-        totalCalled,
         activeDeals: signedCommitments.length,
-        portfolioValue: totalCommitted * 1.25,
       };
 
       this.setCache(cacheKey, profile);
@@ -275,7 +274,7 @@ export class InvestorsService extends BaseService {
   /**
    * Get investor commitments
    */
-  async getCommitments(investorId?: number): Promise<Commitment[]> {
+  async getCommitments(investorId?: number): Promise<DbCommitment[]> {
     try {
       // Use provided ID or get current investor
       let id = investorId;
@@ -286,7 +285,7 @@ export class InvestorsService extends BaseService {
       }
 
       const cacheKey = `commitments:${id}`;
-      const cached = this.getCached<Commitment[]>(cacheKey);
+      const cached = this.getCached<DbCommitment[]>(cacheKey);
       if (cached) return cached;
 
       this.log("getCommitments", { investorId: id });
@@ -413,7 +412,11 @@ export class InvestorsService extends BaseService {
       const units = await adapter.getInvestorUnits(id);
 
       // Get deals to enrich the data
-      const dealIds = [...new Set(units.map((u: any) => u.deal_id))];
+      const dealIds: number[] = Array.from(
+        new Set<number>(
+          units.map((u: InvestorUnit & { deal_id: number }) => u.deal_id)
+        )
+      );
       const deals = await Promise.all(
         dealIds.map((dealId) => this.dataClient.getDealById(dealId))
       );
@@ -422,15 +425,16 @@ export class InvestorsService extends BaseService {
       const companyIds = [
         ...new Set(
           deals
-            .filter((d: any) => d && d.company_id)
-            .map((d: any) => d.company_id)
+            .filter((d): d is Deal => d !== null)
+            .filter((d) => !!d.company_id)
+            .map((d) => d.company_id as number)
         ),
       ];
       const companies = await Promise.all(
         companyIds.map((cid: number) => this.dataClient.getCompanyById(cid))
       );
       const companyMap: Record<number, any> = {};
-      companies.forEach((c: any) => {
+      companies.forEach((c) => {
         if (c?.id) companyMap[c.id] = c;
       });
 
@@ -503,7 +507,7 @@ export class InvestorsService extends BaseService {
     if (cached) return cached;
 
     try {
-      const holdings = await this.getPortfolioHoldings(investorId);
+      const holdings = (await this.getPortfolioHoldings(investorId)) as any;
       if (!holdings?.data) return this.formatResponse([]);
 
       // Transform holdings to commitments format

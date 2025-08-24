@@ -1,13 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { investorsService } from "@/lib/services";
 import { getServiceClient } from "@/lib/db/supabase/server-client";
+import { apiSuccess, apiError, apiPaginated } from "@/lib/utils/api-response";
+import { TransactionSchema, Transaction } from "@/lib/contracts/api/transactions";
+import * as crypto from "crypto";
+import { z } from "zod";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const startTime = Date.now();
+  const correlationId = crypto.randomUUID();
+  
   try {
+    // Log request for debugging
+    console.log(`[Transactions API] Request for investor ${params.id}`, { correlationId });
+    
     const investorId = parseInt(params.id);
+    if (isNaN(investorId)) {
+      return apiError(new Error("Invalid investor ID"), 400, "Invalid investor ID format");
+    }
 
     // Get query parameters for filtering and pagination
     const searchParams = request.nextUrl.searchParams;
@@ -119,16 +132,55 @@ export async function GET(
       };
     });
 
-    const out = Array.isArray((result as any)?.data)
-      ? { ...(result as any), data: enriched }
-      : enriched;
-
-    return NextResponse.json(out);
+    // Validate each transaction with schema
+    const validatedTransactions = enriched.map(t => {
+      try {
+        return TransactionSchema.parse(t);
+      } catch (e) {
+        // Log validation error but continue with original data
+        console.warn(`[Transactions API] Validation warning for transaction ${t.id}:`, e);
+        return t;
+      }
+    });
+    
+    // Calculate response time
+    const responseTime = Date.now() - startTime;
+    
+    // Check if result has pagination info
+    const hasPagination = typeof (result as any)?.total === 'number';
+    
+    // Create response based on whether we have pagination data
+    let response;
+    if (hasPagination) {
+      const total = (result as any).total || enriched.length;
+      response = apiPaginated(validatedTransactions, page, limit, total);
+    } else {
+      response = apiSuccess(validatedTransactions, {
+        correlationId,
+        responseTime,
+        count: validatedTransactions.length,
+        page,
+        limit,
+      });
+    }
+    
+    // Add cache headers for performance
+    response.headers.set('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
+    response.headers.set('X-Correlation-Id', correlationId);
+    
+    return response;
   } catch (error) {
-    console.error("Error fetching transactions data:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error(`[Transactions API] Error for investor ${params.id}`, {
+      error,
+      correlationId,
+      duration: Date.now() - startTime,
+    });
+    
+    // Handle Zod validation errors specifically
+    if (error instanceof Error && error.name === 'ZodError') {
+      return apiError(error, 500, "Transaction data validation failed");
+    }
+    
+    return apiError(error, 500, "Failed to fetch transactions");
   }
 }

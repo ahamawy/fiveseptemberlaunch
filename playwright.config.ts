@@ -12,7 +12,7 @@ export default defineConfig({
     ['json', { outputFile: 'test-results/results.json' }]
   ],
   use: {
-    baseURL: 'http://localhost:3001',
+    baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -25,7 +25,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'npm run dev',
-    port: 3001,
+    port: 3000,
     reuseExistingServer: true,
     timeout: 120 * 1000,
     stdout: 'pipe',

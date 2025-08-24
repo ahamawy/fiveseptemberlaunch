@@ -5,7 +5,10 @@
  */
 
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createLogger } from "@/lib/utils/improved-logger";
 import type { IDataClient } from "./client";
+
+const logger = createLogger("SupabaseAdapter");
 import type {
   Deal,
   Investor,
@@ -20,6 +23,78 @@ import type {
   PortfolioData,
   Database,
 } from "./types";
+
+// Database types for raw Supabase data
+interface DbInvestorUnit {
+  id: number;
+  investor_id: number;
+  deal_id: number;
+  investment_amount?: string;
+  net_capital?: string;
+  realized_gain_loss?: string;
+  unrealized_gain_loss?: string;
+  current_value?: string;
+  status?: string;
+  purchase_date?: string;
+}
+
+interface DbTransaction {
+  id: number;
+  type: string;
+  deal_id: number;
+  amount: number;
+  transaction_date: string;
+  investor_id: number;
+}
+
+interface DbDeal {
+  id: number;
+  name: string;
+  slug: string;
+  company_id: number;
+  status: string;
+  target_raise: number;
+  min_investment: number;
+  current_raise: number;
+  start_date: string;
+  close_date?: string;
+  irr?: number;
+  moic?: number;
+  description?: string;
+}
+
+interface DbInvestor {
+  id: number;
+  public_id?: string;
+  full_name: string;
+  primary_email: string;
+  investor_type: string;
+  commitment_amount: number;
+  paid_amount: number;
+  created_at: string;
+  kyc_status?: string;
+}
+
+interface DbCompany {
+  id: number;
+  name: string;
+  industry: string;
+  sector?: string;
+  founded?: string;
+  headquarters?: string;
+  website?: string;
+  description?: string;
+  logo_url?: string;
+  status?: string;
+}
+
+interface UpcomingCall {
+  id: number;
+  dealName: string;
+  amount: number;
+  dueDate: string;
+  status: string;
+}
 
 export interface SupabaseAdapterOptions {
   useViews?: boolean; // Use database views (simple) or direct tables (complex)
@@ -50,7 +125,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
     this.client = createClient<Database>(supabaseUrl, supabaseKey);
     this.useViews = options?.useViews ?? true; // Default to using views for simplicity
 
-    console.log(
+    logger.info(
       `✅ Unified Supabase client initialized (mode: ${
         this.useViews ? "views" : "tables"
       })`
@@ -80,14 +155,14 @@ export class UnifiedSupabaseAdapter implements IDataClient {
       const { data, error } = await query;
 
       if (error) {
-        console.error("Error fetching deals:", error);
+        logger.error("Error fetching deals:", error);
         return [];
       }
 
       // Map database fields to TypeScript fields
       return (data || []).map(this.mapDealFromDb);
     } catch (error) {
-      console.error("Error in getDeals:", error);
+      logger.error("Error in getDeals:", error);
       return [];
     }
   }
@@ -101,13 +176,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .single();
 
       if (error) {
-        console.error("Error fetching deal:", error);
+        logger.error("Error fetching deal:", error);
         return null;
       }
 
       return data ? this.mapDealFromDb(data) : null;
     } catch (error) {
-      console.error("Error in getDealById:", error);
+      logger.error("Error in getDealById:", error);
       return null;
     }
   }
@@ -121,15 +196,63 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .single();
 
       if (error) {
-        console.error("Error fetching deal by slug:", error);
+        logger.error("Error fetching deal by slug:", error);
         return null;
       }
 
       return data ? this.mapDealFromDb(data) : null;
     } catch (error) {
-      console.error("Error in getDealBySlug:", error);
+      logger.error("Error in getDealBySlug:", error);
       return null;
     }
+  }
+
+  async createDeal(input: {
+    name: string;
+    company_id?: number | null;
+    stage: Deal["stage"];
+    type: Deal["type"];
+    currency: string;
+    opening_date?: string | null;
+    closing_date?: string | null;
+    target_raise?: number | null;
+    current_raise?: number | null;
+    minimum_investment?: number | null;
+    slug: string;
+  }): Promise<Deal> {
+    const now = new Date().toISOString();
+    const toInsert = {
+      name: input.name,
+      slug: input.slug,
+      company_id: input.company_id ?? null,
+      type: input.type,
+      stage: input.stage,
+      currency: input.currency,
+      opening_date: input.opening_date ?? null,
+      closing_date: input.closing_date ?? null,
+      target_raise: input.target_raise ?? null,
+      current_raise: input.current_raise ?? 0,
+      minimum_investment: input.minimum_investment ?? null,
+      description: null,
+      created_at: now,
+      updated_at: now,
+      code: `DEAL-${Math.floor(Date.now() / 1000)}`,
+      public_id: `deal_${Math.floor(Date.now() / 1000)}`,
+      unit_price_init: null,
+    } as any;
+
+    const { data, error } = await this.client
+      .from("deals")
+      .insert(toInsert)
+      .select("*")
+      .single();
+
+    if (error) {
+      logger.error("Error creating deal:", error);
+      throw new Error(error.message || "Failed to create deal");
+    }
+
+    return this.mapDealFromDb(data as any);
   }
 
   // ==========================================
@@ -144,13 +267,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .order("id");
 
       if (error) {
-        console.error("Error fetching investors:", error);
+        logger.error("Error fetching investors:", error);
         return [];
       }
 
       return (data || []).map(this.mapInvestorFromDb);
     } catch (error) {
-      console.error("Error in getInvestors:", error);
+      logger.error("Error in getInvestors:", error);
       return [];
     }
   }
@@ -164,13 +287,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .single();
 
       if (error) {
-        console.error("Error fetching investor:", error);
+        logger.error("Error fetching investor:", error);
         return null;
       }
 
       return data ? this.mapInvestorFromDb(data) : null;
     } catch (error) {
-      console.error("Error in getInvestorById:", error);
+      logger.error("Error in getInvestorById:", error);
       return null;
     }
   }
@@ -184,13 +307,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .single();
 
       if (error) {
-        console.error("Error fetching investor by public_id:", error);
+        logger.error("Error fetching investor by public_id:", error);
         return null;
       }
 
       return data ? this.mapInvestorFromDb(data) : null;
     } catch (error) {
-      console.error("Error in getInvestorByPublicId:", error);
+      logger.error("Error in getInvestorByPublicId:", error);
       return null;
     }
   }
@@ -213,13 +336,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .order("id");
 
       if (error) {
-        console.error("Error fetching companies:", error);
+        logger.error("Error fetching companies:", error);
         return [];
       }
 
       return (data || []).map(this.mapCompanyFromDb);
     } catch (error) {
-      console.error("Error in getCompanies:", error);
+      logger.error("Error in getCompanies:", error);
       return [];
     }
   }
@@ -233,13 +356,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .single();
 
       if (error) {
-        console.error("Error fetching company:", error);
+        logger.error("Error fetching company:", error);
         return null;
       }
 
       return data ? this.mapCompanyFromDb(data) : null;
     } catch (error) {
-      console.error("Error in getCompanyById:", error);
+      logger.error("Error in getCompanyById:", error);
       return null;
     }
   }
@@ -265,13 +388,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
       const { data, error } = await query;
 
       if (error) {
-        console.error("Error fetching commitments:", error);
+        logger.error("Error fetching commitments:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error("Error in getCommitments:", error);
+      logger.error("Error in getCommitments:", error);
       return [];
     }
   }
@@ -288,13 +411,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .single();
 
       if (error) {
-        console.error("Error fetching commitment:", error);
+        logger.error("Error fetching commitment:", error);
         return null;
       }
 
       return data;
     } catch (error) {
-      console.error("Error in getCommitmentById:", error);
+      logger.error("Error in getCommitmentById:", error);
       return null;
     }
   }
@@ -311,13 +434,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .order("commitment_date", { ascending: false });
 
       if (error) {
-        console.error("Error fetching commitments by deal:", error);
+        logger.error("Error fetching commitments by deal:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error("Error in getCommitmentsByDealId:", error);
+      logger.error("Error in getCommitmentsByDealId:", error);
       return [];
     }
   }
@@ -366,13 +489,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
       const { data, error } = await query;
 
       if (error) {
-        console.error("Error fetching transactions:", error);
+        logger.error("Error fetching transactions:", error);
         return [];
       }
 
       return (data || []).map(this.mapTransactionFromDb);
     } catch (error) {
-      console.error("Error in getTransactions:", error);
+      logger.error("Error in getTransactions:", error);
       return [];
     }
   }
@@ -389,13 +512,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .single();
 
       if (error) {
-        console.error("Error fetching transaction:", error);
+        logger.error("Error fetching transaction:", error);
         return null;
       }
 
       return data ? this.mapTransactionFromDb(data) : null;
     } catch (error) {
-      console.error("Error in getTransactionById:", error);
+      logger.error("Error in getTransactionById:", error);
       return null;
     }
   }
@@ -425,13 +548,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
       const { data, error } = await query;
 
       if (error) {
-        console.error("Error fetching documents:", error);
+        logger.error("Error fetching documents:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error("Error in getDocuments:", error);
+      logger.error("Error in getDocuments:", error);
       return [];
     }
   }
@@ -446,13 +569,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .single();
 
       if (error) {
-        console.error("Error fetching document:", error);
+        logger.error("Error fetching document:", error);
         return null;
       }
 
       return data;
     } catch (error) {
-      console.error("Error in getDocumentById:", error);
+      logger.error("Error in getDocumentById:", error);
       return null;
     }
   }
@@ -479,27 +602,31 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
       // Calculate summary metrics
       const totalCommitted = units.reduce(
-        (sum: number, u: any) => sum + parseFloat(u.investment_amount || "0"),
+        (sum: number, u: DbInvestorUnit) =>
+          sum + parseFloat(u.investment_amount || "0"),
         0
       );
 
       const totalCalled = units.reduce(
-        (sum: number, u: any) => sum + parseFloat(u.net_capital || "0"),
+        (sum: number, u: DbInvestorUnit) =>
+          sum + parseFloat(u.net_capital || "0"),
         0
       );
 
       const totalDistributed = units.reduce(
-        (sum: number, u: any) => sum + parseFloat(u.realized_gain_loss || "0"),
+        (sum: number, u: DbInvestorUnit) =>
+          sum + parseFloat(u.realized_gain_loss || "0"),
         0
       );
 
       const currentValue = units.reduce(
-        (sum: number, u: any) => sum + parseFloat(u.current_value || "0"),
+        (sum: number, u: DbInvestorUnit) =>
+          sum + parseFloat(u.current_value || "0"),
         0
       );
 
       const totalGains = units.reduce(
-        (sum: number, u: any) =>
+        (sum: number, u: DbInvestorUnit) =>
           sum +
           parseFloat(u.unrealized_gain_loss || "0") +
           parseFloat(u.realized_gain_loss || "0"),
@@ -508,7 +635,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
       // Count active deals
       const activeDeals = units.filter(
-        (u: any) => u.status === "Active"
+        (u: DbInvestorUnit) => u.status === "Active"
       ).length;
 
       // Calculate portfolio IRR and MOIC
@@ -516,16 +643,16 @@ export class UnifiedSupabaseAdapter implements IDataClient {
       const portfolioIRR = this.calculatePortfolioIRR(units);
 
       // Get recent activity (last 5 transactions)
-      const recentActivity = transactions.slice(0, 5).map((t: any) => ({
+      const recentActivity = transactions.slice(0, 5).map((t: Transaction) => ({
         id: t.id.toString(),
         type: t.type,
         description: `${t.type} - Deal #${t.deal_id}`,
         amount: t.amount,
-        date: t.transaction_date,
+        date: t.created_at,
       }));
 
       // Upcoming calls (mock for now)
-      const upcomingCalls: any[] = [];
+      const upcomingCalls: DashboardData["upcomingCalls"] = [];
 
       return {
         investor,
@@ -543,12 +670,12 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         upcomingCalls,
       };
     } catch (error) {
-      console.error("Error in getDashboardData:", error);
+      logger.error("Error in getDashboardData:", error);
       return this.getEmptyDashboard();
     }
   }
 
-  private calculatePortfolioIRR(units: any[]): number {
+  private calculatePortfolioIRR(units: DbInvestorUnit[]): number {
     // Simplified portfolio IRR calculation
     if (units.length === 0) return 0;
 
@@ -558,7 +685,9 @@ export class UnifiedSupabaseAdapter implements IDataClient {
     for (const unit of units) {
       const investmentAmount = parseFloat(unit.net_capital || "0");
       const currentValue = parseFloat(unit.current_value || "0");
-      const purchaseDate = new Date(unit.purchase_date);
+      const purchaseDate = unit.purchase_date
+        ? new Date(unit.purchase_date)
+        : new Date();
       const now = new Date();
       const years =
         (now.getTime() - purchaseDate.getTime()) / (365 * 24 * 60 * 60 * 1000);
@@ -590,7 +719,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         },
       };
     } catch (error) {
-      console.error("Error in getPortfolioData:", error);
+      logger.error("Error in getPortfolioData:", error);
       return {
         holdings: [],
         summary: {
@@ -608,7 +737,7 @@ export class UnifiedSupabaseAdapter implements IDataClient {
   // INVESTOR UNITS & PORTFOLIO
   // ==========================================
 
-  async getInvestorUnits(investorId: number): Promise<any[]> {
+  async getInvestorUnits(investorId: number): Promise<DbInvestorUnit[]> {
     try {
       const { data, error } = await this.client
         .from("investor_units")
@@ -617,13 +746,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .order("purchase_date", { ascending: false });
 
       if (error) {
-        console.error("Error fetching investor units:", error);
+        logger.error("Error fetching investor units:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error("Error in getInvestorUnits:", error);
+      logger.error("Error in getInvestorUnits:", error);
       return [];
     }
   }
@@ -637,13 +766,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
         .order("snapshot_date", { ascending: false });
 
       if (error) {
-        console.error("Error fetching investment snapshots:", error);
+        logger.error("Error fetching investment snapshots:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error("Error in getInvestmentSnapshots:", error);
+      logger.error("Error in getInvestmentSnapshots:", error);
       return [];
     }
   }
@@ -683,73 +812,98 @@ export class UnifiedSupabaseAdapter implements IDataClient {
     };
   }
 
-  private mapDealFromDb(dbDeal: any): Deal {
+  private mapDealFromDb(dbDeal: DbDeal): Deal {
     return {
+      public_id: `deal_${dbDeal.id}`,
       id: dbDeal.id,
+      code: `DEAL-${dbDeal.id}`,
       name: dbDeal.name,
       slug:
         dbDeal.slug || dbDeal.name?.toLowerCase().replace(/\s+/g, "-") || "",
       company_id: dbDeal.company_id,
-      type: dbDeal.type || "primary",
-      stage: dbDeal.stage || "active",
-      opening_date: dbDeal.opening_date,
-      closing_date: dbDeal.closing_date,
-      target_raise: undefined as any,
-      current_raise: undefined as any,
-      minimum_investment: 50000,
-      currency: dbDeal.currency || "USD",
+      type: (dbDeal as any).type || "primary",
+      stage: (dbDeal as any).stage || "active",
+      opening_date:
+        (dbDeal as any).opening_date ?? (dbDeal as any).start_date ?? null,
+      closing_date:
+        (dbDeal as any).closing_date ?? (dbDeal as any).close_date ?? null,
+      unit_price_init: null,
+      target_raise: (dbDeal as any).target_raise ?? null,
+      current_raise: (dbDeal as any).current_raise ?? null,
+      minimum_investment:
+        (dbDeal as any).minimum_investment ??
+        (dbDeal as any).min_investment ??
+        null,
+      currency: (dbDeal as any).currency || "USD",
       description: null,
-      created_at: dbDeal.created_at || new Date().toISOString(),
-      updated_at: dbDeal.updated_at || new Date().toISOString(),
+      created_at: (dbDeal as any).created_at || new Date().toISOString(),
+      updated_at: (dbDeal as any).updated_at || new Date().toISOString(),
     };
   }
 
-  private mapInvestorFromDb(dbInvestor: any): Investor {
+  private mapInvestorFromDb(dbInvestor: DbInvestor): Investor {
     return {
       id: dbInvestor.id,
       public_id: dbInvestor.public_id || "",
       user_id: null,
-      type: dbInvestor.type || "individual",
+      type:
+        (dbInvestor as any).type ||
+        (dbInvestor as any).investor_type ||
+        "individual",
       name: dbInvestor.full_name,
       email: dbInvestor.primary_email,
       phone: null,
-      country: dbInvestor.country_residence,
-      kyc_status: dbInvestor.status || "pending",
+      country:
+        (dbInvestor as any).country_residence ||
+        (dbInvestor as any).country ||
+        null,
+      kyc_status:
+        (dbInvestor as any).status ||
+        (dbInvestor as any).kyc_status ||
+        "pending",
       accredited: false,
-      created_at: dbInvestor.created_at,
-      updated_at: dbInvestor.updated_at,
+      created_at: dbInvestor.created_at as any,
+      updated_at: (dbInvestor as any).updated_at || new Date().toISOString(),
     };
   }
 
-  private mapCompanyFromDb(dbCompany: any): Company {
+  private mapCompanyFromDb(dbCompany: DbCompany): Company {
     return {
       id: dbCompany.id,
       name: dbCompany.name,
-      type: dbCompany.type || null,
-      sector: dbCompany.sector,
-      country: dbCompany.country,
-      website: dbCompany.website,
-      created_at: dbCompany.created_at,
-      updated_at: dbCompany.updated_at,
+      type: (dbCompany as any).type || null,
+      sector: (dbCompany as any).sector || null,
+      country: (dbCompany as any).country || null,
+      website: (dbCompany as any).website || null,
+      created_at: (dbCompany as any).created_at || new Date().toISOString(),
+      updated_at: (dbCompany as any).updated_at || new Date().toISOString(),
     } as any;
   }
 
-  private mapTransactionFromDb(dbTx: any): Transaction {
+  private mapTransactionFromDb(dbTx: DbTransaction): Transaction {
     return {
-      id: dbTx.transaction_id,
-      public_id: dbTx.public_id,
+      id: (dbTx as any).transaction_id ?? dbTx.id,
+      public_id:
+        (dbTx as any).public_id ||
+        `txn_${(dbTx as any).transaction_id ?? dbTx.id}`,
       investor_id: dbTx.investor_id,
       deal_id: dbTx.deal_id,
-      type: dbTx.transaction_type || "investment",
-      amount: dbTx.gross_capital || dbTx.amount,
-      currency: dbTx.currency || "USD",
-      status: dbTx.status || "completed",
+      type: (dbTx as any).transaction_type || dbTx.type,
+      amount: (dbTx as any).gross_capital ?? dbTx.amount,
+      currency: (dbTx as any).currency || "USD",
+      status: (dbTx as any).status || "completed",
       fee_amount: null,
       reference: null,
       description: null,
       processed_at: null,
-      created_at: dbTx.created_at,
-      updated_at: dbTx.updated_at,
+      created_at:
+        (dbTx as any).created_at ||
+        (dbTx as any).transaction_date ||
+        new Date().toISOString(),
+      updated_at:
+        (dbTx as any).updated_at ||
+        (dbTx as any).transaction_date ||
+        new Date().toISOString(),
     };
   }
 

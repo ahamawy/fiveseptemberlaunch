@@ -1,13 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { useSearchParams } from "next/navigation";
 import { resolveInvestorId as resolveId } from "@/lib/utils/investor";
 import { Button, ButtonGroup } from "@/components/ui/Button";
 import { MotionSection } from "@/components/ui/Motion";
 import { LineChart } from "@/components/ui/Charts";
-import { InformationCircleIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { KPICard, KPIGrid, HeroKPICard } from "@/components/ui/KPICard";
+import {
+  InformationCircleIcon,
+  EyeSlashIcon,
+  ArrowTrendingUpIcon,
+  ChartBarIcon,
+  BanknotesIcon,
+  ChartPieIcon,
+} from "@heroicons/react/24/outline";
 
 interface DashboardData {
   portfolio: {
@@ -32,12 +40,14 @@ interface DashboardData {
   activeDeals: number;
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [guestMode, setGuestMode] = useState<boolean>(false);
-  const [displayMode, setDisplayMode] = useState<"percent" | "currency">("percent");
+  const [displayMode, setDisplayMode] = useState<"percent" | "currency">(
+    "percent"
+  );
   const [isHolding, setIsHolding] = useState<boolean>(false);
   const [scenario, setScenario] = useState<"down" | "base" | "up">("base");
 
@@ -68,7 +78,10 @@ export default function DashboardPage() {
         throw new Error(`Failed to fetch dashboard: ${response.status}`);
       }
 
-      const dashboardData = await response.json();
+      const responseData = await response.json();
+
+      // Handle standardized API response format
+      const dashboardData = responseData.data || responseData;
 
       // Validate the response has expected shape
       if (!dashboardData.portfolio || !dashboardData.performance) {
@@ -77,7 +90,7 @@ export default function DashboardPage() {
 
       setData(dashboardData);
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      // Error is handled by setting error state
       setError(
         error instanceof Error ? error.message : "Failed to load dashboard"
       );
@@ -93,14 +106,18 @@ export default function DashboardPage() {
   };
 
   const formatCurrency = (n: number) =>
-    new Intl.NumberFormat(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n || 0);
+    new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    }).format(n || 0);
 
   const percentSinceEntry = useMemo(() => {
     if (!data) return 0;
     const invested = data.portfolio.totalCommitted || 0;
     const current = data.portfolio.totalValue || 0;
     if (invested <= 0) return 0;
-    return ((current / invested) - 1) * 100;
+    return (current / invested - 1) * 100;
   }, [data]);
 
   const top2ConcentrationPct = useMemo(() => {
@@ -157,7 +174,9 @@ export default function DashboardPage() {
       <div className="flex items-start justify-between pb-6 border-b border-surface-border mb-8">
         <div>
           <h1 className="text-4xl font-bold text-white">Welcome back</h1>
-          <p className="mt-2 text-text-secondary">Your capital is working quietly.</p>
+          <p className="mt-2 text-text-secondary">
+            Your capital is working quietly.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -166,7 +185,8 @@ export default function DashboardPage() {
             onClick={() => {
               const next = !guestMode;
               setGuestMode(next);
-              if (typeof window !== "undefined") localStorage.setItem("guest-mode", String(next));
+              if (typeof window !== "undefined")
+                localStorage.setItem("guest-mode", String(next));
             }}
             title="Guest Mode hides amounts across the app"
           >
@@ -175,14 +195,38 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Hero KPI - Total Portfolio Value */}
+      <MotionSection>
+        <div data-testid="kpi-total-portfolio-value">
+          <HeroKPICard
+            title="Total Portfolio Value"
+            value={maskIfHidden(formatCurrency(currentValue))}
+            subtitle={`${data.activeDeals} active positions across multiple sectors`}
+            trend={{
+              value: Math.round(percentSinceEntry),
+              label: "since entry",
+            }}
+            className="mb-6"
+          />
+        </div>
+      </MotionSection>
+
       {/* First 7 seconds: greeting, percent-only overview, hold-to-reveal */}
       <MotionSection>
         <Card variant="glass" className="mb-6">
           <CardContent className="p-5">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="text-text-secondary">
-                <div className="text-sm">{`+${Math.round(percentSinceEntry)}% since entry`} · {data.activeDeals} positions{top2ConcentrationPct > 0 ? ` · Top-2 = ${Math.round(top2ConcentrationPct)}% of value` : ""}</div>
-                <div className="text-xs mt-1">Touch & hold to reveal amounts</div>
+                <div className="text-sm">
+                  {`+${Math.round(percentSinceEntry)}% since entry`} ·{" "}
+                  {data.activeDeals} positions
+                  {top2ConcentrationPct > 0
+                    ? ` · Top-2 = ${Math.round(top2ConcentrationPct)}% of value`
+                    : ""}
+                </div>
+                <div className="text-xs mt-1">
+                  Touch & hold to reveal amounts
+                </div>
               </div>
               <div
                 className="flex items-center gap-3 select-none"
@@ -198,7 +242,11 @@ export default function DashboardPage() {
                     size="sm"
                     onClick={() => {
                       setDisplayMode("percent");
-                      if (typeof window !== "undefined") localStorage.setItem("dashboard-display-mode", "percent");
+                      if (typeof window !== "undefined")
+                        localStorage.setItem(
+                          "dashboard-display-mode",
+                          "percent"
+                        );
                     }}
                   >
                     %
@@ -208,7 +256,11 @@ export default function DashboardPage() {
                     size="sm"
                     onClick={() => {
                       setDisplayMode("currency");
-                      if (typeof window !== "undefined") localStorage.setItem("dashboard-display-mode", "currency");
+                      if (typeof window !== "undefined")
+                        localStorage.setItem(
+                          "dashboard-display-mode",
+                          "currency"
+                        );
                     }}
                   >
                     $
@@ -227,7 +279,9 @@ export default function DashboardPage() {
                     <p className="text-xs text-text-tertiary">Invested</p>
                     <p className="text-lg font-semibold text-text-primary">
                       {displayMode === "percent"
-                        ? `${Math.round((investedAmount / (currentValue || 1)) * 100)}%`
+                        ? `${Math.round(
+                            (investedAmount / (currentValue || 1)) * 100
+                          )}%`
                         : maskIfHidden(formatCurrency(investedAmount))}
                     </p>
                   </div>
@@ -235,18 +289,28 @@ export default function DashboardPage() {
                     <p className="text-xs text-text-tertiary">Gain</p>
                     <p className="text-lg font-semibold text-text-primary">
                       {displayMode === "percent"
-                        ? `${Math.round(((currentValue - investedAmount) / (investedAmount || 1)) * 100)}%`
-                        : maskIfHidden(formatCurrency(currentValue - investedAmount))}
+                        ? `${Math.round(
+                            ((currentValue - investedAmount) /
+                              (investedAmount || 1)) *
+                              100
+                          )}%`
+                        : maskIfHidden(
+                            formatCurrency(currentValue - investedAmount)
+                          )}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-text-tertiary">MOIC</p>
-                    <p className="text-lg font-semibold text-text-primary">{(data.performance.moic || 1).toFixed(1)}×</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {(data.performance.moic || 1).toFixed(1)}×
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-            <p className="text-xs text-text-tertiary mt-3">Estimates; updated as new information arrives.</p>
+            <p className="text-xs text-text-tertiary mt-3">
+              Estimates; updated as new information arrives.
+            </p>
           </CardContent>
         </Card>
       </MotionSection>
@@ -257,7 +321,10 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               What matters now
-              <InformationCircleIcon className="w-4 h-4 text-text-tertiary" title="Plain-language highlights for your portfolio." />
+              <InformationCircleIcon
+                className="w-4 h-4 text-text-tertiary"
+                title="Plain-language highlights for your portfolio."
+              />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
@@ -276,30 +343,82 @@ export default function DashboardPage() {
             {/* Waterfall chip */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="text-sm text-text-secondary">$50k → Current Value (scenario)</div>
+                <div className="text-sm text-text-secondary">
+                  $50k → Current Value (scenario)
+                </div>
                 <ButtonGroup>
-                  <Button size="sm" variant={scenario === "down" ? "primary" : "glass"} onClick={() => setScenario("down")}>−30%</Button>
-                  <Button size="sm" variant={scenario === "base" ? "primary" : "glass"} onClick={() => setScenario("base")}>Base</Button>
-                  <Button size="sm" variant={scenario === "up" ? "primary" : "glass"} onClick={() => setScenario("up")}>+30%</Button>
+                  <Button
+                    size="sm"
+                    variant={scenario === "down" ? "primary" : "glass"}
+                    onClick={() => setScenario("down")}
+                  >
+                    −30%
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={scenario === "base" ? "primary" : "glass"}
+                    onClick={() => setScenario("base")}
+                  >
+                    Base
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={scenario === "up" ? "primary" : "glass"}
+                    onClick={() => setScenario("up")}
+                  >
+                    +30%
+                  </Button>
                 </ButtonGroup>
               </div>
               {(() => {
-                const total = Math.max(1, investedAmount + Math.max(0, realizedPL) + Math.max(0, adjustedUnrealized));
-                const investedPct = Math.min(100, Math.max(0, (investedAmount / total) * 100));
-                const realizedPct = Math.min(100, Math.max(0, (Math.max(0, realizedPL) / total) * 100));
-                const unrealPct = Math.min(100, Math.max(0, (Math.max(0, adjustedUnrealized) / total) * 100));
+                const total = Math.max(
+                  1,
+                  investedAmount +
+                    Math.max(0, realizedPL) +
+                    Math.max(0, adjustedUnrealized)
+                );
+                const investedPct = Math.min(
+                  100,
+                  Math.max(0, (investedAmount / total) * 100)
+                );
+                const realizedPct = Math.min(
+                  100,
+                  Math.max(0, (Math.max(0, realizedPL) / total) * 100)
+                );
+                const unrealPct = Math.min(
+                  100,
+                  Math.max(0, (Math.max(0, adjustedUnrealized) / total) * 100)
+                );
                 return (
                   <div className="w-full h-3 rounded-full bg-surface-base border border-surface-border overflow-hidden">
-                    <div className="h-full bg-primary-300" style={{ width: `${investedPct}%` }} />
-                    <div className="h-full bg-success-500" style={{ width: `${realizedPct}%` }} />
-                    <div className="h-full bg-info-500" style={{ width: `${unrealPct}%` }} />
+                    <div
+                      className="h-full bg-primary-300"
+                      style={{ width: `${investedPct}%` }}
+                    />
+                    <div
+                      className="h-full bg-success-500"
+                      style={{ width: `${realizedPct}%` }}
+                    />
+                    <div
+                      className="h-full bg-info-500"
+                      style={{ width: `${unrealPct}%` }}
+                    />
                   </div>
                 );
               })()}
               <div className="mt-2 flex items-center gap-4 text-xs text-text-secondary">
-                <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary-300" /> Invested</span>
-                <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-success-500" /> Realized P/L</span>
-                <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-info-500" /> Unrealized P/L</span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-primary-300" />{" "}
+                  Invested
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-success-500" />{" "}
+                  Realized P/L
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-info-500" />{" "}
+                  Unrealized P/L
+                </span>
               </div>
             </div>
 
@@ -314,38 +433,51 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Performance metrics */}
+      {/* Performance metrics with rich KPI cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2 bg-surface-elevated rounded-xl p-6 border border-surface-border">
+        <div
+          className="lg:col-span-2"
+          data-testid="section-performance-metrics"
+        >
           <h2 className="text-xl font-semibold text-white mb-4">
             Performance Metrics
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div>
-              <p className="text-sm text-text-secondary">IRR</p>
-              <p className="text-xl font-bold text-white">
-                {Math.round(data.performance.irr)}%
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-text-secondary">MOIC</p>
-              <p className="text-xl font-bold text-white">
-                {data.performance.moic}x
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-text-secondary">DPI</p>
-              <p className="text-xl font-bold text-white">
-                {data.performance.dpi}x
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-text-secondary">TVPI</p>
-              <p className="text-xl font-bold text-white">
-                {data.performance.tvpi}x
-              </p>
-            </div>
-          </div>
+          <KPIGrid>
+            <KPICard
+              title="IRR"
+              value={`${Math.round(data.performance.irr)}%`}
+              subtitle="Internal Rate of Return"
+              icon={<ArrowTrendingUpIcon className="w-5 h-5" />}
+              variant="gradient"
+              glow
+              change={data.performance.irr > 15 ? 5 : -2}
+            />
+            <KPICard
+              title="MOIC"
+              value={`${data.performance.moic}x`}
+              subtitle="Multiple on Invested Capital"
+              icon={<ChartBarIcon className="w-5 h-5" />}
+              variant="glass"
+              animate
+            />
+            <KPICard
+              title="DPI"
+              value={`${data.performance.dpi}x`}
+              subtitle="Distributions to Paid-In"
+              icon={<BanknotesIcon className="w-5 h-5" />}
+              variant="elevated"
+              change={data.performance.dpi > 0.5 ? 8 : 0}
+              changeType={data.performance.dpi > 0.5 ? "increase" : "neutral"}
+            />
+            <KPICard
+              title="TVPI"
+              value={`${data.performance.tvpi}x`}
+              subtitle="Total Value to Paid-In"
+              icon={<ChartPieIcon className="w-5 h-5" />}
+              variant="gradient"
+              glow
+            />
+          </KPIGrid>
         </div>
 
         <div className="bg-surface-elevated rounded-xl p-6 border border-surface-border">
@@ -376,7 +508,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-surface-elevated rounded-xl p-6 border border-surface-border">
+      <div
+        className="bg-surface-elevated rounded-xl p-6 border border-surface-border"
+        data-testid="section-recent-activity"
+      >
         <h2 className="text-xl font-semibold text-white mb-4">
           Recent Activity
         </h2>
@@ -407,5 +542,19 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-64 text-text-secondary">
+          Loading...
+        </div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
   );
 }

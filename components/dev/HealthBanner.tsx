@@ -27,9 +27,8 @@ export function HealthBanner() {
 
   return (
     <div className="w-full bg-warning-600/20 text-warning-300 border border-warning-600/40 px-4 py-2 text-sm">
-      Supabase connectivity degraded. Some data may be stale. {message && <span className="opacity-80">({message})</span>}
+      Supabase connectivity degraded. Some data may be stale.{" "}
+      {message && <span className="opacity-80">({message})</span>}
     </div>
   );
 }
-
-

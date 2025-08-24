@@ -1,5 +1,4 @@
-import type { RequestInit } from 'node-fetch';
-import { ContextAggregator } from './context-aggregator.service';
+import { ContextAggregator } from "./context-aggregator.service";
 
 export type ExtractedDealData = {
   deal?: {
@@ -30,19 +29,19 @@ export type ExtractedDealData = {
   }>;
 };
 
-const DEFAULT_MODEL = process.env.OPENROUTER_MODEL || 'openrouter/auto';
+const DEFAULT_MODEL = process.env.OPENROUTER_MODEL || "openrouter/auto";
 
 async function buildPrompt(docText: string): Promise<string> {
   const fullContext = await ContextAggregator.loadFullContext();
   return [
-    'You are EQUITIE BACKEND BOT with complete schema and fee engine context. Extract structured data.',
-    'Output strictly as minified JSON matching ExtractedDealData. Use discounts as negative fee lines.',
-    'CONTEXT START',
+    "You are EQUITIE BACKEND BOT with complete schema and fee engine context. Extract structured data.",
+    "Output strictly as minified JSON matching ExtractedDealData. Use discounts as negative fee lines.",
+    "CONTEXT START",
     fullContext,
-    'CONTEXT END',
-    'Document:\n',
-    docText
-  ].join('\n');
+    "CONTEXT END",
+    "Document:\n",
+    docText,
+  ].join("\n");
 }
 
 export async function extractDealDataWithOpenRouter(params: {
@@ -53,51 +52,63 @@ export async function extractDealDataWithOpenRouter(params: {
   const { docText, apiKey, model } = params;
   const key = apiKey || process.env.OPENROUTER_API_KEY;
   if (!key) {
-    throw new Error('Missing OpenRouter API key. Set OPENROUTER_API_KEY.');
+    throw new Error("Missing OpenRouter API key. Set OPENROUTER_API_KEY.");
   }
 
   // Provide project context to improve extractions
-  let context = '';
+  let context = "";
   try {
     // Dynamically import to avoid bundling issues
-    const res = await import('fs/promises');
-    const path = await import('path');
-    const ctxPath = path.resolve(process.cwd(), 'DOCS', 'EQUITIE_BOT_CONTEXT.md');
-    context = await res.readFile(ctxPath, 'utf8');
+    const res = await import("fs/promises");
+    const path = await import("path");
+    const ctxPath = path.resolve(
+      process.cwd(),
+      "DOCS",
+      "EQUITIE_BOT_CONTEXT.md"
+    );
+    context = await res.readFile(ctxPath, "utf8");
   } catch {}
 
   const prompt = await buildPrompt(docText);
   const body = {
     model: model || DEFAULT_MODEL,
     messages: [
-      { role: 'system', content: 'You are a precise extraction engine that outputs only JSON.' },
-      context ? { role: 'system', content: `PROJECT CONTEXT:\n${context}` } : undefined,
-      { role: 'user', content: prompt }
+      {
+        role: "system",
+        content: "You are a precise extraction engine that outputs only JSON.",
+      },
+      context
+        ? { role: "system", content: `PROJECT CONTEXT:\n${context}` }
+        : undefined,
+      { role: "user", content: prompt },
     ],
     temperature: 0,
     top_p: 0.1,
     max_tokens: 4000,
-    response_format: { type: 'json_object' }
+    response_format: { type: "json_object" },
   } as any;
 
   const init: RequestInit = {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${key}`,
-      'HTTP-Referer': 'https://equitie.local',
-      'X-Title': 'EquiTie Backend Extraction'
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${key}`,
+      "HTTP-Referer": "https://equitie.local",
+      "X-Title": "EquiTie Backend Extraction",
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   } as any;
 
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', init);
+  const res = await fetch(
+    "https://openrouter.ai/api/v1/chat/completions",
+    init
+  );
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`OpenRouter error: ${res.status} ${text}`);
   }
   const json = await res.json();
-  const content = json?.choices?.[0]?.message?.content || '{}';
+  const content = json?.choices?.[0]?.message?.content || "{}";
   try {
     return JSON.parse(content) as ExtractedDealData;
   } catch (e) {
@@ -106,8 +117,6 @@ export async function extractDealDataWithOpenRouter(params: {
     if (match) {
       return JSON.parse(match[0]) as ExtractedDealData;
     }
-    throw new Error('Failed to parse JSON from OpenRouter response');
+    throw new Error("Failed to parse JSON from OpenRouter response");
   }
 }
-
-

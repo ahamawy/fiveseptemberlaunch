@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { PlusIcon, BeakerIcon, PencilIcon, TrashIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { createLogger } from '@/lib/utils/improved-logger';
+
+const logger = createLogger('FormulaManager');
 
 interface FormulaTemplate {
   id: number;
@@ -59,7 +62,7 @@ export default function FormulaManagerPage() {
         setFormulas(data.data);
       }
     } catch (error) {
-      console.error('Error fetching formulas:', error);
+      logger.error('Error fetching formulas:', error);
     } finally {
       setLoading(false);
     }
@@ -79,8 +82,8 @@ export default function FormulaManagerPage() {
       const result = await response.json();
       setTestResult(result);
     } catch (error) {
-      console.error('Error testing formula:', error);
-      setTestResult({ success: false, error: error.message });
+      logger.error('Error testing formula:', error);
+      setTestResult({ success: false, error: error instanceof Error ? error.message : 'Unknown error occurred' });
     } finally {
       setIsTesting(false);
     }
@@ -109,7 +112,7 @@ export default function FormulaManagerPage() {
         setIsEditing(false);
       }
     } catch (error) {
-      console.error('Error saving formula:', error);
+      logger.error('Error saving formula:', error);
     }
   };
 
@@ -125,7 +128,7 @@ export default function FormulaManagerPage() {
         await fetchFormulas();
       }
     } catch (error) {
-      console.error('Error deleting formula:', error);
+      logger.error('Error deleting formula:', error);
     }
   };
 

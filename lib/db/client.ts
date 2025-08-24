@@ -58,6 +58,19 @@ export interface IDataClient {
   getDeals(filters?: DealFilters): Promise<Deal[]>;
   getDealById(id: number): Promise<Deal | null>;
   getDealBySlug(slug: string): Promise<Deal | null>;
+  createDeal(input: {
+    name: string;
+    company_id?: number | null;
+    stage: Deal["stage"];
+    type: Deal["type"];
+    currency: string;
+    opening_date?: string | null;
+    closing_date?: string | null;
+    target_raise?: number | null;
+    current_raise?: number | null;
+    minimum_investment?: number | null;
+    slug: string;
+  }): Promise<Deal>;
 
   // Investors
   getInvestors(): Promise<Investor[]>;

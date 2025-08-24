@@ -3,6 +3,8 @@
  * Real-time validation of Supabase connectivity and configuration
  */
 
+import 'server-only';
+
 import { getAppConfig } from '@/lib/config';
 import { getCurrentDataMode } from '@/lib/db/client';
 import { UnifiedSupabaseAdapter } from '../supabase-unified';

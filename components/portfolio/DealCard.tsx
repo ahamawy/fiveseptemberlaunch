@@ -1,6 +1,15 @@
 import { Card, CardContent } from "@/components/ui/Card";
-import { formatCurrency, formatPercentage, getStatusColor } from "@/lib/theme-utils";
-import { ChevronRightIcon, DocumentTextIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon } from "@heroicons/react/24/outline";
+import {
+  formatCurrency,
+  formatPercentage,
+  getStatusColor,
+} from "@/lib/theme-utils";
+import {
+  ChevronRightIcon,
+  DocumentTextIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
+} from "@heroicons/react/24/outline";
 import type { PortfolioDeal } from "@/lib/contracts/portfolio.contract";
 
 interface DealCardProps {
@@ -10,12 +19,19 @@ interface DealCardProps {
   variant?: "compact" | "detailed";
 }
 
-export function DealCard({ deal, onNavigate, investorId, variant = "compact" }: DealCardProps) {
+export function DealCard({
+  deal,
+  onNavigate,
+  investorId,
+  variant = "compact",
+}: DealCardProps) {
   const handleClick = () => {
     if (onNavigate) {
       onNavigate(deal.dealId);
     } else {
-      const url = `/investor-portal/deals/${deal.dealId}${investorId ? `?investor=${investorId}` : ""}`;
+      const url = `/investor-portal/deals/${deal.dealId}${
+        investorId ? `?investor=${investorId}` : ""
+      }`;
       window.location.href = url;
     }
   };
@@ -43,8 +59,8 @@ export function DealCard({ deal, onNavigate, investorId, variant = "compact" }: 
 
   if (variant === "detailed") {
     return (
-      <Card 
-        variant="glass" 
+      <Card
+        variant="glass"
         className="hover:shadow-lg transition-all cursor-pointer group"
         onClick={handleClick}
       >
@@ -84,7 +100,11 @@ export function DealCard({ deal, onNavigate, investorId, variant = "compact" }: 
             <div>
               <p className="text-xs text-text-tertiary">IRR</p>
               <div className="flex items-center gap-1">
-                <p className={`text-sm font-medium ${getStatusColor(deal.irr).text}`}>
+                <p
+                  className={`text-sm font-medium ${
+                    getStatusColor(deal.irr).text
+                  }`}
+                >
                   {formatPercentage(deal.irr)}
                 </p>
                 {getTrendIcon()}
@@ -101,7 +121,11 @@ export function DealCard({ deal, onNavigate, investorId, variant = "compact" }: 
           {/* Footer */}
           <div className="flex items-center justify-between pt-4 border-t border-surface-border">
             <div className="flex items-center gap-3">
-              <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusBadge(deal.status)}`}>
+              <span
+                className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusBadge(
+                  deal.status
+                )}`}
+              >
                 {deal.status}
               </span>
               {deal.documentsCount && deal.documentsCount > 0 && (
@@ -112,7 +136,9 @@ export function DealCard({ deal, onNavigate, investorId, variant = "compact" }: 
               )}
             </div>
             <span className="text-xs text-text-tertiary capitalize">
-              {deal.dealType === "fund" ? "Partnership" : deal.dealType.replace("_", " ")}
+              {deal.dealType === "fund"
+                ? "Partnership"
+                : deal.dealType.replace("_", " ")}
             </span>
           </div>
         </CardContent>
@@ -122,8 +148,8 @@ export function DealCard({ deal, onNavigate, investorId, variant = "compact" }: 
 
   // Compact variant
   return (
-    <Card 
-      variant="gradient" 
+    <Card
+      variant="gradient"
       className="hover:shadow-lg transition-all cursor-pointer group"
       onClick={handleClick}
     >
@@ -139,7 +165,7 @@ export function DealCard({ deal, onNavigate, investorId, variant = "compact" }: 
             </span>
           </p>
         </div>
-        
+
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-text-tertiary">Committed:</span>
@@ -166,9 +192,13 @@ export function DealCard({ deal, onNavigate, investorId, variant = "compact" }: 
             </span>
           </div>
         </div>
-        
+
         <div className="mt-3 flex items-center justify-between">
-          <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusBadge(deal.status)}`}>
+          <span
+            className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusBadge(
+              deal.status
+            )}`}
+          >
             {deal.status}
           </span>
           <ChevronRightIcon className="w-4 h-4 text-text-tertiary group-hover:text-primary-300 transition-colors" />

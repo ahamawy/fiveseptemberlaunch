@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Card,
@@ -61,7 +61,7 @@ interface CommitmentsData {
   }>;
 }
 
-export default function DealsPage() {
+function DealsContent() {
   const [data, setData] = useState<CommitmentsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [filterStage, setFilterStage] = useState<string>("all");
@@ -76,14 +76,21 @@ export default function DealsPage() {
 
   const fetchCommitmentsData = async () => {
     try {
-      // Fetch deals data from the general deals API
+      // Fetch deals directly from the deals API which has the actual data
       const response = await fetch(`/api/deals?limit=50`);
       const dealsResponse = await response.json();
 
       const deals: any[] = dealsResponse?.data || [];
-      const moics = deals.map((d) => Number(d.moic ?? d.valuation?.moic ?? 1)).filter((n) => Number.isFinite(n));
-      const avgMoic = moics.length ? moics.reduce((a, b) => a + b, 0) / moics.length : 1;
-      const totalCommitted = deals.reduce((sum, d) => sum + (Number(d.target_raise || 0)), 0);
+      const moics = deals
+        .map((d) => Number(d.moic ?? d.valuation?.moic ?? 1))
+        .filter((n) => Number.isFinite(n));
+      const avgMoic = moics.length
+        ? moics.reduce((a, b) => a + b, 0) / moics.length
+        : 1;
+      const totalCommitted = deals.reduce(
+        (sum, d) => sum + Number(d.target_raise || 0),
+        0
+      );
 
       // Transform deals data roughly into the commitments UI shape with real values filled
       const transformedData: CommitmentsData = {
@@ -92,10 +99,10 @@ export default function DealsPage() {
           dealId: deal.id,
           dealName: deal.name,
           dealCode: `DEAL-${deal.id}`,
-          dealStage: (deal.stage || 'active').toLowerCase(),
-          companyName: deal.company_name || 'Unknown Company',
-          companySector: deal.company_sector || '—',
-          currency: deal.currency || 'USD',
+          dealStage: (deal.stage || "active").toLowerCase(),
+          companyName: deal.company_name || "Unknown Company",
+          companySector: deal.company_sector || "—",
+          currency: deal.currency || "USD",
           committedAmount: Number(deal.target_raise || 0),
           capitalCalled: Number(deal.target_raise || 0), // quick-win: mirror committed (until calls are modeled)
           capitalDistributed: 0,
@@ -103,7 +110,7 @@ export default function DealsPage() {
           percentageCalled: 100, // quick-win: show non-zero; replace when calls are implemented
           nextCallAmount: 0,
           nextCallDate: null,
-          status: (deal.stage || 'active').toLowerCase(),
+          status: (deal.stage || "active").toLowerCase(),
           dealOpeningDate: deal.opening_date,
           dealClosingDate: deal.closing_date,
           // attach for table display (without changing UI types)
@@ -112,7 +119,9 @@ export default function DealsPage() {
         })),
         summary: {
           totalCommitments: deals.length,
-          activeCommitments: deals.filter((d: any) => String(d.stage || '').toLowerCase() === 'active').length,
+          activeCommitments: deals.filter(
+            (d: any) => String(d.stage || "").toLowerCase() === "active"
+          ).length,
           totalCommitted,
           totalCalled: totalCommitted,
           totalDistributed: 0,
@@ -124,7 +133,7 @@ export default function DealsPage() {
 
       setData(transformedData);
     } catch (error) {
-      console.error("Error fetching commitments data:", error);
+      // Error is handled by setting loading state
     } finally {
       setLoading(false);
     }
@@ -270,9 +279,14 @@ export default function DealsPage() {
             <p className="text-2xl font-bold text-text-primary mt-1">
               {/* averageCallPercentage holds 100 (quick-win); compute avg MOIC from commitments' moic */}
               {(() => {
-                const moics = data.commitments.map((c: any) => Number(c.moic || 0)).filter((n) => Number.isFinite(n) && n > 0);
-                const avg = moics.length ? moics.reduce((a: number, b: number) => a + b, 0) / moics.length : 1;
-                return avg.toFixed(2) + 'x';
+                const moics = data.commitments
+                  .map((c: any) => Number(c.moic || 0))
+                  .filter((n) => Number.isFinite(n) && n > 0);
+                const avg = moics.length
+                  ? moics.reduce((a: number, b: number) => a + b, 0) /
+                    moics.length
+                  : 1;
+                return avg.toFixed(2) + "x";
               })()}
             </p>
           </CardContent>
@@ -468,5 +482,19 @@ export default function DealsPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function DealsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-64 text-text-secondary">
+          Loading deals…
+        </div>
+      }
+    >
+      <DealsContent />
+    </Suspense>
   );
 }

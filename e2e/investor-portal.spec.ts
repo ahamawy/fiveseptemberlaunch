@@ -55,8 +55,11 @@ test.describe('Investor Portal Dashboard', () => {
     expect(response.status()).toBe(200);
     
     const data = await response.json();
-    expect(data).toHaveProperty('portfolio');
-    expect(data).toHaveProperty('performance');
+    // API now returns standardized format with data wrapper
+    expect(data).toHaveProperty('success', true);
+    expect(data).toHaveProperty('data');
+    expect(data.data).toHaveProperty('portfolio');
+    expect(data.data).toHaveProperty('performance');
   });
 
   test('should display portfolio cards', async ({ page }) => {

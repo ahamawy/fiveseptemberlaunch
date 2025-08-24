@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error testing formula:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to test formula' },
       { status: 500 }
     );
   }
