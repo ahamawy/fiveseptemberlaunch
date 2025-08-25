@@ -40,24 +40,35 @@ mcp__supabase__get_logs({
 })
 ```
 
-## Database Structure
+## Database Structure (UPDATED - Clean Schema)
 
-### Main Tables (with dots in names!)
-- `investors.investor` - Investor profiles
-- `deals.deal` - Investment opportunities  
-- `companies.company` - Company data
-- `transactions.transaction.primary` - Transaction records
+### Main Tables - Single Source of Truth
+- `transactions_clean` - ALL transactions (primary, secondary, advisory, subnominee)
+- `deals_clean` - ALL deals 
+- `companies_clean` - ALL companies
+- `investors_clean` - ALL investors
+
+### Backward Compatibility (Views)
+The old dot-notation names still work as views:
+- `investors.investor` → Points to `investors_clean`
+- `deals.deal` → Points to `deals_clean`
+- `companies.company` → Points to `companies_clean`
+- `transactions.transaction.primary` → Points to `transactions_clean` (primary type only)
 
 ### How to Query
 ```typescript
-// In API routes, use the service layer:
-import { dealsService } from "@/lib/services";
-const deals = await dealsService.getActiveDeals();
-
-// Or direct Supabase:
+// RECOMMENDED: Use clean tables directly
 import { getServiceClient } from "@/lib/db/supabase/server-client";
 const sb = getServiceClient();
-const { data } = await sb.from("deals.deal").select("*");
+const { data } = await sb.from("deals_clean").select("*");
+
+// For transactions, filter by type if needed:
+const { data } = await sb.from("transactions_clean")
+  .select("*")
+  .eq("transaction_type", "primary");
+
+// LEGACY: Old names still work via views
+const { data } = await sb.from("deals.deal").select("*"); // Works but uses view
 ```
 
 ## Project Structure
@@ -116,9 +127,11 @@ npm run test:e2e
 ## Important Rules
 
 1. NO emoji in code files
-2. Use dot-named tables exactly as shown
-3. Always handle errors properly
-4. Use TypeScript types from `/lib/types`
+2. Use clean table names for new code (`transactions_clean`, `deals_clean`, etc.)
+3. Old dot-notation names work via views for backward compatibility
+4. Always handle errors properly
+5. Use TypeScript types from `/lib/types`
+6. Single source of truth: Each ID comes from ONE table only
 
 ## Need Help?
 
