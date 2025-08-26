@@ -105,7 +105,7 @@
 **Relationships:**
 - **Belongs To** → INVESTORS_CLEAN (via `investor_id`)
 - **Belongs To** → DEALS_CLEAN (via `deal_id`)
-- **Has Optional** → DEAL_FORMULA_TEMPLATES (via `formula_template_id`)
+- **Optional Mapping** → `formula_templates` (by deal `formula_template` value; no direct FK)
 - **Has Optional** → CALCULATION_AUDIT_LOG (via `calculation_audit_id`)
 
 **Business Context:**

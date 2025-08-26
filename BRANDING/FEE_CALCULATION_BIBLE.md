@@ -4,6 +4,20 @@
 
 This document serves as the definitive guide for all fee calculations in the EquiTie platform. It provides exact formulas, calculation sequences, edge cases, and implementation requirements to ensure consistent and accurate fee application across all investment transactions.
 
+## Schema Alignment (Clean Tables)
+
+- Deal config: `deals_clean`
+  - `eq_deal_structuring_fee_percent`, `eq_performance_fee_percent`, `eq_deal_annual_management_fee_percent`
+  - `management_fee_tier_1_percent`, `management_fee_tier_2_percent`, `tier_1_period`
+  - `nc_calculation_method`, `premium_calculation_method`, `fee_base_capital` ('GC' | 'NC')
+  - `formula_template`, `other_fees_allowed`
+- Transaction amounts: `transactions_clean`
+  - `gross_capital`, `initial_net_capital`, `units`, `unit_price`
+  - Discounts: `structuring_fee_discount_percent`, `management_fee_discount_percent`, `performance_fee_discount_percent`, `premium_fee_discount_percent`
+  - Optional: `other_fees`, `other_fees_description`
+
+Key rule: When `fee_base_capital = 'NC'`, upfront fees (e.g., structuring) use net-capital basis; otherwise use gross-capital basis.
+
 ## Fee Philosophy
 
 EquiTie operates on a multi-layered fee model that aligns interests between:
@@ -30,32 +44,41 @@ EquiTie operates on a multi-layered fee model that aligns interests between:
 # Step 1: Start with investor commitment
 gross_capital = investor_commitment
 
-# Step 2: Calculate structuring fee
-structuring_fee_rate = deal.eq_structuring_fee_percent / 100
-structuring_discount = investor.structuring_discount_percent / 100
+# Step 2: Calculate structuring fee (basis per deal.fee_base_capital)
+structuring_fee_rate = deal.eq_deal_structuring_fee_percent / 100
+structuring_discount = transaction.structuring_fee_discount_percent / 100  # (0..1)
 effective_structuring_rate = structuring_fee_rate * (1 - structuring_discount)
-structuring_fee_amount = gross_capital * effective_structuring_rate
 
-# Step 3: Calculate premium (if applicable)
-if deal.has_premium:
-    # Method 1: Valuation-based
-    premium_rate = (deal.pre_money_sell_valuation / deal.pre_money_purchase_valuation) - 1
-    # Method 2: Unit price-based
-    premium_rate = (deal.exit_unit_price / deal.initial_unit_price) - 1
-    
-    premium_discount = investor.premium_discount_percent / 100
-    effective_premium_rate = premium_rate * (1 - premium_discount)
-    premium_amount = gross_capital * effective_premium_rate
+if deal.fee_base_capital == 'NC':
+    structuring_base = initial_net_capital if defined else gross_capital  # template-dependent
 else:
-    premium_amount = 0
+    structuring_base = gross_capital
 
-# Step 4: Apply admin fee
-admin_fee = deal.eq_admin_fee  # Flat fee
-admin_discount = investor.admin_discount_percent / 100
-effective_admin_fee = admin_fee * (1 - admin_discount)
+structuring_fee_amount = structuring_base * effective_structuring_rate
 
-# Step 5: Calculate net capital
-initial_net_capital = gross_capital - structuring_fee_amount - premium_amount - effective_admin_fee
+# Step 3: Calculate premium (if applicable, per deal.premium_calculation_method)
+premium_amount = 0
+if deal.premium_calculation_method != 'none':
+    if deal.premium_calculation_method == 'valuation_based':
+        premium_rate = (deal.pre_money_sell_valuation / deal.pre_money_purchase_valuation) - 1
+    elif deal.premium_calculation_method == 'unit_price_based':
+        premium_rate = (deal.exit_unit_price / deal.initial_unit_price) - 1
+    elif deal.premium_calculation_method == 'built_in_nc':
+        # Premium is inherent in NC formula; do not compute separate amount
+        premium_rate = 0
+    else:
+        premium_rate = 0
+
+    premium_discount = (transaction.premium_fee_discount_percent or 0) / 100
+    effective_premium_rate = premium_rate * (1 - premium_discount)
+    premium_amount = (gross_capital if deal.fee_base_capital == 'GC' else initial_net_capital) * effective_premium_rate
+
+# Step 4: Apply admin fee (flat)
+admin_fee = deal.eq_admin_fee  # Flat amount; discounts typically not modeled globally
+
+# Step 5: Calculate net capital (include optional other_fees if present)
+other_fees_amount = transaction.other_fees or 0
+initial_net_capital = gross_capital - structuring_fee_amount - premium_amount - admin_fee - other_fees_amount
 
 # Step 6: Calculate units purchased
 units_purchased = initial_net_capital / deal.initial_unit_price
@@ -73,7 +96,7 @@ investor_position = {
 ### Phase 2: Holding Period (Annual)
 
 ```python
-# Annual management fee calculation
+# Annual management fee calculation (tiered)
 for year in holding_period:
     # Determine AUM base
     if year == 1:
@@ -83,12 +106,12 @@ for year in holding_period:
     
     # Apply tiered management fees
     if year <= deal.tier_1_period:
-        mgmt_rate = deal.eq_management_fee_1_percent / 100
+        mgmt_rate = (deal.management_fee_tier_1_percent or deal.eq_deal_annual_management_fee_percent) / 100
     else:
-        mgmt_rate = deal.eq_management_fee_2_percent / 100
+        mgmt_rate = (deal.management_fee_tier_2_percent or deal.eq_deal_annual_management_fee_percent) / 100
     
     # Apply discount
-    mgmt_discount = investor.management_discount_percent / 100
+    mgmt_discount = transaction.management_fee_discount_percent / 100
     effective_mgmt_rate = mgmt_rate * (1 - mgmt_discount)
     
     # Calculate fee
@@ -113,7 +136,7 @@ def calculate_exit_proceeds(investor_position, exit_price):
     # Step 3: Apply performance fee (only on gains)
     if profit > 0:
         perf_rate = deal.eq_performance_fee_percent / 100
-        perf_discount = investor.performance_discount_percent / 100
+        perf_discount = transaction.performance_fee_discount_percent / 100
         effective_perf_rate = perf_rate * (1 - perf_discount)
         performance_fee = profit * effective_perf_rate
     else:
@@ -152,8 +175,8 @@ def calculate_partnership_fees(deal, investor):
     partner_struct_amount = gross_capital * (deal.partner_structuring_fee_percent / 100)
     
     # Management fee split
-    total_mgmt_rate = deal.eq_management_fee_percent + deal.partner_management_fee_percent
-    eq_mgmt_amount = aum * (deal.eq_management_fee_percent / 100)
+    total_mgmt_rate = deal.eq_deal_annual_management_fee_percent + deal.partner_management_fee_percent
+    eq_mgmt_amount = aum * (deal.eq_deal_annual_management_fee_percent / 100)
     partner_mgmt_amount = aum * (deal.partner_management_fee_percent / 100)
     
     # Performance fee split

@@ -20,19 +20,18 @@ After analyzing the deal-specific formulas against the current Supabase schema, 
 
 | Field Name | Table | Type | Purpose | Priority |
 |------------|-------|------|---------|----------|
-| `management_fee_tier_1` | deals_clean | numeric(5,2) | First tier rate | HIGH |
-| `management_fee_tier_2` | deals_clean | numeric(5,2) | Second tier rate | HIGH |
+| `management_fee_tier_1_percent` | deals_clean | numeric(5,2) | First tier rate | HIGH |
+| `management_fee_tier_2_percent` | deals_clean | numeric(5,2) | Second tier rate | HIGH |
 | `tier_1_period` | deals_clean | integer | Years for tier 1 | HIGH |
-| `tier_2_start` | deals_clean | integer | When tier 2 begins | MEDIUM |
 
 ### 3. Partner Fee Discounts
 
 | Field Name | Table | Type | Purpose | Priority |
 |------------|-------|------|---------|----------|
-| `discount_partner_management_fee` | deals_clean | numeric(3,2) | 0-1 range | MEDIUM |
-| `discount_partner_structuring_fee` | deals_clean | numeric(3,2) | 0-1 range | MEDIUM |
-| `discount_partner_performance_fee` | deals_clean | numeric(3,2) | 0-1 range | MEDIUM |
-| `discount_partner_admin_fee` | deals_clean | numeric(3,2) | 0-1 range | LOW |
+| `discount_partner_management_fee_percent` | deals_clean | numeric(3,2) | 0-1 range | MEDIUM |
+| `discount_partner_structuring_fee_percent` | deals_clean | numeric(3,2) | 0-1 range | MEDIUM |
+| `discount_partner_performance_fee_percent` | deals_clean | numeric(3,2) | 0-1 range | MEDIUM |
+| `discount_partner_admin_fee_percent` | deals_clean | numeric(3,2) | 0-1 range | LOW |
 
 ## Formula Template Mapping
 
@@ -84,8 +83,8 @@ ALTER TABLE deals_clean
   ADD COLUMN formula_template varchar(50),
   ADD COLUMN fee_base_capital varchar(2) DEFAULT 'GC',
   ADD COLUMN premium_calculation_method premium_calculation_method,
-  ADD COLUMN management_fee_tier_1 numeric(5,2),
-  ADD COLUMN management_fee_tier_2 numeric(5,2),
+  ADD COLUMN management_fee_tier_1_percent numeric(5,2),
+  ADD COLUMN management_fee_tier_2_percent numeric(5,2),
   ADD COLUMN tier_1_period integer DEFAULT 1,
   ADD COLUMN other_fees_allowed boolean DEFAULT false;
 ```

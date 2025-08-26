@@ -101,6 +101,36 @@ Used in: `companies_clean.funding_round`
 - Affects risk assessment
 - Influences valuation methodology
 
+### 7. Net Capital Calculation Method (`nc_calculation_method`)
+Used in: `deals_clean.nc_calculation_method`
+
+| Value | Description |
+|-------|-------------|
+| `standard` | NC = GC - (SFR × GC) - Premium |
+| `direct` | NC = GC (Reddit, Scout, New Heights, Egypt) |
+| `structured` | NC = GC × (1 - SFR) (Figure AI) |
+| `premium_based` | NC = GC × (PMSP/ISP) (Impossible, SpaceX 2) |
+| `complex` | (GC × (1 - SFR)) × (PMSP/ISP) (OpenAI) |
+| `inverse` | NC = GC / (1 + SFR) (SpaceX 1) |
+
+**Usage Notes:**
+- Controls NC derivation per deal template
+- Validated against `formula_templates` text
+
+### 8. Premium Calculation Method (`premium_calculation_method`)
+Used in: `deals_clean.premium_calculation_method`
+
+| Value | Description |
+|-------|-------------|
+| `valuation_based` | (PMSP/ISP - 1) based premium |
+| `unit_price_based` | (EUP/IUP) based premium |
+| `built_in_nc` | Premium inherent in NC formula |
+| `none` | No premium applied |
+
+**Usage Notes:**
+- Determines where premium is computed and applied
+- Some templates build premium into NC
+
 ## Document & Compliance Enums
 
 ### 7. Document Category (`document_category_enum`)
