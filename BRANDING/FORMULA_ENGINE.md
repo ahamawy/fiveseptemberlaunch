@@ -271,3 +271,10 @@ function validatePartnerFees(deal) {
 - [ ] Support discount framework
 - [ ] Calculate partner splits
 - [ ] Generate audit trail
+
+## Schema Linkage and QA
+- Templates select and behavior: `deals_clean.formula_template`, `deals_clean.nc_calculation_method`, `deals_clean.premium_calculation_method`, `deals_clean.fee_base_capital`
+- Tiering: `management_fee_tier_1_percent`, `management_fee_tier_2_percent`, `tier_1_period`
+- Other fees: `transactions_clean.other_fees`, `transactions_clean.other_fees_description`
+- Audit trail: `formula_calculation_log` inputs/steps/outputs
+- See also: `BRANDING/FORMULA_ENGINE_SCHEMA_MAPPING.md`, `BRANDING/DOCS_QA_CHECKLIST.md`
