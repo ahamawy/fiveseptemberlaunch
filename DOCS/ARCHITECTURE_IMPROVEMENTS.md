@@ -299,7 +299,7 @@ if (!requireAdmin(authContext)) {
 
 ### Migration Tracking
 Created `schema_migrations` table to track applied migrations:
-- Base schema, ARCHON, Formula system
+- Base schema, Formula system
 - Constraints, indexes, RLS policies
 - All migrations are idempotent and safe to re-run
 

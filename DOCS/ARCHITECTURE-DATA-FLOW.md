@@ -5,7 +5,7 @@ Purpose: Stop churn by enforcing a single source of truth, clear contracts, and 
 ## Principles
 
 - Single source of truth for numbers is Supabase (tables, views, SQL/PLPGSQL functions).
-- No money/valuation/fee calculations in the frontend or API handlers; only in DB or ARCHON Fee Engine.
+- No money/valuation/fee calculations in the frontend or API handlers; only in DB or the Fee Engine.
 - API routes validate and shape data only; repositories fetch; UI renders.
 - Contracts (Zod) define exact input/output for each API.
 - Fees: precedence enforced, discounts are negative, 2-decimal rounding, integer units, audit trail in notes.

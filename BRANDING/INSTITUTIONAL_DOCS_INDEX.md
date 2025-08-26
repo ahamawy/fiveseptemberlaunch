@@ -1,7 +1,7 @@
 # EQUITIE Institutional Documentation Index
 
 ## Purpose
-A single entry point for all investor- and regulator-grade documentation. Use this index to navigate canonical references, fee engine specs, schema mappings, and QA gates.
+A single entry point for business logic and Supabase mapping documentation. Use this index to navigate canonical references, fee calculation specs, schema mappings, and QA gates.
 
 ## Canonical References
 - Formula Engine (templates, variables, validations): `BRANDING/FORMULA_ENGINE.md`
@@ -13,9 +13,8 @@ A single entry point for all investor- and regulator-grade documentation. Use th
 - Entity Relationships: `BRANDING/ENTITY_RELATIONSHIPS.md`
 - Enumerations: `BRANDING/ENUM_REFERENCE.md`
 
-## Fee Engine Deep Context
-- ARCHON Fee Engine Context (legacy deep dive): `ARCHIVE/docs/ARCHON_FEE_ENGINE_CONTEXT.md`
-  - Status: Referenced for historical context; authoritative implementation lives in `lib/services/fee-engine/` and `BRANDING/FORMULA_ENGINE.md`.
+## Fee Engine Context
+Authoritative implementation lives in `lib/services/fee-engine/` and `BRANDING/FORMULA_ENGINE.md`.
 
 ## Schema Mapping Addendum
 - Formula Engine ↔ Clean Schema mapping and invariants: `BRANDING/FORMULA_ENGINE_SCHEMA_MAPPING.md`

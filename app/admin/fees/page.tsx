@@ -59,8 +59,8 @@ const feeTools: FeeToolCard[] = [
     status: 'beta'
   },
   {
-    title: 'ARCHON Fee Engine',
-    description: 'Interactive calculator for testing fee scenarios with ARCHON precedence algorithm.',
+    title: 'Fee Engine',
+    description: 'Interactive calculator for testing fee scenarios with precedence algorithm.',
     href: '/admin/equitie-fee-engine',
     icon: CalculatorIcon,
     category: 'calculation',
@@ -127,7 +127,7 @@ export default function FeeHubPage() {
             <div className="space-y-2 text-sm text-muted-foreground">
               <p><strong className="text-white">New Deal Setup:</strong> Start with Fee Profiles to configure your fee structure</p>
               <p><strong className="text-white">Importing Fees:</strong> Use Smart Import for automatic mapping or Import V2 for manual control</p>
-              <p><strong className="text-white">Testing Calculations:</strong> Use ARCHON Fee Engine to validate your fee logic</p>
+              <p><strong className="text-white">Testing Calculations:</strong> Use the Fee Engine to validate your fee logic</p>
               <p><strong className="text-white">Complex Scenarios:</strong> Deal Equations for custom formulas and edge cases</p>
             </div>
           </CardContent>
@@ -182,7 +182,7 @@ export default function FeeHubPage() {
               <div>
                 <h3 className="text-lg font-semibold text-white mb-1">Need Help?</h3>
                 <p className="text-sm text-muted-foreground">
-                  View the complete documentation for fee management and ARCHON engine
+                  View the complete documentation for fee management and the fee engine
                 </p>
               </div>
               <a

@@ -1,8 +1,8 @@
-# EQUITIE Bot Context (Backend Reasoning Guide with ARCHON Fee Engine)
+# EQUITIE Bot Context (Backend Reasoning Guide with Fee Engine)
 
 > For feature-specific canonical docs, refer to `FEATURES/<feature-code>-<feature-name>/README.md`. For Fees, see `FEATURES/fees/README.md`.
 
-This document provides the AI agent with comprehensive context about our data model, conventions, flows, and the integrated ARCHON Fee Engine for intelligent data processing and fee calculations.
+This document provides the AI agent with comprehensive context about our data model, conventions, flows, and the integrated Fee Engine for intelligent data processing and fee calculations.
 
 ## Conventions
 
@@ -42,7 +42,7 @@ This document provides the AI agent with comprehensive context about our data mo
 - Use `eng.units_ledger` + `analytics.v_unit_prices` for AUM and MOIC
 - Normalize legacy rows to 1,000 USD unit price unless explicitly documented otherwise
 
-## ARCHON Fee Engine Integration
+## Fee Engine Integration
 
 ### Enhanced Calculator (`lib/services/fee-engine/enhanced-calculator.ts`)
 

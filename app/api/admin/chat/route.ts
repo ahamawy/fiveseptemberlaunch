@@ -293,7 +293,7 @@ export async function POST(req: NextRequest) {
         // Add fee context to reasoning
         const feeContext = extractedData ? {
           ...extractedData,
-          feeEngineVersion: 'ARCHON Enhanced v2.0',
+          feeEngineVersion: 'EquiTie Fee Engine v1',
           capabilities: ['precedence ordering', 'basis calculations', 'discount handling', 'partner fees']
         } : {};
 
@@ -345,8 +345,8 @@ export async function POST(req: NextRequest) {
 
     // If no specific processing, provide enhanced helpful response
     if (!response) {
-      response = `🤖 **EQUITIE AI Agent with ARCHON Fee Engine**\n\n`;
-      response += `I'm your intelligent assistant powered by GPT-5 reasoning and the ARCHON Fee Engine. I can:\n\n`;
+      response = `🤖 **EQUITIE AI Agent with Fee Engine**\n\n`;
+      response += `I'm your intelligent assistant powered by GPT-5 reasoning and the EquiTie Fee Engine. I can:\n\n`;
       response += `**📊 Data Processing:**\n`;
       response += `• Parse CSV files (investors, fees, transactions)\n`;
       response += `• Extract data from PDFs (LPAs, fee schedules)\n`;
@@ -412,7 +412,7 @@ async function getEnhancedChatResponse(message: string): Promise<string> {
         messages: [
           {
             role: 'system',
-            content: `You are the EQUITIE AI Agent powered by GPT-5 with the ARCHON Fee Engine integrated. You have deep knowledge of:
+            content: `You are the EQUITIE AI Agent powered by GPT-5 with the Fee Engine integrated. You have deep knowledge of:
 
 1. Fee Calculations:
    - Precedence-based fee ordering (PREMIUM always first)
@@ -445,6 +445,6 @@ Use step-by-step reasoning to solve complex problems. When discussing fees, alwa
     const data = await response.json();
     return data?.choices?.[0]?.message?.content || 'I can help you with fee calculations, data processing, and investment analysis. What would you like to know?';
   } catch (error) {
-    return 'I\'m your EQUITIE AI Agent with integrated ARCHON Fee Engine. Upload a CSV or PDF, or ask me about fee calculations, investor data, or investment analysis!';
+    return 'I\'m your EQUITIE AI Agent with the integrated Fee Engine. Upload a CSV or PDF, or ask me about fee calculations, investor data, or investment analysis!';
   }
 }

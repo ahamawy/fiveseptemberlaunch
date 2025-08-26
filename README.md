@@ -67,7 +67,7 @@ node SCRIPTS/health-check.js
 ```
 Checks core pages and APIs and reports summary (expects 200s). Update routes in `SCRIPTS/health-check.js` as needed.
 
-## ARCHON Fee Engine
+## Fee Engine
 
 - Precedence-based ordering (PREMIUM first)
 - Basis: GROSS | NET | NET_AFTER_PREMIUM
@@ -141,7 +141,7 @@ Checks core pages and APIs and reports summary (expects 200s). Update routes in 
 ## Status
 
 ✅ Supabase integrated
-✅ ARCHON Fee Engine operational
+✅ Fee Engine operational
 ✅ 25 tests passing
 ✅ AI assistant active
 
