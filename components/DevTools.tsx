@@ -76,7 +76,7 @@ export function DevTools() {
       {/* Theme Toggle Button */}
       <button
         onClick={toggleTheme}
-        className="fixed bottom-4 right-20 z-50 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-xs font-mono"
+        className="fixed bottom-4 left-20 z-[9998] bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-xs font-mono"
       >
         {theme === 'dark' ? (
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -92,7 +92,7 @@ export function DevTools() {
       {/* Dev Tools Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 z-50 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-xs font-mono"
+        className="fixed bottom-4 left-4 z-[9998] bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-xs font-mono"
       >
         {isOpen ? (
           <>

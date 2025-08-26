@@ -14,6 +14,8 @@ import {
   TableCell,
 } from "@/components/ui/Table";
 import { formatCurrency, formatDate } from "@/lib/theme-utils";
+import { ExportButton } from "@/components/ui/ExportButton";
+import { SearchBar } from "@/components/ui/SearchBar";
 
 interface Transaction {
   id: number;
@@ -57,6 +59,8 @@ function TransactionsContent() {
   const [filterType, setFilterType] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
 
   const searchParams = useSearchParams();
   const investorParam = searchParams.get("investor");
@@ -126,12 +130,32 @@ function TransactionsContent() {
       };
 
       setData(transactionsData);
+      setFilteredTransactions(transactionsData.transactions);
     } catch (error) {
       // Error is handled by setting loading state
     } finally {
       setLoading(false);
     }
   };
+
+  // Filter transactions based on search query
+  useEffect(() => {
+    if (!data) return;
+    
+    const filtered = data.transactions.filter(transaction => {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        transaction.dealName?.toLowerCase().includes(searchLower) ||
+        transaction.companyName?.toLowerCase().includes(searchLower) ||
+        transaction.description?.toLowerCase().includes(searchLower) ||
+        transaction.reference?.toLowerCase().includes(searchLower) ||
+        transaction.type?.toLowerCase().includes(searchLower) ||
+        transaction.amount?.toString().includes(searchQuery)
+      );
+    });
+    
+    setFilteredTransactions(filtered);
+  }, [searchQuery, data]);
 
   if (loading) {
     return (
@@ -306,12 +330,21 @@ function TransactionsContent() {
       <div className="relative z-10">
       {/* Header */}
       <div className="pb-6 border-b border-border">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
-          Transaction History
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          View all your investment transactions and cash flows
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
+              Transaction History
+            </h1>
+            <p className="mt-2 text-muted-foreground">
+              View all your investment transactions and cash flows
+            </p>
+          </div>
+          <ExportButton 
+            data={data.transactions}
+            type="transactions"
+            className="mt-2"
+          />
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -368,9 +401,21 @@ function TransactionsContent() {
           <CardTitle>All Transactions</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Filters */}
-          <div className="flex flex-wrap gap-4 mb-6">
-            <div>
+          {/* Search and Filters */}
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-4 mb-4">
+              <div className="flex-1 min-w-[300px]">
+                <SearchBar 
+                  placeholder="Search transactions by deal, company, description..."
+                  onSearch={setSearchQuery}
+                  defaultValue={searchQuery}
+                  showResults
+                  resultCount={filteredTransactions.length}
+                />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-4">
+              <div>
               <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Type
               </label>
@@ -409,6 +454,7 @@ function TransactionsContent() {
                 <option value="cancelled">Cancelled</option>
               </select>
             </div>
+            </div>
           </div>
 
           {/* Transactions Table */}
@@ -426,7 +472,7 @@ function TransactionsContent() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.transactions.map((transaction) => (
+                {filteredTransactions.map((transaction) => (
                   <TableRow key={transaction.id}>
                     <TableCell className="text-foreground">
                       {formatDate(transaction.occurredOn)}

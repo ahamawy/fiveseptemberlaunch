@@ -20,6 +20,7 @@ import {
   TableCell,
 } from "@/components/ui/Table";
 import { formatCurrency, formatPercentage } from "@/lib/theme-utils";
+import { ExportButton } from "@/components/ui/ExportButton";
 
 interface Commitment {
   id: number;
@@ -220,12 +221,21 @@ function DealsContent() {
       <div className="relative z-10">
       {/* Header */}
       <div className="pb-6 border-b border-border">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
-          Deals & Commitments
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Manage your investment commitments and track deal progress
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
+              Deals & Commitments
+            </h1>
+            <p className="mt-2 text-muted-foreground">
+              Manage your investment commitments and track deal progress
+            </p>
+          </div>
+          <ExportButton 
+            data={data.commitments}
+            type="deals"
+            className="mt-2"
+          />
+        </div>
       </div>
 
       {/* Summary Statistics */}

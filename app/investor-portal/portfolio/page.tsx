@@ -13,6 +13,7 @@ import { BarChart } from "@/components/ui/BarChart";
 import { NivoPie } from "@/components/ui/NivoCharts";
 import { MotionSection } from "@/components/ui/Motion";
 import { resolveInvestorId as resolveId } from "@/lib/utils/investor";
+import { ExportButton } from "@/components/ui/ExportButton";
 
 interface DealPerformance {
   dealId: number;
@@ -200,12 +201,21 @@ export default function PortfolioPage() {
           {/* Header */}
           <MotionSection>
             <div className="pb-6 border-b border-border">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
-                Portfolio Overview
-              </h1>
-              <p className="mt-2 text-muted-foreground">
-                Detailed view of your investment portfolio
-              </p>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
+                    Portfolio Overview
+                  </h1>
+                  <p className="mt-2 text-muted-foreground">
+                    Detailed view of your investment portfolio
+                  </p>
+                </div>
+                <ExportButton 
+                  data={data.deals}
+                  type="portfolio"
+                  className="mt-2"
+                />
+              </div>
             </div>
           </MotionSection>
 
