@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import PortalSwitcher from "@/components/PortalSwitcher";
+import { Logo } from "@/components/ui/Logo";
+import { cn } from "@/lib/utils";
 
 export default function AdminLayout({
   children,
@@ -17,42 +19,50 @@ export default function AdminLayout({
     { href: "/admin/investors", label: "Investors" },
     { href: "/admin/transactions", label: "Transactions" },
     { href: "/admin/companies", label: "Companies" },
-    { href: "/admin/formulas", label: "Formulas" },
     { href: "/admin/fees", label: "Fees" },
     { href: "/admin/monitoring", label: "Monitoring" },
     { href: "/admin/api-docs", label: "API Docs" },
   ];
 
   return (
-    <div className="min-h-screen bg-background-deep">
+    <div className="relative min-h-screen bg-background">
+      <div className="absolute inset-0 bg-gradient-mesh opacity-10 pointer-events-none" />
       <PortalSwitcher />
-      <nav className="sticky top-0 z-30 bg-white/80 dark:bg-background-surface/80 backdrop-blur-md border-b border-surface-border">
+      <nav className="sticky top-0 z-30 bg-card/80 backdrop-blur-md border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-14 flex items-center justify-between">
-            <div className="text-primary-300 font-semibold">Admin</div>
-            <div className="flex gap-2">
-              {links.map((l) => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
-                    pathname?.startsWith(l.href)
-                      ? "bg-primary-900/40 text-primary-200"
-                      : "text-text-secondary hover:text-text-primary hover:bg-surface-hover"
-                  }`}
-                >
-                  {l.label}
-                </Link>
-              ))}
+          <div className="h-16 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Logo size="sm" />
+              <span className="text-lg font-semibold text-muted-foreground">Admin Portal</span>
+            </div>
+            <div className="flex gap-1">
+              {links.map((link) => {
+                const isActive = pathname?.startsWith(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                      isActive
+                        ? "bg-primary/20 text-primary shadow-sm"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
       </nav>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
     </div>
   );
 }
+
 
 

@@ -152,6 +152,32 @@ export function apiPaginated<T>(
 }
 
 /**
+ * Attaches standard cache headers to a response
+ */
+export function withCache<T = any>(
+  response: NextResponse<T>,
+  options: { sMaxage?: number; staleWhileRevalidate?: number } = {}
+): NextResponse<T> {
+  const { sMaxage = 60, staleWhileRevalidate = 300 } = options;
+  response.headers.set(
+    'Cache-Control',
+    `s-maxage=${sMaxage}, stale-while-revalidate=${staleWhileRevalidate}`
+  );
+  return response;
+}
+
+/**
+ * Attaches arbitrary headers to a response
+ */
+export function withHeaders<T = any>(
+  response: NextResponse<T>,
+  headers: Record<string, string>
+): NextResponse<T> {
+  Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
+  return response;
+}
+
+/**
  * Parse and validate query parameters
  */
 export function parseQueryParams(url: string) {

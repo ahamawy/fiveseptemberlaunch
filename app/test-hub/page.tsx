@@ -191,7 +191,7 @@ function HealthCheckItem({ name, status }: { name: string; status: "healthy" | "
   const statusConfig = {
     healthy: { icon: CheckCircleIcon, color: "text-green-500", badge: "success" as const },
     warning: { icon: ArrowPathIcon, color: "text-yellow-500", badge: "warning" as const },
-    error: { icon: XCircleIcon, color: "text-red-500", badge: "destructive" as const },
+    error: { icon: XCircleIcon, color: "text-red-500", badge: "error" as const },
   };
 
   const config = statusConfig[status];

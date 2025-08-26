@@ -1,0 +1,9 @@
+{
+  "animations": { "enabled": true },
+  "durations": { "fast": 0.3, "base": 0.6, "slow": 0.9 },
+  "easing": {
+    "snap": [0.83, 0, 0.17, 1],
+    "soft": [0.22, 1, 0.36, 1]
+  }
+}
+

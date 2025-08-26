@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { investorsService } from "@/lib/services";
 import { getServiceClient } from "@/lib/db/supabase/server-client";
-import { apiSuccess, apiError, apiPaginated } from "@/lib/utils/api-response";
+import { apiSuccess, apiError, apiPaginated, withCache, withHeaders } from "@/lib/utils/api-response";
 import { TransactionSchema, Transaction } from "@/lib/contracts/api/transactions";
 import * as crypto from "crypto";
 import { z } from "zod";
@@ -55,9 +55,8 @@ export async function GET(
     const dealIds = Array.from(
       new Set(rows.map((r: any) => r.deal_id).filter(Boolean))
     );
-    const { data: deals } = await (sb as any)
-      .schema("deals")
-      .from("deal")
+    const { data: deals } = await sb
+      .from("deals_clean")
       .select("deal_id, deal_name, deal_currency, underlying_company_id")
       .in("deal_id", dealIds);
     const dealIdToDeal = new Map<number, any>();
@@ -66,9 +65,8 @@ export async function GET(
       dealIdToDeal.set(d.deal_id, d);
       if (d.underlying_company_id) companyIds.add(d.underlying_company_id);
     });
-    const { data: companies } = await (sb as any)
-      .schema("companies")
-      .from("company")
+    const { data: companies } = await sb
+      .from("companies_clean")
       .select("company_id, company_name, company_sector")
       .in("company_id", Array.from(companyIds));
     const companyIdToName = new Map<number, string>();
@@ -81,9 +79,8 @@ export async function GET(
     // Documents per deal for this investor
     let docsByDeal = new Map<number, number>();
     if (dealIds.length > 0) {
-      const { data: docs } = await (sb as any)
-        .schema("documents")
-        .from("document")
+      const { data: docs } = await sb
+        .from("documents")
         .select("deal_id")
         .in("deal_id", dealIds)
         .eq("investor_id", investorId);
@@ -164,9 +161,9 @@ export async function GET(
       });
     }
     
-    // Add cache headers for performance
-    response.headers.set('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
-    response.headers.set('X-Correlation-Id', correlationId);
+    // Add cache and tracing headers
+    response = withCache(response, { sMaxage: 30, staleWhileRevalidate: 60 });
+    response = withHeaders(response, { 'X-Correlation-Id': correlationId });
     
     return response;
   } catch (error) {

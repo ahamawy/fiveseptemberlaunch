@@ -502,9 +502,10 @@ export default function ApiDocumentationPortal() {
         data,
         timestamp: new Date().toISOString()
       });
-    } catch (error) {
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
       setTestResult({
-        error: error.message,
+        error: message,
         timestamp: new Date().toISOString()
       });
     }
@@ -565,7 +566,7 @@ export default function ApiDocumentationPortal() {
                     >
                       <span className="font-medium text-text-primary">{category}</span>
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary">{categoryEndpoints.length}</Badge>
+                        <Badge variant="info">{categoryEndpoints.length}</Badge>
                         {expandedCategories.has(category) ? (
                           <ChevronDownIcon className="w-4 h-4 text-text-secondary" />
                         ) : (
@@ -643,7 +644,7 @@ export default function ApiDocumentationPortal() {
                         </Badge>
                       )}
                       {selectedEndpoint.since && (
-                        <Badge variant="secondary">
+                        <Badge variant="info">
                           Since {selectedEndpoint.since}
                         </Badge>
                       )}
@@ -695,7 +696,7 @@ export default function ApiDocumentationPortal() {
                                     {param.type}
                                   </Badge>
                                   {param.required && (
-                                    <Badge variant="destructive" className="text-xs">Required</Badge>
+                                    <Badge variant="error" className="text-xs">Required</Badge>
                                   )}
                                 </div>
                                 <p className="text-sm text-text-secondary mt-1">
@@ -704,7 +705,7 @@ export default function ApiDocumentationPortal() {
                                 {param.enum && (
                                   <div className="flex flex-wrap gap-1 mt-2">
                                     {param.enum.map((value) => (
-                                      <Badge key={value} variant="secondary" className="text-xs">
+                                      <Badge key={value} variant="info" className="text-xs">
                                         {value}
                                       </Badge>
                                     ))}
@@ -731,7 +732,7 @@ export default function ApiDocumentationPortal() {
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">{selectedEndpoint.requestBody.type}</Badge>
                           {selectedEndpoint.requestBody.required && (
-                            <Badge variant="destructive" className="text-xs">Required</Badge>
+                            <Badge variant="error" className="text-xs">Required</Badge>
                           )}
                         </div>
                         {selectedEndpoint.requestBody.schema && (
@@ -748,7 +749,7 @@ export default function ApiDocumentationPortal() {
                       {selectedEndpoint.responses.map((response, idx) => (
                         <div key={idx} className="p-3 bg-surface-elevated rounded-lg">
                           <div className="flex items-center gap-2 mb-2">
-                            <Badge variant={response.status < 300 ? "success" : response.status < 400 ? "warning" : "destructive"}>
+                            <Badge variant={response.status < 300 ? "success" : response.status < 400 ? "warning" : "error"}>
                               {response.status}
                             </Badge>
                             <span className="text-sm text-text-secondary">{response.description}</span>
@@ -774,7 +775,7 @@ export default function ApiDocumentationPortal() {
                         ) : (
                           <>
                             <div className="flex items-center gap-2 mb-3">
-                              <Badge variant={testResult.status < 300 ? "success" : "destructive"}>
+                              <Badge variant={testResult.status < 300 ? "success" : "error"}>
                                 {testResult.status} {testResult.statusText}
                               </Badge>
                               <span className="text-xs text-text-tertiary">{testResult.timestamp}</span>

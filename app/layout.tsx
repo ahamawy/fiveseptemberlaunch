@@ -21,7 +21,16 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "EquiTie Investor Portal",
-  description: "Manage your investment portfolio",
+  description: "Institutional-grade investment portfolio management platform",
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
+  themeColor: '#8B5CF6',
 };
 
 export default function RootLayout({

@@ -12,7 +12,7 @@ export class TransactionsRepo extends BaseRepo {
   async listEnriched(filters: TxListFilters = {}) {
     const limit = Math.min(500, Math.max(1, filters.limit ?? 50));
     let query = this.db
-      .from("transactions.transaction.primary")
+      .from("transactions_clean")
       .select("*")
       .order("transaction_date", { ascending: false })
       .limit(limit);
@@ -32,7 +32,7 @@ export class TransactionsRepo extends BaseRepo {
     );
 
     const { data: deals } = await this.db
-      .from("deals.deal")
+      .from("deals_clean")
       .select("deal_id, deal_name, underlying_company_id")
       .in("deal_id", dealIds);
     const dealIdToDeal = new Map<number, any>();
@@ -43,7 +43,7 @@ export class TransactionsRepo extends BaseRepo {
     });
 
     const { data: companies } = await this.db
-      .from("companies.company")
+      .from("companies_clean")
       .select("company_id, company_name")
       .in("company_id", Array.from(companyIds));
     const companyIdToName = new Map<number, string>();
@@ -52,7 +52,7 @@ export class TransactionsRepo extends BaseRepo {
     );
 
     const { data: investors } = await this.db
-      .from("investors.investor")
+      .from("investors_clean")
       .select("investor_id, full_name")
       .in("investor_id", investorIds);
     const investorIdToName = new Map<number, string>();
@@ -100,5 +100,6 @@ export class TransactionsRepo extends BaseRepo {
 }
 
 export const transactionsRepo = new TransactionsRepo();
+
 
 

@@ -89,6 +89,14 @@
   .glass-adaptive { @apply backdrop-blur-md; }
   .glass-dark { @apply backdrop-blur-md border border-border; }
 
+  /* Gradient mesh background */
+  .bg-gradient-mesh {
+    background-image: 
+      radial-gradient(at 40% 20%, hsla(263, 70%, 50%, 0.15) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.05) 0px, transparent 50%);
+  }
+  
   /* Simple glow shadows */
   .shadow-glow-primary { box-shadow: 0 0 24px rgba(139, 92, 246, 0.3); }
   .shadow-glow-purple { box-shadow: 0 0 24px rgba(139, 92, 246, 0.3); }
@@ -100,6 +108,42 @@
   /* Shimmer animation for skeletons */
   @keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
   .animate-shimmer { animation: shimmer 2s linear infinite; }
+  
+  /* Legacy class mappings for consistency */
+  .bg-background-deep { @apply bg-background; }
+  .bg-background-surface { @apply bg-card; }
+  .bg-surface-hover { @apply bg-muted; }
+  .bg-surface-elevated { @apply bg-card; }
+  .border-surface-border { @apply border-border; }
+  .text-text-primary { @apply text-foreground; }
+  .text-text-secondary { @apply text-muted-foreground; }
+  .text-text-tertiary { @apply text-muted-foreground/70; }
+  
+  /* Missing primary color classes */
+  .text-primary-300 { color: hsl(263 70% 65%); }
+  .text-primary-200 { color: hsl(263 70% 75%); }
+  .text-primary-400 { color: hsl(263 70% 55%); }
+  .text-primary-500 { color: hsl(263 70% 50%); }
+  .bg-primary-300 { background: hsl(263 70% 65%); }
+  .bg-primary-400 { background: hsl(263 70% 55%); }
+  .bg-primary-500 { background: hsl(263 70% 50%); }
+  .bg-primary-900 { background: hsl(263 70% 20%); }
+  .bg-primary-300\/20 { background: hsla(263, 70%, 65%, 0.2); }
+  .bg-primary-300\/10 { background: hsla(263, 70%, 65%, 0.1); }
+  .bg-primary-500\/5 { background: hsla(263, 70%, 50%, 0.05); }
+  .bg-primary-900\/40 { background: hsla(263, 70%, 20%, 0.4); }
+  
+  /* Accent colors */
+  .bg-accent-blue { background: #7BB8F0; }
+  .text-accent-blue { color: #7BB8F0; }
+  .from-primary-300 { --tw-gradient-from: hsl(263 70% 65%); }
+  .to-accent-blue { --tw-gradient-to: #7BB8F0; }
+  
+  /* Status colors */
+  .text-status-success { @apply text-green-500; }
+  .text-status-error { @apply text-red-500; }
+  .text-status-warning { @apply text-amber-500; }
+  .text-status-info { @apply text-blue-500; }
 
   /* Animated gradient helper */
   @keyframes gradientMove {

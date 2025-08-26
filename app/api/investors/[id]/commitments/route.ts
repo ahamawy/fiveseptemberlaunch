@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { investorsService } from '@/lib/services';
-import { apiSuccess, apiError } from '@/lib/utils/api-response';
+import { apiSuccess, apiError, withCache, withHeaders } from '@/lib/utils/api-response';
 import { CommitmentsResponseSchema } from '@/lib/contracts/api/commitments';
 import * as crypto from 'crypto';
 
@@ -82,16 +82,15 @@ export async function GET(
     const responseTime = Date.now() - startTime;
     
     // Create successful response with metadata
-    const response = apiSuccess(validatedData, {
+    let response = apiSuccess(validatedData, {
       correlationId,
       responseTime,
       commitmentsCount: validatedData.commitments.length,
       hasUpcomingCalls: validatedData.upcomingCalls.length > 0,
     });
     
-    // Add cache headers for performance
-    response.headers.set('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
-    response.headers.set('X-Correlation-Id', correlationId);
+    response = withCache(response, { sMaxage: 60, staleWhileRevalidate: 300 });
+    response = withHeaders(response, { 'X-Correlation-Id': correlationId });
     
     return response;
   } catch (error) {

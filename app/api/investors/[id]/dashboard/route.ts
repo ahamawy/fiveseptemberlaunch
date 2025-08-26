@@ -4,6 +4,8 @@ import {
   apiSuccess,
   apiError,
   apiValidationError,
+  withCache,
+  withHeaders,
 } from "@/lib/utils/api-response";
 import { DashboardDataSchema } from "@/lib/contracts/api/dashboard";
 import { z } from "zod";
@@ -61,18 +63,16 @@ export async function GET(
     // Validate response with schema
     const validatedData = DashboardDataSchema.parse(responseData);
 
-    const response = apiSuccess(validatedData, {
+    let response = apiSuccess(validatedData, {
       correlationId,
       responseTime: Date.now() - startTime,
     });
 
-    // Add cache headers
-    response.headers.set(
-      "Cache-Control",
-      "s-maxage=60, stale-while-revalidate=300"
-    );
-    response.headers.set("x-correlation-id", correlationId);
-    response.headers.set("x-response-time", `${Date.now() - startTime}ms`);
+    response = withCache(response, { sMaxage: 60, staleWhileRevalidate: 300 });
+    response = withHeaders(response, {
+      'x-correlation-id': correlationId,
+      'x-response-time': `${Date.now() - startTime}ms`,
+    });
 
     return response;
   } catch (error) {

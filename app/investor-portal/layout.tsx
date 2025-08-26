@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import PortalSwitcher from '@/components/PortalSwitcher';
+import { Logo } from '@/components/ui/Logo';
 
 interface InvestorPortalLayoutProps {
   children: ReactNode;
@@ -26,23 +27,14 @@ export default function InvestorPortalLayout({ children }: InvestorPortalLayoutP
     <div className="relative min-h-screen bg-background">
       <div className="absolute inset-0 bg-gradient-mesh opacity-10 pointer-events-none" />
       <PortalSwitcher />
-      <nav className="bg-white dark:bg-background-surface/80 backdrop-blur-md shadow-md dark:shadow-glow-purple/10 border-b border-gray-200 dark:border-surface-border relative z-10">
+      <nav className="sticky top-0 z-30 bg-card/80 backdrop-blur-md border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex items-center gap-2">
-              {process.env.NEXT_PUBLIC_LOGO_URL ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={process.env.NEXT_PUBLIC_LOGO_URL}
-                  alt="logo"
-                  className="w-6 h-6 rounded border border-surface-border object-contain"
-                />
-              ) : null}
-              <h1 className="text-xl font-semibold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
-                Investor Portal
-              </h1>
+            <div className="flex items-center gap-3">
+              <Logo size="sm" />
+              <span className="text-lg font-semibold text-muted-foreground">Investor Portal</span>
             </div>
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center gap-1">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 return (
@@ -52,8 +44,8 @@ export default function InvestorPortalLayout({ children }: InvestorPortalLayoutP
                     className={cn(
                       'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
                       isActive
-                        ? 'bg-primary-500 text-white dark:bg-primary-300/20 dark:text-primary-300 shadow-lg dark:shadow-glow-purple/20'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-text-secondary dark:hover:text-text-primary dark:hover:bg-background-surface'
+                        ? 'bg-primary/20 text-primary shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                     )}
                   >
                     <span>{link.label}</span>

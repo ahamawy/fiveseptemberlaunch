@@ -5,8 +5,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getCacheAdapter } from '@/lib/infrastructure/cache';
+import { withIdempotency } from '@/lib/utils/api-middleware';
 
-export async function POST(request: NextRequest) {
+export const POST = withIdempotency(async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { pattern, tags, all } = body;
@@ -63,14 +64,14 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         error: 'Failed to invalidate cache',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );
   }
-}
+});
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = withIdempotency(async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');
@@ -102,9 +103,9 @@ export async function DELETE(request: NextRequest) {
       {
         success: false,
         error: 'Failed to delete cache entry',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );
   }
-}
+});

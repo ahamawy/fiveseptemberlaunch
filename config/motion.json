@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "glowFollow": { "enabled": true, "radius": 220 }
+  },
+  "scroll": { "viewportOnce": true, "amount": 0.25 },
+  "micro": {
+    "hover": { "whileHover": { "y": -2, "scale": 1.02 } },
+    "tap": { "whileTap": { "scale": 0.98 } }
+  }
+}
+

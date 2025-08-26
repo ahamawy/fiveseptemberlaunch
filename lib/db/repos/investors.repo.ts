@@ -15,7 +15,7 @@ export class InvestorsRepo extends BaseRepo {
 
     // Get investor-specific transaction summary from the proper table
     const { data: txSummary } = await this.db
-      .from("transactions.transaction.primary")
+      .from("transactions_clean")
       .select("gross_capital, initial_net_capital")
       .eq("investor_id", investorId);
 
@@ -38,7 +38,7 @@ export class InvestorsRepo extends BaseRepo {
 
     // Recent activity (last 5)
     const { data: recent } = await this.db
-      .from("transactions")
+      .from("transactions_clean")
       .select(
         "deal_id, transaction_date, initial_net_capital, gross_capital, transaction_type, investor_id"
       )
@@ -91,7 +91,7 @@ export class InvestorsRepo extends BaseRepo {
     if (perDeal.length === 0) {
       // Fallback: aggregate from transactions by deal
       const { data: tx } = await this.db
-        .from("transactions")
+        .from("transactions_clean")
         .select("deal_id, initial_net_capital, gross_capital, investor_id")
         .eq("investor_id", investorId);
       const map = new Map<number, { net: number; cur: number }>();
@@ -210,7 +210,7 @@ export class InvestorsRepo extends BaseRepo {
     const investorsByDeal = new Map<number, number>();
     try {
       const { data: investors } = await this.db
-        .from("transactions")
+        .from("transactions_clean")
         .select("deal_id, investor_id")
         .in("deal_id", dealIds);
 

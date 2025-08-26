@@ -1,0 +1,22 @@
+{
+  "hero": { "primaryCta": { "href": "/investor-portal/dashboard" } },
+  "cta": { "copy": "Track your investments, analyze performance, and access secure documents." },
+  "stats": [
+    { "id": "aum", "label": "Assets Tracked", "value": 125000000, "format": "$0,0a+" },
+    { "id": "deals", "label": "Active Deals", "value": 24, "format": "0+" },
+    { "id": "investors", "label": "Investors", "value": 202, "format": "0+" },
+    { "id": "documents", "label": "Documents", "value": 4821, "format": "0,0+" }
+  ],
+  "positioning": {
+    "paragraphs": [
+      { "textKey": "sections.positioningBody1" },
+      { "textKey": "sections.positioningBody2" }
+    ],
+    "claims": [
+      "bootstrapped-profitable",
+      "institutional-security",
+      "glass-morphism-ui"
+    ]
+  }
+}
+

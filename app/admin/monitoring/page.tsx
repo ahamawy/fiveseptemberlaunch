@@ -283,7 +283,7 @@ export default function MonitoringDashboard() {
                 <Badge variant={
                   service.status === "healthy" ? "success" : 
                   service.status === "degraded" ? "warning" : 
-                  "destructive"
+                  "error"
                 }>
                   {service.status}
                 </Badge>
@@ -323,7 +323,7 @@ export default function MonitoringDashboard() {
                     {tag}
                   </Badge>
                 ))}
-                <Badge variant={flag.enabled ? "success" : "secondary"}>
+                <Badge variant={flag.enabled ? "success" : "default"}>
                   {flag.enabled ? "Enabled" : "Disabled"}
                 </Badge>
               </div>
@@ -431,7 +431,7 @@ export default function MonitoringDashboard() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm">SMS Provider</span>
-                <Badge variant="destructive">Open</Badge>
+                <Badge variant="error">Open</Badge>
               </div>
             </div>
           </CardContent>
@@ -482,7 +482,7 @@ export default function MonitoringDashboard() {
             </div>
             <div className="flex items-center gap-3">
               <Button
-                variant={autoRefresh ? "default" : "outline"}
+                variant={autoRefresh ? "glass" : "outline"}
                 onClick={() => setAutoRefresh(!autoRefresh)}
                 className="flex items-center gap-2"
               >

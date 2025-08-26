@@ -3,20 +3,12 @@
  * Central export for all cache-related functionality
  */
 
-export * from './redis-adapter';
-export * from './strategies';
+export { RedisCacheAdapter, InMemoryCacheAdapter, CacheFactory, getCacheAdapter } from './redis-adapter';
+export type { ICacheAdapter, CacheOptions, CacheStats } from './redis-adapter';
+export { CacheKeyGenerator, CacheStrategies, cacheManager } from './strategies';
 
 import { getCacheAdapter, ICacheAdapter } from './redis-adapter';
 import { CacheKeyGenerator, CacheStrategies, cacheManager } from './strategies';
-
-// Re-export commonly used items
-export {
-  getCacheAdapter,
-  ICacheAdapter,
-  CacheKeyGenerator,
-  CacheStrategies,
-  cacheManager
-};
 
 // Cache configuration
 export interface CacheConfig {
@@ -124,7 +116,7 @@ export async function checkCacheHealth(): Promise<{
       status: 'unhealthy',
       details: {
         operational: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         timestamp: new Date().toISOString()
       }
     };

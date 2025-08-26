@@ -84,14 +84,28 @@ Created 16 performance indexes:
    - `sync_investor_to_new`
 
 2. **Duplicate Tables**:
-   - `core.transactions` (was synced copy)
-   - `core.deals` (was synced copy)
-   - `core.investors` (was synced copy)
-   - `core.companies` (was synced copy)
+   - `core.transactions` (now a view)
+   - `core.deals` (now a view)
+   - `core.investors` (now a view)
+   - `core.companies` (now a view)
 
 3. **Old Dot-Notation Tables** (replaced with views):
    - Physical tables with dots removed
    - Now exist as compatibility views only
+
+4. **Useless Columns Removed** (9 total):
+   - From `transactions_clean`:
+     - `buyer_investor_id` (100% NULL)
+     - `seller_investor_id` (100% NULL)
+     - `created_by` (100% NULL)
+     - `updated_by` (100% NULL)
+     - `notes` (100% NULL)
+     - `nominee_investor_id` (100% NULL)
+     - `secondary_transaction_date` (100% NULL)
+     - `purchase_price` (100% NULL)
+     - `fee_calc_notes` (100% NULL)
+   - From `investors_clean`:
+     - `id` (duplicate - kept `investor_id` as primary key)
 
 ### Migration Safety
 
@@ -123,6 +137,18 @@ All services now use clean tables internally:
 - `transactionsService` → uses `transactions_clean`
 - `companiesService` → uses `companies_clean`
 
+### Foreign Key Relationships (Clean & Readable)
+
+All foreign keys now follow clear naming conventions:
+
+| Table | FK Column | References | Description |
+|-------|-----------|------------|-------------|
+| `transactions_clean` | `deal_id` | `deals_clean.deal_id` | Links transaction to its deal |
+| `transactions_clean` | `investor_id` | `investors_clean.investor_id` | Links transaction to the investor |
+| `deals_clean` | `underlying_company_id` | `companies_clean.company_id` | The company being invested in |
+| `deals_clean` | `partner_company_id` | `companies_clean.company_id` | The partner company |
+| `deals_clean` | `holding_entity` | `companies_clean.company_id` | The holding entity |
+
 ### Benefits Achieved
 
 1. **61% storage reduction** - No more duplicate data
@@ -131,6 +157,8 @@ All services now use clean tables internally:
 4. **Better performance** - Optimized indexes
 5. **Backward compatible** - Existing code still works
 6. **Easier maintenance** - Simpler schema to understand
+7. **Clean FK relationships** - All foreign keys follow `entity_id` naming
+8. **No useless columns** - Removed 10 columns that were 100% NULL
 
 ### System Health
 

@@ -395,8 +395,7 @@ export abstract class InstitutionalService extends BaseService {
     // Add metadata
     event.metadata = {
       ...event.metadata,
-      source: this.constructor.name,
-      timestamp: event.timestamp || new Date()
+      source: this.constructor.name
     };
 
     await this.eventBus.publish(event);
@@ -593,22 +592,22 @@ export abstract class InstitutionalService extends BaseService {
 
     // Check cache
     health.checks.cache = {
-      size: this.cache.size,
+      size: (this as any).cache?.size ?? 0,
       healthy: true
     };
 
     // Check data connection
     try {
-      await this.dataClient.health?.check();
+      await (this.dataClient as any).health?.check?.();
       health.checks.database = {
         connected: true,
         healthy: true
       };
-    } catch (error) {
+    } catch (e: unknown) {
       health.checks.database = {
         connected: false,
         healthy: false,
-        error: error.message
+        error: e instanceof Error ? e.message : String(e)
       };
       health.status = 'degraded';
     }

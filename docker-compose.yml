@@ -13,7 +13,8 @@ services:
       - SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       - NODE_ENV=development
-    command: npx @supabase/mcp
+      - PORT=3100
+    command: node lib/mcp/equitie-server.mjs
     ports:
       - "3100:3100"
     networks:

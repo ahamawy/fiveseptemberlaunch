@@ -12,20 +12,20 @@ interface CardProps extends HTMLMotionProps<"div"> {
 }
 
 export function Card({ 
-  variant = 'default', 
+  variant = 'glass', 
   className, 
   children,
   glow = false,
-  animate = true,
+  animate = false,
   ...props 
 }: CardProps) {
   const variants = {
-    default: 'bg-card border border-surface-border',
-    glass: 'glass-card-hover',
-    gradient: 'bg-gradient-hero text-white border border-border',
-    elevated: 'bg-card border border-surface-border shadow-elevated',
-    outline: 'bg-transparent border border-surface-border',
-    hero: 'bg-gradient-mesh border border-border backdrop-blur-xl'
+    default: 'bg-card border border-border',
+    glass: 'bg-card/60 backdrop-blur-md border border-border/50',
+    gradient: 'bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20',
+    elevated: 'bg-card border border-border shadow-elevated',
+    outline: 'bg-transparent border border-border',
+    hero: 'bg-gradient-mesh border border-border/30 backdrop-blur-xl'
   };
 
   const Component: any = animate ? motion.div : 'div';
@@ -88,12 +88,12 @@ interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
 export function CardTitle({
   className,
   children,
-  gradient = true,
+  gradient = false,
   ...props
 }: CardTitleProps) {
   const base = 'text-xl font-bold font-heading tracking-tight';
   const gradientClass = gradient
-    ? 'text-gradient bg-gradient-hero animate-gradient'
+    ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent'
     : 'text-foreground';
   return (
     <h3 className={cn(base, gradientClass, className)} {...props}>

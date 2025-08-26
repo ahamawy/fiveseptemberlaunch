@@ -404,5 +404,6 @@ export default function DocumentsPage() {
         </Card>
       </div>
     </div>
+    </div>
   );
 }

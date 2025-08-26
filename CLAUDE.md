@@ -30,7 +30,7 @@ mcp__supabase__list_tables({ project_id: "ikezqzljrupkzmyytgok" })
 // Execute SQL
 mcp__supabase__execute_sql({ 
   project_id: "ikezqzljrupkzmyytgok",
-  query: "SELECT * FROM investors.investor LIMIT 5"
+  query: "SELECT * FROM investors_clean LIMIT 5"
 })
 
 // Get logs for debugging
@@ -47,6 +47,15 @@ mcp__supabase__get_logs({
 - `deals_clean` - ALL deals 
 - `companies_clean` - ALL companies
 - `investors_clean` - ALL investors
+- `documents` - Document storage
+- `investor_units` - Investor commitments/units
+
+### Important: Column Name Changes
+Clean tables use specific primary key names:
+- `investor_id` (not `id`)
+- `deal_id` (not `id`) 
+- `company_id` (not `id`)
+- `transaction_id` (not `id`)
 
 ### Backward Compatibility (Views)
 The old dot-notation names still work as views:
@@ -132,6 +141,8 @@ npm run test:e2e
 4. Always handle errors properly
 5. Use TypeScript types from `/lib/types`
 6. Single source of truth: Each ID comes from ONE table only
+7. SupabaseAdapter uses `useViews: false` by default for performance
+8. All repos should query clean tables directly
 
 ## Need Help?
 

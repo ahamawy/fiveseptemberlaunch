@@ -76,10 +76,11 @@ export class InvestorsService extends BaseService {
       if (!investor) return null;
 
       // Get additional metrics
-      const [commitments, transactions] = await Promise.all([
+      const [commitmentsRaw, transactions] = await Promise.all([
         this.dataClient.getCommitments(id),
         this.dataClient.getTransactions({ investor_id: id }),
       ]);
+      const commitments = (commitmentsRaw ?? []) as Array<any>;
 
       const signedCommitments = commitments.filter(
         (c) => c.status === "signed"
@@ -125,10 +126,11 @@ export class InvestorsService extends BaseService {
       if (!investor) return null;
 
       // Compute basic metrics similar to getInvestorById
-      const [commitments, transactions] = await Promise.all([
+      const [commitmentsRaw, transactions] = await Promise.all([
         this.dataClient.getCommitments(investor.id),
         this.dataClient.getTransactions({ investor_id: investor.id }),
       ]);
+      const commitments = (commitmentsRaw ?? []) as Array<any>;
 
       const signedCommitments = commitments.filter(
         (c) => c.status === "signed"
@@ -285,13 +287,13 @@ export class InvestorsService extends BaseService {
       }
 
       const cacheKey = `commitments:${id}`;
-      const cached = this.getCached<DbCommitment[]>(cacheKey);
+      const cached = await this.getCached<DbCommitment[]>(cacheKey);
       if (cached) return cached;
 
       this.log("getCommitments", { investorId: id });
       await this.delay();
 
-      const commitments = await this.dataClient.getCommitments(id);
+      const commitments = ((await this.dataClient.getCommitments(id)) ?? []) as DbCommitment[];
 
       this.setCache(cacheKey, commitments);
       return commitments;
