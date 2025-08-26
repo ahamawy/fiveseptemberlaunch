@@ -40,15 +40,17 @@ mcp__supabase__get_logs({
 })
 ```
 
-## Database Structure (UPDATED - Clean Schema)
+## Database Structure (UPDATED - Clean Schema with Formula Engine)
 
 ### Main Tables - Single Source of Truth
 - `transactions_clean` - ALL transactions (primary, secondary, advisory, subnominee)
-- `deals_clean` - ALL deals 
+- `deals_clean` - ALL deals with formula templates
 - `companies_clean` - ALL companies
 - `investors_clean` - ALL investors
 - `documents` - Document storage
 - `investor_units` - Investor commitments/units
+- `formula_templates` - Deal-specific calculation templates
+- `formula_calculation_log` - Audit trail for all calculations
 
 ### Important: Column Name Changes
 Clean tables use specific primary key names:
@@ -56,6 +58,22 @@ Clean tables use specific primary key names:
 - `deal_id` (not `id`) 
 - `company_id` (not `id`)
 - `transaction_id` (not `id`)
+
+### New Formula Engine Fields (Added 2024-11-26)
+**deals_clean**:
+- `nc_calculation_method` - How Net Capital is calculated (enum)
+- `formula_template` - Links to formula template (varchar)
+- `fee_base_capital` - 'GC' or 'NC' for fee calculations
+- `premium_calculation_method` - How premium is calculated (enum)
+- `management_fee_tier_1_percent` - First tier management fee
+- `management_fee_tier_2_percent` - Second tier management fee
+- `tier_1_period` - Years for first tier
+- `other_fees_allowed` - Boolean for Reddit-style deals
+- `discount_partner_*_fee_percent` - Partner fee discounts
+
+**transactions_clean**:
+- `other_fees` - Additional fees (Reddit-specific)
+- `other_fees_description` - Description of other fees
 
 ### Backward Compatibility (Views)
 The old dot-notation names still work as views:
@@ -114,7 +132,24 @@ node SCRIPTS/health-check.js
 # Run tests
 npm test
 npm run test:e2e
+
+# Test formula engine
+open http://localhost:3001/formula-validator
 ```
+
+## Formula Templates
+
+Deals now use formula templates for fee calculations:
+- `standard` - Default template
+- `impossible` - NC = GC × (PMSP/ISP)
+- `reddit` - NC = GC with Other Fees
+- `openai` - Complex NC with tiered management
+- `figure` - NC = GC × (1 - SFR)
+- `scout` - NC = GC with premium
+- `spacex1` - NC = GC / (1 + SFR), fees on NC
+- `spacex2` - NC = GC × (PMSP/ISP)
+- `newheights` - Minimal fees (admin + performance)
+- `egypt` - NC = GC with premium
 
 ## Common Tasks
 

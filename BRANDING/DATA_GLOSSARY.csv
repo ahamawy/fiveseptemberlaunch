@@ -1,0 +1,188 @@
+Table Name,Column Name,Data Type,Business Description,Required,Enum Values,Foreign Key Reference,Example Values,Business Rules,Notes
+investors_clean,investor_id,integer,Unique identifier for each investor,Yes,,,10001,Primary key auto-generated,Never changes once assigned
+investors_clean,full_name,varchar,Complete legal name of the investor,No,,,John Michael Smith,Must match passport/legal documents,Computed from first + middle + last if not provided
+investors_clean,first_name,varchar,Investor's legal first name,No,,,John,Used for personalization,Part of full name composition
+investors_clean,middle_name,varchar,Investor's middle name or initial,No,,,Michael,Optional field,Part of full name composition
+investors_clean,last_name,varchar,Investor's legal surname,No,,,Smith,Used for formal communication,Part of full name composition
+investors_clean,primary_email,varchar,Main email address for all communications,No,,,john.smith@example.com,Must be valid email format,Used for login and primary contact
+investors_clean,secondary_email,varchar,Alternative email for backup communications,No,,,j.smith@work.com,Must be valid email format,Used for redundancy
+investors_clean,phone,varchar,Primary contact phone number,No,,,+1-555-123-4567,International format preferred,Include country code
+investors_clean,nationality,varchar,Country of citizenship/passport,No,,,United States,ISO country name preferred,Affects regulatory requirements
+investors_clean,country_of_residence,varchar,Current country of legal residence,No,,,United Kingdom,ISO country name preferred,Determines tax jurisdiction
+investors_clean,birthday,date,Date of birth for KYC compliance,No,,,1975-06-15,Required for KYC,Format: YYYY-MM-DD
+investors_clean,address,text,Complete residential address,No,,,123 Main St Apt 4B London UK,Full postal address,Used for legal documents
+investors_clean,investor_type,enum,Classification of investor entity,"No","INDIVIDUAL, COMPANY",,INDIVIDUAL,Determines document requirements,Affects fee structures
+investors_clean,referred_by,varchar,Name or ID of referring party,No,,,Sarah Johnson,Track referral sources,May link to another investor
+investors_clean,passport_copy,varchar,Reference to passport document storage,No,,,DOC-2024-001,Links to document system,Legacy field - use passport_document_id
+investors_clean,id_checked,boolean,KYC identity verification status,No,,,true,Compliance requirement,Must be true before transactions
+investors_clean,residence_city,text,City of primary residence,No,,,London,Part of address details,Used for demographic analysis
+investors_clean,marital_status,text,Legal marital status,No,,,Married,May affect legal requirements,Privacy-sensitive data
+investors_clean,occupation,text,Current professional occupation,No,,,Investment Manager,Used for suitability assessment,Part of KYC profile
+investors_clean,join_date,date,Date investor joined platform,No,,,2023-01-15,Track investor lifecycle,Format: YYYY-MM-DD
+investors_clean,source_of_wealth,text,Primary source of investable assets,No,,,Business ownership and investments,Compliance requirement,Part of AML checks
+investors_clean,expected_income_usd,numeric,Annual income in USD,No,,,250000.00,Suitability assessment,Privacy-sensitive data
+investors_clean,education_background,text,Highest education level achieved,No,,,MBA from Harvard Business School,Optional profiling data,Used for investor categorization
+investors_clean,languages_spoken,array,List of languages investor speaks,No,,,"{English,French,Arabic}",PostgreSQL array type,Useful for communication preferences
+investors_clean,business_interests,text,Description of business sectors of interest,No,,,Technology and renewable energy,Investment preference indicator,Helps with deal matching
+investors_clean,usd_bank_account_details,text,Banking details for USD transactions,No,,,Chase Bank NYC SWIFT:XXX,Encrypted/sensitive data,Required for distributions
+investors_clean,decision_independence,boolean,Can make investment decisions independently,No,,,true,Legal requirement check,Must be true for certain jurisdictions
+investors_clean,investor_status,varchar,Current status in the system,No,,,Active,Track investor lifecycle,"Common values: Active, Inactive, Suspended"
+investors_clean,kyc_status,varchar,Current KYC verification status,No,,,Verified,Compliance tracking,"Values: Pending, In Progress, Verified, Rejected, Expired"
+investors_clean,job_sector,varchar,Industry sector of employment,No,,,Financial Services,Professional categorization,Used for investor profiling
+investors_clean,company,varchar,Current employer organization,No,,,Goldman Sachs,Professional affiliation,May affect insider restrictions
+investors_clean,previous_company,varchar,Previous employer organization,No,,,Morgan Stanley,Professional history,Used for background checks
+investors_clean,university,varchar,Educational institution attended,No,,,Harvard University,Educational background,Alumni network tracking
+investors_clean,gender,varchar,Gender identification,No,,,Male,Optional demographic data,Privacy-sensitive field
+investors_clean,linkedin_url,varchar,LinkedIn profile URL,No,,,https://linkedin.com/in/johnsmith,Professional verification,Public profile reference
+investors_clean,professional_bio,text,Professional background summary,No,,,20 years in private equity...,Investor profile content,Used for relationship management
+investors_clean,extracted_from_source,varchar,Data source system identifier,No,,,CRM_IMPORT_2024,Data lineage tracking,Audit trail for data origin
+investors_clean,enrichment_batch_id,integer,Data enrichment process identifier,No,,,1001,Track data quality improvements,Links to enrichment logs
+investors_clean,enrichment_timestamp,timestamptz,When data was last enriched,No,,,2024-01-15T10:30:00Z,Data quality tracking,ISO timestamp format
+investors_clean,data_quality_score,integer,Data completeness score (0-100),No,,,85,Data quality metric,Higher scores indicate better data
+investors_clean,enrichment_status,varchar,Current enrichment process status,No,,,Completed,Data pipeline tracking,"Values: Pending, Processing, Completed, Failed"
+investors_clean,kyc_completed_date,timestamp,When KYC was successfully completed,No,,,2024-01-20 14:30:00,Compliance tracking,Required for audit
+investors_clean,kyc_notes,text,Additional KYC process notes,No,,,Verified via video call,Compliance documentation,Internal use only
+investors_clean,passport_document_id,uuid,Link to passport in documents table,No,,documents.id,550e8400-e29b-41d4-a716,Foreign key reference,Replaces passport_copy field
+investors_clean,created_at,timestamptz,Record creation timestamp,No,,,2024-01-15T10:00:00Z,Audit trail,System-generated
+investors_clean,updated_at,timestamptz,Last record update timestamp,No,,,2024-01-20T15:30:00Z,Audit trail,System-generated
+deals_clean,deal_id,integer,Unique identifier for each deal,Yes,,,20001,Primary key auto-generated,Never changes once assigned
+deals_clean,deal_name,varchar,Official name of the deal,No,,,Series B - TechCo Investment,Human-readable identifier,Used in all reporting
+deals_clean,deal_type,enum,Classification of deal structure,"No","primary, secondary, revenue_share, advisory_shares, spv, partnership, facilitated_direct, facilitated_indirect",,primary,Determines fee structure,Affects legal documents required
+deals_clean,underlying_company_id,integer,Portfolio company being invested in,No,,companies_clean.company_id,30001,Links to company entity,Core investment target
+deals_clean,holding_entity,integer,SPV or entity holding the investment,No,,companies_clean.company_id,30002,Legal structure reference,May be same as partner company
+deals_clean,deal_date,date,Official deal closing date,No,,,2024-03-15,Legal effective date,Format: YYYY-MM-DD
+deals_clean,initial_unit_price,numeric,Starting price per unit in deal currency,No,,,1000.00,Basis for calculations,Usually standardized to 1000
+deals_clean,exit_price_per_unit,numeric,Final unit price at exit,No,,,1850.00,Null if not exited,Used for returns calculation
+deals_clean,deal_exited,boolean,Whether deal has been fully exited,No,,,false,Exit status flag,True triggers exit calculations
+deals_clean,gross_capital,numeric,Total capital raised for deal,No,,,5000000.00,Before fees,In deal currency
+deals_clean,deal_partner_name,varchar,Name of co-investment partner,No,,,Sequoia Capital,Strategic partner identification,May be individual or firm
+deals_clean,deal_currency,varchar,Currency for all deal transactions,No,,,USD,ISO currency code,Affects FX calculations
+deals_clean,initial_net_capital,numeric,Capital after initial fees,No,,,4750000.00,Post-structuring fees,Available for investment
+deals_clean,eq_deal_structuring_fee_percent,numeric,EquiTie's structuring fee percentage,No,,,2.50,Percentage as decimal,Applied to gross capital
+deals_clean,eq_deal_premium_fee_percent,numeric,EquiTie's premium fee percentage,No,,,1.00,Success-based fee,Applied on exit
+deals_clean,eq_performance_fee_percent,numeric,EquiTie's carried interest percentage,No,,,20.00,Percentage of gains,Industry standard 20%
+deals_clean,eq_deal_annual_management_fee_percent,numeric,EquiTie's annual management fee,No,,,2.00,Annual percentage,Charged on AUM
+deals_clean,deal_units_issued,integer,Total units created for the deal,No,,,5000,Fixed at deal creation,Basis for ownership calculation
+deals_clean,advisory_shares_earned,integer,Units earned for advisory services,No,,,100,Non-dilutive allocation,Part of total units
+deals_clean,partner_llc_agreement,varchar,Reference to LLC agreement document,No,,,DOC-LLC-2024-001,Legal document reference,Links to documents table
+deals_clean,partner_side_letter,varchar,Reference to side letter document,No,,,DOC-SL-2024-001,Legal document reference,Special terms documentation
+deals_clean,exit_date,date,Date of deal exit/liquidation,No,,,2026-06-30,Null if not exited,Format: YYYY-MM-DD
+deals_clean,deal_status,varchar,Current deal lifecycle status,No,,,Active,"Values: Draft, Raising, Active, Exited, Cancelled",Workflow state tracking
+deals_clean,partner_performance_fee_percent,numeric,Co-investor's carry percentage,No,,,15.00,Split with partner,Reduces EquiTie's carry
+deals_clean,partner_annual_management_fee_percent,numeric,Partner's management fee share,No,,,1.50,Annual percentage,Part of total management fee
+deals_clean,partner_subscription_capital,numeric,Partner's capital commitment,No,,,2000000.00,In deal currency,Co-investment amount
+deals_clean,deal_category,enum,High-level deal classification,"No","INVESTMENT, SECONDARY, ADVISORY, DISTRIBUTION",,INVESTMENT,Business line categorization,Affects reporting structure
+deals_clean,partner_structuring_fee_percent,numeric,Partner's structuring fee share,No,,,1.00,One-time percentage,Part of total structuring
+deals_clean,partner_subscription_capital_usd,numeric,Partner capital in USD equivalent,No,,,2000000.00,FX converted amount,For consolidated reporting
+deals_clean,exchange_rate_usd_gbp,numeric,USD to GBP exchange rate at deal date,No,,,0.79,Historical FX rate,For currency conversion
+deals_clean,transaction_count,bigint,Number of transactions in deal,No,,,25,Computed field,Count of related transactions
+deals_clean,pre_money_purchase_valuation,numeric,Company valuation before investment,No,,,50000000.00,Valuation metric,Basis for ownership calculation
+deals_clean,pre_money_sell_valuation,numeric,Valuation at exit before fees,No,,,95000000.00,Exit valuation,For returns calculation
+deals_clean,deal_premium_amount,numeric,Total premium fees collected,No,,,50000.00,Computed from percentage,Success fee amount
+deals_clean,partner_company_id,integer,Partner organization entity,No,,companies_clean.company_id,30003,Links to company entity,Co-investor organization
+deals_clean,created_at,timestamptz,Record creation timestamp,No,,,2024-03-01T10:00:00Z,Audit trail,System-generated
+deals_clean,updated_at,timestamptz,Last record update timestamp,No,,,2024-03-15T15:30:00Z,Audit trail,System-generated
+companies_clean,company_id,integer,Unique identifier for each company,Yes,,,30001,Primary key auto-generated,Never changes once assigned
+companies_clean,company_name,varchar,Legal name of the company,No,,,TechCo Holdings Inc,Official registered name,Must match legal documents
+companies_clean,company_type,enum,Classification of company role,"No","portfolio, partner, holding",,portfolio,Determines relationships,Affects reporting categorization
+companies_clean,company_description,text,Business description and overview,No,,,Leading AI/ML platform for enterprises,Company summary,Used in investor materials
+companies_clean,country_incorporation,varchar,Country of legal incorporation,No,,,Delaware USA,Jurisdiction of registration,Affects legal structure
+companies_clean,company_sector,text,Primary industry sector (legacy),No,,,Technology,Being migrated to 'sector',Use 'sector' field instead
+companies_clean,company_website,text,Official company website URL,No,,,https://techco.com,Public web presence,Should be valid URL
+companies_clean,funding_round,enum,Current funding stage,"No","seed, series-a, series-b, series-c, growth, pre-ipo",,series-b,Investment stage,Indicates maturity level
+companies_clean,founding_year,integer,Year company was founded,No,,,2018,Historical reference,Four-digit year
+companies_clean,lead_contact_name,text,Primary business contact person,No,,,Sarah Chen,Key relationship,Usually CEO or CFO
+companies_clean,lead_contact_email,text,Email of primary contact,No,,,sarah@techco.com,Direct communication,Must be valid email
+companies_clean,employee_count,integer,Current number of employees,No,,,150,Company size metric,Updated periodically
+companies_clean,sector,text,Primary industry sector,No,,,Technology,Standardized classification,Replaces company_sector
+companies_clean,latest_valuation_mil,numeric,Most recent valuation in millions,No,,,50.00,In millions of USD,Post-money valuation
+companies_clean,created_at,timestamptz,Record creation timestamp,No,,,2024-01-10T10:00:00Z,Audit trail,System-generated
+companies_clean,updated_at,timestamptz,Last record update timestamp,No,,,2024-03-20T15:30:00Z,Audit trail,System-generated
+transactions_clean,transaction_id,integer,Unique identifier for each transaction,Yes,,,40001,Primary key auto-generated,Never changes once assigned
+transactions_clean,transaction_type,text,Category of transaction,Yes,primary,"primary, secondary, advisory, subnominee",primary,Determines processing rules,Default is 'primary'
+transactions_clean,deal_id,integer,Associated deal identifier,No,,deals_clean.deal_id,20001,Links to deal entity,Core relationship
+transactions_clean,investor_id,integer,Participating investor identifier,No,,investors_clean.investor_id,10001,Links to investor entity,Transaction party
+transactions_clean,transaction_date,date,Date transaction was executed,No,,,2024-03-20,Legal effective date,Format: YYYY-MM-DD
+transactions_clean,units,integer,Number of units purchased/sold,No,,,50,Ownership units,Affects percentage ownership
+transactions_clean,unit_price,numeric,Price per unit at transaction,No,,,1000.00,Transaction pricing,In deal currency
+transactions_clean,gross_capital,numeric,Total transaction amount before fees,No,,,50000.00,Units × unit_price,Before any deductions
+transactions_clean,initial_net_capital,numeric,Capital after initial fees,No,,,47500.00,Post-structuring amount,Available for investment
+transactions_clean,admin_fee,numeric,Administrative fee amount,No,,,250.00,Fixed or percentage based,One-time charge
+transactions_clean,management_fee_percent,numeric,Annual management fee percentage,No,,,2.00,Ongoing charge,Applied annually
+transactions_clean,management_fee_amount,numeric,Calculated management fee amount,No,,,1000.00,Annual amount,Based on percentage
+transactions_clean,performance_fee_percent,numeric,Carried interest percentage,No,,,20.00,Success fee rate,Applied to gains only
+transactions_clean,structuring_fee_percent,numeric,Deal structuring fee percentage,No,,,2.50,One-time percentage,Applied at transaction
+transactions_clean,structuring_fee_amount,numeric,Calculated structuring fee amount,No,,,1250.00,One-time amount,Based on gross capital
+transactions_clean,structuring_fee_discount_percent,numeric,Discount on structuring fee,No,,,10.00,Special terms discount,Reduces structuring fee
+transactions_clean,premium_fee_percent,numeric,Premium/success fee percentage,No,,,1.00,Exit-based fee,Charged on successful exit
+transactions_clean,premium_amount,numeric,Calculated premium fee amount,No,,,500.00,Success fee amount,Based on gains
+transactions_clean,nominee,boolean,Whether investor is a nominee,No,,,false,Nominee flag,Affects beneficial ownership
+transactions_clean,term_sheet,varchar,Reference to term sheet document,No,,,DOC-TS-2024-001,Legal document reference,Links to documents table
+transactions_clean,closing_agreement,varchar,Reference to closing agreement,No,,,DOC-CA-2024-001,Legal document reference,Final transaction docs
+transactions_clean,transfer_due,numeric,Amount to be transferred,No,,,47500.00,Payment obligation,Before discounts
+transactions_clean,transfer_post_discount,numeric,Amount after any discounts,No,,,47000.00,Final payment amount,Actual amount due
+transactions_clean,initial_amount_received,numeric,Amount actually received,No,,,47000.00,Payment tracking,For reconciliation
+transactions_clean,status,varchar,Current transaction status,No,,,Completed,"Values: Pending, Completed, Cancelled",Workflow tracking
+transactions_clean,fee_calc_method,text,Fee calculation methodology used,No,,,Standard,Calculation variant,For audit trail
+transactions_clean,fee_calc_is_locked,boolean,Whether fees are finalized,No,,,true,Prevents recalculation,Lock after completion
+transactions_clean,fee_calc_locked_at,timestamptz,When fees were locked,No,,,2024-03-20T16:00:00Z,Audit timestamp,Lock event tracking
+transactions_clean,subnominee_investor_id,integer,Ultimate beneficial owner if nominee,No,,investors_clean.investor_id,10002,Links to real investor,Only if nominee=true
+transactions_clean,created_at,timestamptz,Record creation timestamp,No,,,2024-03-20T10:00:00Z,Audit trail,System-generated
+transactions_clean,updated_at,timestamptz,Last record update timestamp,No,,,2024-03-20T16:00:00Z,Audit trail,System-generated
+investor_units,id,uuid,Unique identifier for investor position,Yes,,,550e8400-e29b-41d4,Primary key UUID,System-generated
+investor_units,investor_id,integer,Investor holding the units,Yes,,investors_clean.investor_id,10001,Links to investor,Cannot be null
+investor_units,deal_id,integer,Deal these units belong to,Yes,,deals_clean.deal_id,20001,Links to deal,Cannot be null
+investor_units,investment_amount,numeric,Initial investment amount,Yes,,,100000.00,Original commitment,In deal currency
+investor_units,net_capital,numeric,Capital after initial fees,Yes,,,95000.00,Post-fee amount,Invested capital
+investor_units,units_purchased,numeric,Number of units owned,Yes,,,100,Ownership units,Can be fractional
+investor_units,unit_price_at_purchase,numeric,Purchase price per unit,Yes,,,1000.00,Historical price,Default 1000.00
+investor_units,current_unit_price,numeric,Current market price per unit,No,,,1200.00,Mark-to-market price,Default 1000.00
+investor_units,current_value,numeric,Current total position value,No,,,120000.00,Units × current price,Computed field
+investor_units,unrealized_gain_loss,numeric,Paper gains/losses,No,,,20000.00,Current value - net capital,Default 0
+investor_units,realized_gain_loss,numeric,Actual gains/losses from exits,No,,,0,From partial/full exits,Default 0
+investor_units,purchase_date,date,Date units were purchased,Yes,,,2024-03-20,Transaction date,Format: YYYY-MM-DD
+investor_units,exit_date,date,Date of exit if applicable,No,,,2026-06-30,Null if still held,Format: YYYY-MM-DD
+investor_units,status,varchar,Current position status,No,,,Active,"Values: Active, Exited, Transferred",Default 'Active'
+investor_units,notes,text,Additional position notes,No,,,Early investor discount applied,Free text notes,Internal use
+investor_units,formula_template_id,bigint,Link to fee calculation template,No,,deal_formula_templates.id,1001,Formula configuration,For fee calculations
+investor_units,variables_snapshot,jsonb,Snapshot of calculation variables,No,,,"{""discount"": 0.1}",JSON data structure,Audit trail for calcs
+investor_units,calculation_audit_id,bigint,Link to calculation audit log,No,,calculation_audit_log.id,5001,Calculation history,For audit trail
+investor_units,gross_capital,numeric,Total investment before fees,No,,,105000.00,Pre-fee amount,For fee calculation base
+investor_units,pre_money_share_price,numeric,Share price before investment,No,,,10.00,Valuation metric,For ownership calculation
+investor_units,investor_share_price,numeric,Investor's effective share price,No,,,10.50,After fees/premiums,Actual cost basis
+investor_units,exit_unit_price,numeric,Unit price at exit,No,,,1850.00,Exit pricing,For returns calculation
+investor_units,initial_unit_price,numeric,Starting unit price,No,,,1000.00,Baseline price,Usually standardized
+investor_units,years_held,numeric,Investment holding period in years,No,,,2.25,Duration calculation,For IRR calculation
+investor_units,net_proceeds,numeric,Exit proceeds after fees,No,,,175000.00,Final distribution,Post-exit fees
+investor_units,net_proceeds_post_discount,numeric,Proceeds after any discounts,No,,,172500.00,Final net amount,Actual distribution
+investor_units,total_fees_paid,numeric,Cumulative fees over lifetime,No,,,12500.00,All fees summed,For net returns
+investor_units,irr_actual,numeric,Actual internal rate of return,No,,,18.50,Percentage return,Annualized performance
+investor_units,moic_actual,numeric,Multiple on invested capital,No,,,1.82,Return multiple,Total return/investment
+investor_units,created_at,timestamp,Record creation timestamp,No,,,2024-03-20 10:00:00,Audit trail,System-generated
+investor_units,updated_at,timestamp,Last record update timestamp,No,,,2024-03-21 15:30:00,Audit trail,System-generated
+documents,id,uuid,Unique identifier for document,Yes,,,550e8400-e29b-41d4,Primary key UUID,System-generated
+documents,name,text,Document file name or title,Yes,,,Q1 2024 Financial Report.pdf,Human-readable name,Required field
+documents,type,text,MIME type or file extension,No,,,application/pdf,File type identifier,For handling/preview
+documents,url,text,Public URL to access document,No,,,https://storage.equitie.com/doc123,Access endpoint,May be signed URL
+documents,description,text,Document description or summary,No,,,Quarterly financial statements,Document context,For search/discovery
+documents,investor_id,integer,Associated investor if applicable,No,,investors_clean.investor_id,10001,Links to investor,Null if not investor-specific
+documents,deal_id,integer,Associated deal if applicable,No,,deals_clean.deal_id,20001,Links to deal,Null if not deal-specific
+documents,company_id,integer,Associated company if applicable,No,,companies_clean.company_id,30001,Links to company,Null if not company-specific
+documents,transaction_id,integer,Associated transaction if applicable,No,,transactions_clean.transaction_id,40001,Links to transaction,Null if not transaction-specific
+documents,uploaded_at,timestamptz,When document was uploaded,No,,,2024-03-20T10:30:00Z,Upload timestamp,Default now()
+documents,document_category,enum,Classification of document type,"No","passport, partner_llc_agreement, partner_side_letter, term_sheet, closing_agreement, subscription_agreement, kyc, other",,term_sheet,Document taxonomy,Standardized categories
+documents,is_executed,boolean,Whether document is legally executed,No,,,true,Execution status,Default false
+documents,is_legal_document,boolean,Whether document has legal significance,No,,,true,Legal classification,Default false
+documents,execution_date,timestamptz,When document was executed,No,,,2024-03-15T14:00:00Z,Legal effective date,Null if not executed
+documents,expiry_date,timestamptz,Document expiration date if applicable,No,,,2025-03-15T00:00:00Z,Validity period end,Null if perpetual
+documents,signatory_name,varchar,Person who signed document,No,,,John Smith,Signatory identification,For executed documents
+documents,signatory_title,varchar,Title/role of signatory,No,,,Chief Executive Officer,Signatory authority,Validates signing authority
+documents,counterparty_name,varchar,Other party to the document,No,,,TechCo Holdings Inc,Contract party,For bilateral documents
+documents,document_status,varchar,Current document workflow status,No,,,Executed,"Values: Draft, Pending, Executed, Expired",Default 'draft'
+documents,bucket,text,Storage bucket/container name,No,,,equitie-documents-prod,Storage location,For file system
+documents,storage_path,text,Path within storage bucket,No,,,deals/2024/03/doc123.pdf,File organization,Hierarchical storage
+documents,sha256,text,SHA-256 hash of document content,No,,,a665a45920422f9d417e4867e,Integrity verification,Detect modifications
+documents,source_system,text,System that created/imported document,No,,,DocuSign,Data lineage,Integration tracking
+documents,origin_url,text,Original source URL if imported,No,,,https://docusign.com/doc/abc123,Import reference,Audit trail
+documents,created_at,timestamptz,Record creation timestamp,No,,,2024-03-20T10:00:00Z,Audit trail,Default now()
+documents,updated_at,timestamptz,Last record update timestamp,No,,,2024-03-21T15:30:00Z,Audit trail,Default now()
