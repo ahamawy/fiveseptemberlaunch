@@ -38,7 +38,7 @@ export function KPICard({
   const changeColors = {
     increase: 'text-accent-green',
     decrease: 'text-accent-red',
-    neutral: 'text-text-secondary',
+    neutral: 'text-muted-foreground',
   };
 
   const changeIcons = {
@@ -78,14 +78,14 @@ export function KPICard({
                   {icon}
                 </div>
               )}
-              <p className="text-sm font-medium text-text-secondary">
+              <p className="text-sm font-medium text-muted-foreground">
                 {title}
               </p>
             </div>
 
             {/* Value with animation */}
             <div className={cn(
-              "text-3xl font-bold text-text-primary mb-1",
+              "text-3xl font-bold text-foreground mb-1",
               animate && "animate-in fade-in slide-in-from-bottom-2 duration-500"
             )}>
               {value}
@@ -94,7 +94,7 @@ export function KPICard({
             {/* Subtitle and change */}
             <div className="flex items-center gap-3">
               {subtitle && (
-                <p className="text-xs text-text-tertiary">
+                <p className="text-xs text-muted-foreground/70">
                   {subtitle}
                 </p>
               )}
@@ -158,7 +158,7 @@ export function HeroKPICard({
       
       {/* Content */}
       <div className="relative">
-        <p className="text-sm font-medium text-text-secondary mb-3">
+        <p className="text-sm font-medium text-muted-foreground mb-3">
           {title}
         </p>
         
@@ -175,7 +175,7 @@ export function HeroKPICard({
               )}>
                 {trend.value > 0 ? '+' : ''}{trend.value}%
               </span>
-              <span className="text-xs text-text-tertiary">
+              <span className="text-xs text-muted-foreground/70">
                 {trend.label}
               </span>
             </div>
@@ -183,7 +183,7 @@ export function HeroKPICard({
         </div>
         
         {subtitle && (
-          <p className="mt-3 text-sm text-text-secondary">
+          <p className="mt-3 text-sm text-muted-foreground">
             {subtitle}
           </p>
         )}

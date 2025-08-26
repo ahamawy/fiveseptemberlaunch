@@ -148,7 +148,7 @@ Investment Fund A,28,352000,7040,1760,0,3520,14080,0,325600`;
   };
   
   return (
-    <div className="min-h-screen bg-background-deep">
+    <div className="min-h-screen bg-background">
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="mb-8">
@@ -175,7 +175,7 @@ Investment Fund A,28,352000,7040,1760,0,3520,14080,0,325600`;
               <select
                 value={selectedProfile || ''}
                 onChange={(e) => setSelectedProfile(Number(e.target.value))}
-                className="w-full p-2 rounded-lg bg-surface border border-surface-border text-white"
+                className="w-full p-2 rounded-lg bg-surface border border-border text-white"
               >
                 <option value="">-- Select Profile --</option>
                 {profiles.map(profile => (
@@ -230,7 +230,7 @@ Investment Fund A,28,352000,7040,1760,0,3520,14080,0,325600`;
           
           <div className="space-y-4">
             {/* File Upload */}
-            <div className="border-2 border-dashed border-surface-border rounded-lg p-6">
+            <div className="border-2 border-dashed border-border rounded-lg p-6">
               <input
                 type="file"
                 accept=".csv"
@@ -263,7 +263,7 @@ Investment Fund A,28,352000,7040,1760,0,3520,14080,0,325600`;
                 value={csvText}
                 onChange={(e) => setCsvText(e.target.value)}
                 rows={8}
-                className="w-full p-3 rounded-lg bg-surface border border-surface-border text-white font-mono text-sm"
+                className="w-full p-3 rounded-lg bg-surface border border-border text-white font-mono text-sm"
                 placeholder={sampleCSV}
               />
             </div>
@@ -354,7 +354,7 @@ Investment Fund A,28,352000,7040,1760,0,3520,14080,0,325600`;
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-surface-border">
+                  <tr className="border-b border-border">
                     <th className="text-left py-2 px-3 text-sm font-medium text-gray-400">Investor</th>
                     <th className="text-left py-2 px-3 text-sm font-medium text-gray-400">Deal</th>
                     <th className="text-right py-2 px-3 text-sm font-medium text-gray-400">Gross</th>
@@ -369,7 +369,7 @@ Investment Fund A,28,352000,7040,1760,0,3520,14080,0,325600`;
                 </thead>
                 <tbody>
                   {results.slice(0, 20).map((result, idx) => (
-                    <tr key={idx} className="border-b border-surface-border hover:bg-surface-light/30">
+                    <tr key={idx} className="border-b border-border hover:bg-surface-light/30">
                       <td className="py-2 px-3 text-sm text-white">{result.investor_id}</td>
                       <td className="py-2 px-3 text-sm text-white">{result.deal_id}</td>
                       <td className="py-2 px-3 text-sm text-right text-white">

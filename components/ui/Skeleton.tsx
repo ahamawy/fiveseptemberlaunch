@@ -24,7 +24,7 @@ export function Skeleton({
   return (
     <div
       className={cn(
-        'bg-surface-elevated',
+        'bg-card',
         roundedClasses[rounded],
         variant === 'shimmer' && 'animate-shimmer bg-gradient-to-r from-surface-elevated via-surface-hover to-surface-elevated bg-[length:200%_100%]',
         variant === 'pulse' && 'animate-pulse',
@@ -38,7 +38,7 @@ export function Skeleton({
 // Specialized skeleton for cards
 export function CardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('rounded-xl border border-surface-border p-6', className)}>
+    <div className={cn('rounded-xl border border-border p-6', className)}>
       <div className="space-y-3">
         <Skeleton className="h-5 w-1/3" />
         <Skeleton className="h-8 w-2/3" />
@@ -54,7 +54,7 @@ export function CardSkeleton({ className }: { className?: string }) {
 // Skeleton for table rows
 export function TableRowSkeleton({ columns = 5 }: { columns?: number }) {
   return (
-    <tr className="border-b border-surface-border">
+    <tr className="border-b border-border">
       {Array.from({ length: columns }).map((_, i) => (
         <td key={i} className="p-4">
           <Skeleton className="h-4 w-full" />
@@ -67,7 +67,7 @@ export function TableRowSkeleton({ columns = 5 }: { columns?: number }) {
 // Skeleton for KPI cards
 export function KPICardSkeleton() {
   return (
-    <div className="rounded-xl bg-surface-elevated border border-surface-border p-6">
+    <div className="rounded-xl bg-card border border-border p-6">
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Skeleton className="h-5 w-5 rounded-full" />
@@ -88,7 +88,7 @@ export function DashboardSkeleton() {
   return (
     <div className="space-y-6">
       {/* Header skeleton */}
-      <div className="pb-6 border-b border-surface-border">
+      <div className="pb-6 border-b border-border">
         <Skeleton className="h-10 w-64 mb-3" />
         <Skeleton className="h-5 w-48" />
       </div>
@@ -109,8 +109,8 @@ export function DashboardSkeleton() {
       </div>
 
       {/* Table skeleton */}
-      <div className="rounded-xl border border-surface-border overflow-hidden">
-        <div className="p-4 border-b border-surface-border">
+      <div className="rounded-xl border border-border overflow-hidden">
+        <div className="p-4 border-b border-border">
           <Skeleton className="h-6 w-32" />
         </div>
         <table className="w-full">
@@ -138,7 +138,7 @@ export function PortfolioSkeleton() {
 export function DealsSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="pb-6 border-b border-surface-border">
+      <div className="pb-6 border-b border-border">
         <Skeleton className="h-10 w-48 mb-3" />
         <Skeleton className="h-5 w-64" />
       </div>

@@ -114,11 +114,11 @@ export default function DocumentsPage() {
       <div className="absolute inset-0 bg-gradient-mesh opacity-10 pointer-events-none" />
       <div className="relative z-10">
       {/* Header */}
-      <div className="pb-6 border-b border-surface-border">
+      <div className="pb-6 border-b border-border">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
           Documents
         </h1>
-        <p className="mt-2 text-text-secondary">
+        <p className="mt-2 text-muted-foreground">
           Access your investment documents, reports, and tax forms
         </p>
       </div>
@@ -131,7 +131,7 @@ export default function DocumentsPage() {
             placeholder="Search documents..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 bg-background-surface border border-surface-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300/50 text-text-primary placeholder-text-muted"
+            className="w-full px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300/50 text-foreground placeholder-text-muted"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -159,7 +159,7 @@ export default function DocumentsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-12 text-text-secondary">
+            <div className="text-center py-12 text-muted-foreground">
               Loading documents...
             </div>
           ) : error ? (
@@ -202,10 +202,10 @@ export default function DocumentsPage() {
                         {doc.type}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-text-secondary">
+                    <TableCell className="text-muted-foreground">
                       {new Date(doc.date).toLocaleDateString()}
                     </TableCell>
-                    <TableCell className="text-text-secondary">
+                    <TableCell className="text-muted-foreground">
                       {doc.size}
                     </TableCell>
                     <TableCell>{getStatusBadge(doc.status)}</TableCell>
@@ -276,7 +276,7 @@ export default function DocumentsPage() {
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-text-primary">
+              <h3 className="mt-2 text-sm font-medium text-foreground">
                 No documents found
               </h3>
               <p className="mt-1 text-sm text-text-muted">
@@ -295,8 +295,8 @@ export default function DocumentsPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-text-secondary text-sm">Total Documents</p>
-                <p className="text-2xl font-bold text-text-primary">
+                <p className="text-muted-foreground text-sm">Total Documents</p>
+                <p className="text-2xl font-bold text-foreground">
                   {documents.length}
                 </p>
               </div>
@@ -321,8 +321,8 @@ export default function DocumentsPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-text-secondary text-sm">Reports</p>
-                <p className="text-2xl font-bold text-text-primary">
+                <p className="text-muted-foreground text-sm">Reports</p>
+                <p className="text-2xl font-bold text-foreground">
                   {documents.filter((d) => d.type === "Report").length}
                 </p>
               </div>
@@ -347,8 +347,8 @@ export default function DocumentsPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-text-secondary text-sm">Tax Forms</p>
-                <p className="text-2xl font-bold text-text-primary">
+                <p className="text-muted-foreground text-sm">Tax Forms</p>
+                <p className="text-2xl font-bold text-foreground">
                   {documents.filter((d) => d.type === "Tax Form").length}
                 </p>
               </div>
@@ -373,8 +373,8 @@ export default function DocumentsPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-text-secondary text-sm">This Month</p>
-                <p className="text-2xl font-bold text-text-primary">
+                <p className="text-muted-foreground text-sm">This Month</p>
+                <p className="text-2xl font-bold text-foreground">
                   {
                     documents.filter((d) => {
                       const dt = new Date(d.date);

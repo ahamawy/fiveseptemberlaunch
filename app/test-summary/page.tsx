@@ -176,12 +176,12 @@ export default function TestSummaryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background-deep p-6 lg:p-8">
+    <div className="min-h-screen bg-background p-6 lg:p-8">
       {/* Header */}
       <div className="mb-8 flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Test Summary Dashboard</h1>
-          <p className="text-text-secondary">Comprehensive testing overview and system health</p>
+          <p className="text-muted-foreground">Comprehensive testing overview and system health</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -221,12 +221,12 @@ export default function TestSummaryPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <CircleStackIcon className="w-5 h-5 text-text-secondary" />
-                <span className="text-sm text-text-secondary">Database</span>
+                <CircleStackIcon className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Database</span>
               </div>
               {getHealthBadge(systemHealth.database)}
             </div>
-            <div className="text-xs text-text-tertiary">Supabase PostgreSQL</div>
+            <div className="text-xs text-muted-foreground/70">Supabase PostgreSQL</div>
           </CardContent>
         </Card>
 
@@ -234,12 +234,12 @@ export default function TestSummaryPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <ServerIcon className="w-5 h-5 text-text-secondary" />
-                <span className="text-sm text-text-secondary">API Server</span>
+                <ServerIcon className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">API Server</span>
               </div>
               {getHealthBadge(systemHealth.api)}
             </div>
-            <div className="text-xs text-text-tertiary">Next.js API Routes</div>
+            <div className="text-xs text-muted-foreground/70">Next.js API Routes</div>
           </CardContent>
         </Card>
 
@@ -247,12 +247,12 @@ export default function TestSummaryPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <CloudIcon className="w-5 h-5 text-text-secondary" />
-                <span className="text-sm text-text-secondary">Supabase</span>
+                <CloudIcon className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Supabase</span>
               </div>
               {getHealthBadge(systemHealth.supabase)}
             </div>
-            <div className="text-xs text-text-tertiary">Auth & Realtime</div>
+            <div className="text-xs text-muted-foreground/70">Auth & Realtime</div>
           </CardContent>
         </Card>
 
@@ -260,12 +260,12 @@ export default function TestSummaryPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <CpuChipIcon className="w-5 h-5 text-text-secondary" />
-                <span className="text-sm text-text-secondary">Cache</span>
+                <CpuChipIcon className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Cache</span>
               </div>
               {getHealthBadge(systemHealth.cache)}
             </div>
-            <div className="text-xs text-text-tertiary">In-memory cache</div>
+            <div className="text-xs text-muted-foreground/70">In-memory cache</div>
           </CardContent>
         </Card>
       </div>
@@ -336,7 +336,7 @@ export default function TestSummaryPage() {
         <CardHeader>
           <CardTitle>
             Test Results
-            <span className="ml-2 text-sm text-text-secondary">
+            <span className="ml-2 text-sm text-muted-foreground">
               Last run: {testResults[0]?.timestamp ? new Date(testResults[0].timestamp).toLocaleTimeString() : "Never"}
             </span>
           </CardTitle>
@@ -347,32 +347,32 @@ export default function TestSummaryPage() {
               <div className="w-8 h-8 border-4 border-primary-300 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : testResults.length === 0 ? (
-            <div className="text-center py-8 text-text-secondary">
+            <div className="text-center py-8 text-muted-foreground">
               No test results yet. Click "Run Tests" to start.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-surface-border">
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Status</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Test Name</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Endpoint</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Response Time</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Data Count</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Message</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Status</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Test Name</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Endpoint</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Response Time</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Data Count</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Message</th>
                   </tr>
                 </thead>
                 <tbody>
                   {testResults.map((result, index) => (
-                    <tr key={index} className="border-b border-surface-border hover:bg-surface-hover transition-colors">
+                    <tr key={index} className="border-b border-border hover:bg-muted transition-colors">
                       <td className="py-4 px-4">
                         {getStatusIcon(result.status)}
                       </td>
                       <td className="py-4 px-4 text-white font-medium">
                         {result.name}
                       </td>
-                      <td className="py-4 px-4 text-text-secondary text-sm">
+                      <td className="py-4 px-4 text-muted-foreground text-sm">
                         <code className="bg-surface-base px-2 py-1 rounded">
                           {result.endpoint}
                         </code>
@@ -389,7 +389,7 @@ export default function TestSummaryPage() {
                       <td className="py-4 px-4 text-white">
                         {result.dataCount !== undefined ? result.dataCount : "-"}
                       </td>
-                      <td className="py-4 px-4 text-text-secondary text-sm">
+                      <td className="py-4 px-4 text-muted-foreground text-sm">
                         {result.message || "OK"}
                       </td>
                     </tr>
@@ -408,21 +408,21 @@ export default function TestSummaryPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="/test-deals" className="block p-3 bg-surface-base rounded-lg hover:bg-surface-hover transition-colors">
+            <a href="/test-deals" className="block p-3 bg-surface-base rounded-lg hover:bg-muted transition-colors">
               <p className="text-white font-medium">Test Deals</p>
-              <p className="text-xs text-text-secondary">Deal functionality</p>
+              <p className="text-xs text-muted-foreground">Deal functionality</p>
             </a>
-            <a href="/test-transactions" className="block p-3 bg-surface-base rounded-lg hover:bg-surface-hover transition-colors">
+            <a href="/test-transactions" className="block p-3 bg-surface-base rounded-lg hover:bg-muted transition-colors">
               <p className="text-white font-medium">Test Transactions</p>
-              <p className="text-xs text-text-secondary">Transaction flows</p>
+              <p className="text-xs text-muted-foreground">Transaction flows</p>
             </a>
-            <a href="/test-real-data" className="block p-3 bg-surface-base rounded-lg hover:bg-surface-hover transition-colors">
+            <a href="/test-real-data" className="block p-3 bg-surface-base rounded-lg hover:bg-muted transition-colors">
               <p className="text-white font-medium">Test Real Data</p>
-              <p className="text-xs text-text-secondary">Supabase connection</p>
+              <p className="text-xs text-muted-foreground">Supabase connection</p>
             </a>
-            <a href="/investor-portal/dashboard" className="block p-3 bg-surface-base rounded-lg hover:bg-surface-hover transition-colors">
+            <a href="/investor-portal/dashboard" className="block p-3 bg-surface-base rounded-lg hover:bg-muted transition-colors">
               <p className="text-white font-medium">Investor Portal</p>
-              <p className="text-xs text-text-secondary">Main dashboard</p>
+              <p className="text-xs text-muted-foreground">Main dashboard</p>
             </a>
           </div>
         </CardContent>

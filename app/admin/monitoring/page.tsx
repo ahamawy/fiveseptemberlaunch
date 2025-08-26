@@ -234,7 +234,7 @@ export default function MonitoringDashboard() {
           <Card key={metric.name} className="hover:border-primary-300 transition-colors">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-text-secondary">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   {metric.name}
                 </CardTitle>
                 {metric.trend && (
@@ -254,7 +254,7 @@ export default function MonitoringDashboard() {
                   {metric.value}
                 </span>
                 {metric.unit && (
-                  <span className="text-sm text-text-tertiary">{metric.unit}</span>
+                  <span className="text-sm text-muted-foreground/70">{metric.unit}</span>
                 )}
               </div>
             </CardContent>
@@ -270,12 +270,12 @@ export default function MonitoringDashboard() {
         <CardContent>
           <div className="space-y-3">
             {services.map((service) => (
-              <div key={service.name} className="flex items-center justify-between p-3 bg-surface-elevated rounded-lg">
+              <div key={service.name} className="flex items-center justify-between p-3 bg-card rounded-lg">
                 <div className="flex items-center gap-3">
                   {getStatusIcon(service.status)}
                   <div>
-                    <div className="font-medium text-text-primary">{service.name}</div>
-                    <div className="text-xs text-text-secondary">
+                    <div className="font-medium text-foreground">{service.name}</div>
+                    <div className="text-xs text-muted-foreground">
                       Response: {service.responseTime}ms | Uptime: {service.uptime}%
                     </div>
                   </div>
@@ -306,12 +306,12 @@ export default function MonitoringDashboard() {
       <CardContent>
         <div className="space-y-2">
           {featureFlags.map((flag) => (
-            <div key={flag.key} className="flex items-center justify-between p-3 bg-surface-elevated rounded-lg">
+            <div key={flag.key} className="flex items-center justify-between p-3 bg-card rounded-lg">
               <div className="flex items-center gap-3">
                 <FlagIcon className={`w-5 h-5 ${flag.enabled ? "text-green-500" : "text-gray-500"}`} />
                 <div>
-                  <div className="font-medium text-text-primary">{flag.name}</div>
-                  <div className="text-xs text-text-secondary">
+                  <div className="font-medium text-foreground">{flag.name}</div>
+                  <div className="text-xs text-muted-foreground">
                     {flag.key} • {flag.type}
                     {flag.rolloutPercentage !== undefined && ` • ${flag.rolloutPercentage}%`}
                   </div>
@@ -345,7 +345,7 @@ export default function MonitoringDashboard() {
       <CardContent>
         <div className="space-y-2">
           {events.map((event) => (
-            <div key={event.id} className="flex items-start gap-3 p-3 bg-surface-elevated rounded-lg">
+            <div key={event.id} className="flex items-start gap-3 p-3 bg-card rounded-lg">
               <div className={`mt-1 ${
                 event.level === "error" ? "text-red-500" :
                 event.level === "warning" ? "text-yellow-500" :
@@ -357,12 +357,12 @@ export default function MonitoringDashboard() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-sm text-text-primary">{event.type}</span>
-                  <span className="text-xs text-text-tertiary">
+                  <span className="font-medium text-sm text-foreground">{event.type}</span>
+                  <span className="text-xs text-muted-foreground/70">
                     {new Date(event.timestamp).toLocaleTimeString()}
                   </span>
                 </div>
-                <div className="text-sm text-text-secondary mt-1">{event.message}</div>
+                <div className="text-sm text-muted-foreground mt-1">{event.message}</div>
               </div>
             </div>
           ))}
@@ -445,19 +445,19 @@ export default function MonitoringDashboard() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <div className="text-sm text-text-secondary mb-1">Global Limit</div>
+              <div className="text-sm text-muted-foreground mb-1">Global Limit</div>
               <div className="text-2xl font-bold">8,420 / 10,000</div>
-              <div className="text-xs text-text-tertiary">requests/minute</div>
+              <div className="text-xs text-muted-foreground/70">requests/minute</div>
             </div>
             <div>
-              <div className="text-sm text-text-secondary mb-1">Top User</div>
+              <div className="text-sm text-muted-foreground mb-1">Top User</div>
               <div className="text-2xl font-bold">user_789</div>
-              <div className="text-xs text-text-tertiary">342 requests</div>
+              <div className="text-xs text-muted-foreground/70">342 requests</div>
             </div>
             <div>
-              <div className="text-sm text-text-secondary mb-1">Blocked IPs</div>
+              <div className="text-sm text-muted-foreground mb-1">Blocked IPs</div>
               <div className="text-2xl font-bold">3</div>
-              <div className="text-xs text-text-tertiary">in last hour</div>
+              <div className="text-xs text-muted-foreground/70">in last hour</div>
             </div>
           </div>
         </CardContent>
@@ -472,11 +472,11 @@ export default function MonitoringDashboard() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-text-primary flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                 <CpuChipIcon className="w-8 h-8 text-primary-300" />
                 System Monitoring Dashboard
               </h1>
-              <p className="text-text-secondary mt-2">
+              <p className="text-muted-foreground mt-2">
                 Real-time monitoring of institutional-grade infrastructure
               </p>
             </div>
@@ -507,7 +507,7 @@ export default function MonitoringDashboard() {
                 </div>
                 <Badge variant="success">All Services Running</Badge>
               </div>
-              <div className="flex items-center gap-4 text-sm text-text-secondary">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span>Uptime: 99.99%</span>
                 <span>•</span>
                 <span>Version: 1.2.3</span>

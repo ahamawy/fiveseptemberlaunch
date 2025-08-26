@@ -69,37 +69,37 @@ export function DealCard({
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-text-primary group-hover:text-primary-300 transition-colors">
+              <h3 className="text-lg font-semibold text-foreground group-hover:text-primary-300 transition-colors">
                 {deal.dealName}
               </h3>
-              <p className="text-sm text-text-secondary mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 {deal.companyName}
                 {deal.sector && (
-                  <span className="ml-2 px-2 py-0.5 rounded-full bg-surface-hover text-xs">
+                  <span className="ml-2 px-2 py-0.5 rounded-full bg-muted text-xs">
                     {deal.sector}
                   </span>
                 )}
               </p>
             </div>
-            <ChevronRightIcon className="w-5 h-5 text-text-tertiary group-hover:text-primary-300 transition-colors" />
+            <ChevronRightIcon className="w-5 h-5 text-muted-foreground/70 group-hover:text-primary-300 transition-colors" />
           </div>
 
           {/* Metrics Grid */}
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <p className="text-xs text-text-tertiary">Committed</p>
-              <p className="text-sm font-medium text-text-primary">
+              <p className="text-xs text-muted-foreground/70">Committed</p>
+              <p className="text-sm font-medium text-foreground">
                 {formatCurrency(deal.committed, deal.currency)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-text-tertiary">Current Value</p>
-              <p className="text-sm font-medium text-text-primary">
+              <p className="text-xs text-muted-foreground/70">Current Value</p>
+              <p className="text-sm font-medium text-foreground">
                 {formatCurrency(deal.currentValue, deal.currency)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-text-tertiary">IRR</p>
+              <p className="text-xs text-muted-foreground/70">IRR</p>
               <div className="flex items-center gap-1">
                 <p
                   className={`text-sm font-medium ${
@@ -112,15 +112,15 @@ export function DealCard({
               </div>
             </div>
             <div>
-              <p className="text-xs text-text-tertiary">MOIC</p>
-              <p className="text-sm font-medium text-text-primary">
+              <p className="text-xs text-muted-foreground/70">MOIC</p>
+              <p className="text-sm font-medium text-foreground">
                 {deal.moic.toFixed(2)}x
               </p>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-surface-border">
+          <div className="flex items-center justify-between pt-4 border-t border-border">
             <div className="flex items-center gap-3">
               <span
                 className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusBadge(
@@ -130,13 +130,13 @@ export function DealCard({
                 {deal.status}
               </span>
               {deal.documentsCount && deal.documentsCount > 0 && (
-                <div className="flex items-center gap-1 text-text-tertiary">
+                <div className="flex items-center gap-1 text-muted-foreground/70">
                   <DocumentTextIcon className="w-4 h-4" />
                   <span className="text-xs">{deal.documentsCount}</span>
                 </div>
               )}
             </div>
-            <span className="text-xs text-text-tertiary capitalize">
+            <span className="text-xs text-muted-foreground/70 capitalize">
               {deal.dealType === "fund"
                 ? "Partnership"
                 : deal.dealType.replace("_", " ")}
@@ -156,10 +156,10 @@ export function DealCard({
     >
       <CardContent>
         <div className="mb-3">
-          <h4 className="text-sm font-semibold text-text-primary group-hover:text-primary-300 transition-colors">
+          <h4 className="text-sm font-semibold text-foreground group-hover:text-primary-300 transition-colors">
             {deal.dealName}
           </h4>
-          <p className="text-xs text-text-secondary">
+          <p className="text-xs text-muted-foreground">
             {deal.companyName}
             <span className="ml-2 px-2 py-0.5 rounded-full border border-white/10 text-[10px] uppercase tracking-wide text-white/70">
               {deal.dealType === "fund" ? "Partnership" : deal.dealType}
@@ -169,26 +169,26 @@ export function DealCard({
 
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-text-tertiary">Committed:</span>
-            <span className="font-medium text-text-primary">
+            <span className="text-muted-foreground/70">Committed:</span>
+            <span className="font-medium text-foreground">
               {formatCurrency(deal.committed, deal.currency)}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-tertiary">Current Value:</span>
-            <span className="font-medium text-text-primary">
+            <span className="text-muted-foreground/70">Current Value:</span>
+            <span className="font-medium text-foreground">
               {formatCurrency(deal.currentValue, deal.currency)}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-tertiary">IRR:</span>
+            <span className="text-muted-foreground/70">IRR:</span>
             <span className={`font-medium ${getStatusColor(deal.irr).text}`}>
               {formatPercentage(deal.irr)}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-tertiary">MOIC:</span>
-            <span className="font-medium text-text-primary">
+            <span className="text-muted-foreground/70">MOIC:</span>
+            <span className="font-medium text-foreground">
               {deal.moic.toFixed(2)}x
             </span>
           </div>
@@ -202,7 +202,7 @@ export function DealCard({
           >
             {deal.status}
           </span>
-          <ChevronRightIcon className="w-4 h-4 text-text-tertiary group-hover:text-primary-300 transition-colors" />
+          <ChevronRightIcon className="w-4 h-4 text-muted-foreground/70 group-hover:text-primary-300 transition-colors" />
         </div>
       </CardContent>
     </Card>

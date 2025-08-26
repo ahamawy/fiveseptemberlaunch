@@ -32,7 +32,7 @@ export function LoadingState({
         </div>
       </div>
       {message && (
-        <p className="mt-4 text-text-secondary text-sm">{message}</p>
+        <p className="mt-4 text-muted-foreground text-sm">{message}</p>
       )}
     </div>
   );
@@ -40,7 +40,7 @@ export function LoadingState({
 
 export function LoadingOverlay({ message }: { message?: string }) {
   return (
-    <div className="absolute inset-0 bg-background-deep/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
       <LoadingState message={message} size="lg" />
     </div>
   );

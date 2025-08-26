@@ -73,7 +73,7 @@ export default function AdminTransactionsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-text-secondary">Loading…</div>
+            <div className="text-muted-foreground">Loading…</div>
           ) : error ? (
             <div className="text-error-400">{error}</div>
           ) : (
@@ -135,7 +135,7 @@ export default function AdminTransactionsPage() {
                 </TableBody>
               </Table>
               {rows.length === 0 && (
-                <div className="text-center text-text-secondary py-8">
+                <div className="text-center text-muted-foreground py-8">
                   No transactions found
                 </div>
               )}
@@ -151,7 +151,7 @@ export default function AdminTransactionsPage() {
           {rows.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <div className="text-sm text-text-tertiary mb-2">
+                <div className="text-sm text-muted-foreground/70 mb-2">
                   Transactions by Type
                 </div>
                 <BarChart
@@ -176,7 +176,7 @@ export default function AdminTransactionsPage() {
                 />
               </div>
               <div>
-                <div className="text-sm text-text-tertiary mb-2">
+                <div className="text-sm text-muted-foreground/70 mb-2">
                   Top Deals by Amount (sum)
                 </div>
                 <BarChart
@@ -200,7 +200,7 @@ export default function AdminTransactionsPage() {
               </div>
             </div>
           ) : (
-            <div className="text-text-secondary">No data</div>
+            <div className="text-muted-foreground">No data</div>
           )}
         </CardContent>
       </Card>

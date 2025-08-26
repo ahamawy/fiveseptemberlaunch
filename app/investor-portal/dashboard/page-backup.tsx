@@ -70,7 +70,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center space-y-4">
           <div className="w-12 h-12 border-4 border-primary-300 border-t-transparent rounded-full animate-spin" />
-          <div className="text-text-secondary">Loading dashboard...</div>
+          <div className="text-muted-foreground">Loading dashboard...</div>
         </div>
       </div>
     );
@@ -81,7 +81,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center space-y-4">
           <div className="text-error-400 text-xl">Failed to load dashboard</div>
-          <div className="text-text-secondary">{error || 'No data available'}</div>
+          <div className="text-muted-foreground">{error || 'No data available'}</div>
           <button 
             onClick={() => fetchDashboardData()}
             className="px-4 py-2 bg-primary-300 text-white rounded-lg hover:bg-primary-400 transition-colors"
@@ -94,18 +94,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background-deep">
+    <div className="min-h-screen bg-background">
       <div className="relative">
         {/* Background gradient mesh */}
         <div className="absolute inset-0 bg-gradient-mesh opacity-30 pointer-events-none" />
         
         <div className="relative z-10 p-6 lg:p-8 space-y-8">
           {/* Header */}
-          <div className="pb-6 border-b border-surface-border">
+          <div className="pb-6 border-b border-border">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
               Welcome back, Investor
             </h1>
-            <p className="mt-2 text-text-secondary">
+            <p className="mt-2 text-muted-foreground">
               Here's your portfolio overview for today
             </p>
           </div>

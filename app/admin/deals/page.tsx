@@ -77,7 +77,7 @@ export default function AdminDealsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-text-secondary">Loading…</div>
+            <div className="text-muted-foreground">Loading…</div>
           ) : error ? (
             <div className="text-error-400">{error}</div>
           ) : (
@@ -103,17 +103,17 @@ export default function AdminDealsPage() {
                       <TableCell className="font-mono text-sm">
                         {r.id}
                       </TableCell>
-                      <TableCell className="text-text-primary">
+                      <TableCell className="text-foreground">
                         <div className="flex items-center gap-3">
                           {r.company_logo_url ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={r.company_logo_url}
                               alt="logo"
-                              className="w-7 h-7 rounded object-cover border border-surface-border"
+                              className="w-7 h-7 rounded object-cover border border-border"
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded bg-surface-elevated border border-surface-border" />
+                            <div className="w-7 h-7 rounded bg-card border border-border" />
                           )}
                           <div>{r.name}</div>
                         </div>
@@ -128,7 +128,7 @@ export default function AdminDealsPage() {
                         <div className="flex items-start gap-3">
                           {/** Logo pulled via Companies API mapping is not available here; keep text fallback. */}
                           <div>
-                            <div className="text-text-primary">
+                            <div className="text-foreground">
                               {r.company_name || "-"}
                             </div>
                             <div className="text-[10px] text-text-muted font-mono">
@@ -164,7 +164,7 @@ export default function AdminDealsPage() {
                 </TableBody>
               </Table>
               {rows.length === 0 && (
-                <div className="text-center text-text-secondary py-8">
+                <div className="text-center text-muted-foreground py-8">
                   No deals found
                 </div>
               )}
@@ -180,7 +180,7 @@ export default function AdminDealsPage() {
           {rows.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <div className="text-sm text-text-tertiary mb-2">
+                <div className="text-sm text-muted-foreground/70 mb-2">
                   Deals by Stage
                 </div>
                 <BarChart
@@ -205,7 +205,7 @@ export default function AdminDealsPage() {
                 />
               </div>
               <div>
-                <div className="text-sm text-text-tertiary mb-2">
+                <div className="text-sm text-muted-foreground/70 mb-2">
                   Deals by Currency
                 </div>
                 <BarChart
@@ -229,7 +229,7 @@ export default function AdminDealsPage() {
               </div>
             </div>
           ) : (
-            <div className="text-text-secondary">No data</div>
+            <div className="text-muted-foreground">No data</div>
           )}
         </CardContent>
       </Card>

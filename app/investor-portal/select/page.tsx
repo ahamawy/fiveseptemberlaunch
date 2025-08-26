@@ -62,7 +62,7 @@ export default function InvestorSelectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background-deep flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>Select Investor</CardTitle>
@@ -76,7 +76,7 @@ export default function InvestorSelectPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Search by name or email (or paste ID/public_id)"
-              className="w-full px-4 py-2 bg-background-surface border border-surface-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300/50 text-text-primary placeholder-text-muted"
+              className="w-full px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300/50 text-foreground placeholder-text-muted"
             />
             {error && <div className="text-error-400 text-sm">{error}</div>}
             <div className="flex gap-2">
@@ -95,18 +95,18 @@ export default function InvestorSelectPage() {
               </Button>
             </div>
             {results.length > 0 && (
-              <div className="mt-4 border border-surface-border rounded-lg divide-y divide-surface-border">
+              <div className="mt-4 border border-border rounded-lg divide-y divide-surface-border">
                 {results.map((r) => (
                   <div
                     key={r.id}
-                    className="p-3 hover:bg-surface-hover cursor-pointer flex items-center justify-between"
+                    className="p-3 hover:bg-muted cursor-pointer flex items-center justify-between"
                     onClick={() => onPick(r.id)}
                   >
                     <div>
-                      <div className="text-text-primary">
+                      <div className="text-foreground">
                         {r.name || `Investor #${r.id}`}
                       </div>
-                      <div className="text-xs text-text-tertiary">
+                      <div className="text-xs text-muted-foreground/70">
                         {r.email || "No email"}
                       </div>
                     </div>

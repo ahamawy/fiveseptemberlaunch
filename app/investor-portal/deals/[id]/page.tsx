@@ -196,10 +196,10 @@ export default function DealDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background-deep flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <div className="w-12 h-12 border-4 border-primary-300 border-t-transparent rounded-full animate-spin" />
-          <div className="text-text-secondary">Loading deal details...</div>
+          <div className="text-muted-foreground">Loading deal details...</div>
         </div>
       </div>
     );
@@ -207,20 +207,20 @@ export default function DealDetailPage() {
 
   if (!deal) {
     return (
-      <div className="min-h-screen bg-background-deep flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-error-400">Deal not found</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background-deep">
+    <div className="min-h-screen bg-background">
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-mesh opacity-20 pointer-events-none" />
 
         <div className="relative z-10 p-6 lg:p-8 space-y-8">
           {/* Header with back button */}
-          <div className="pb-6 border-b border-surface-border">
+          <div className="pb-6 border-b border-border">
             <Button
               onClick={() => router.back()}
               variant="glass"
@@ -236,21 +236,21 @@ export default function DealDetailPage() {
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
                   {deal.name}
                 </h1>
-                <div className="mt-2 flex items-center space-x-4 text-text-secondary">
+                <div className="mt-2 flex items-center space-x-4 text-muted-foreground">
                   <span className="flex items-center">
                     <BuildingOfficeIcon className="w-4 h-4 mr-1" />
                     {deal.company.name}
                   </span>
                   {deal.company.sector && (
-                    <span className="px-2 py-1 rounded-full bg-surface-hover text-xs">
+                    <span className="px-2 py-1 rounded-full bg-muted text-xs">
                       {deal.company.sector}
                     </span>
                   )}
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-text-secondary">Deal Type</div>
-                <div className="text-lg font-semibold text-text-primary capitalize">
+                <div className="text-sm text-muted-foreground">Deal Type</div>
+                <div className="text-lg font-semibold text-foreground capitalize">
                   {deal.type.replace("_", " ")}
                 </div>
               </div>
@@ -262,47 +262,47 @@ export default function DealDetailPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-6">
               <Card variant="glass" className="hover:shadow-lg transition-shadow">
                 <CardContent>
-                  <dt className="text-sm font-medium text-text-secondary">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Committed
                   </dt>
-                  <dd className="mt-2 text-2xl font-bold text-text-primary">
+                  <dd className="mt-2 text-2xl font-bold text-foreground">
                     {formatCurrency(deal.investment_summary.committed, deal.currency)}
                   </dd>
                 </CardContent>
               </Card>
               <Card variant="glass" className="hover:shadow-lg transition-shadow">
                 <CardContent>
-                  <dt className="text-sm font-medium text-text-secondary">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Called
                   </dt>
-                  <dd className="mt-2 text-2xl font-bold text-text-primary">
+                  <dd className="mt-2 text-2xl font-bold text-foreground">
                     {formatCurrency(deal.investment_summary.called, deal.currency)}
                   </dd>
                 </CardContent>
               </Card>
               <Card variant="glass" className="hover:shadow-lg transition-shadow">
                 <CardContent>
-                  <dt className="text-sm font-medium text-text-secondary">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Distributed
                   </dt>
-                  <dd className="mt-2 text-2xl font-bold text-text-primary">
+                  <dd className="mt-2 text-2xl font-bold text-foreground">
                     {formatCurrency(deal.investment_summary.distributed, deal.currency)}
                   </dd>
                 </CardContent>
               </Card>
               <Card variant="glass" className="hover:shadow-lg transition-shadow">
                 <CardContent>
-                  <dt className="text-sm font-medium text-text-secondary">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Current Value
                   </dt>
-                  <dd className="mt-2 text-2xl font-bold text-text-primary">
+                  <dd className="mt-2 text-2xl font-bold text-foreground">
                     {formatCurrency(deal.investment_summary.current_value, deal.currency)}
                   </dd>
                 </CardContent>
               </Card>
               <Card variant="glass" className="hover:shadow-lg transition-shadow">
                 <CardContent>
-                  <dt className="text-sm font-medium text-text-secondary">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     IRR
                   </dt>
                   <dd className={`mt-2 text-2xl font-bold ${getStatusColor(deal.investment_summary.irr).text}`}>
@@ -312,10 +312,10 @@ export default function DealDetailPage() {
               </Card>
               <Card variant="glass" className="hover:shadow-lg transition-shadow">
                 <CardContent>
-                  <dt className="text-sm font-medium text-text-secondary">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     MOIC
                   </dt>
-                  <dd className="mt-2 text-2xl font-bold text-text-primary">
+                  <dd className="mt-2 text-2xl font-bold text-foreground">
                     {deal.investment_summary.moic.toFixed(2)}x
                   </dd>
                 </CardContent>
@@ -386,42 +386,42 @@ export default function DealDetailPage() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <h3 className="text-sm font-medium text-text-secondary mb-2">Target Raise</h3>
-                      <p className="text-lg text-text-primary">
+                      <h3 className="text-sm font-medium text-muted-foreground mb-2">Target Raise</h3>
+                      <p className="text-lg text-foreground">
                         {deal.target_raise ? formatCurrency(deal.target_raise, deal.currency) : "N/A"}
                       </p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-text-secondary mb-2">Minimum Investment</h3>
-                      <p className="text-lg text-text-primary">
+                      <h3 className="text-sm font-medium text-muted-foreground mb-2">Minimum Investment</h3>
+                      <p className="text-lg text-foreground">
                         {deal.minimum_investment ? formatCurrency(deal.minimum_investment, deal.currency) : "N/A"}
                       </p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-text-secondary mb-2">Opening Date</h3>
-                      <p className="text-lg text-text-primary">
+                      <h3 className="text-sm font-medium text-muted-foreground mb-2">Opening Date</h3>
+                      <p className="text-lg text-foreground">
                         {deal.opening_date ? new Date(deal.opening_date).toLocaleDateString() : "N/A"}
                       </p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-text-secondary mb-2">Closing Date</h3>
-                      <p className="text-lg text-text-primary">
+                      <h3 className="text-sm font-medium text-muted-foreground mb-2">Closing Date</h3>
+                      <p className="text-lg text-foreground">
                         {deal.closing_date ? new Date(deal.closing_date).toLocaleDateString() : "N/A"}
                       </p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-text-secondary mb-2">Status</h3>
-                      <p className="text-lg text-text-primary capitalize">{deal.stage}</p>
+                      <h3 className="text-sm font-medium text-muted-foreground mb-2">Status</h3>
+                      <p className="text-lg text-foreground capitalize">{deal.stage}</p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-text-secondary mb-2">Currency</h3>
-                      <p className="text-lg text-text-primary">{deal.currency}</p>
+                      <h3 className="text-sm font-medium text-muted-foreground mb-2">Currency</h3>
+                      <p className="text-lg text-foreground">{deal.currency}</p>
                     </div>
                   </div>
                   {deal.description && (
                     <div className="mt-6">
-                      <h3 className="text-sm font-medium text-text-secondary mb-2">Description</h3>
-                      <p className="text-text-primary">{deal.description}</p>
+                      <h3 className="text-sm font-medium text-muted-foreground mb-2">Description</h3>
+                      <p className="text-foreground">{deal.description}</p>
                     </div>
                   )}
                 </CardContent>
@@ -437,34 +437,34 @@ export default function DealDetailPage() {
                   <div className="overflow-x-auto">
                     <table className="min-w-full">
                       <thead>
-                        <tr className="border-b border-surface-border">
-                          <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                        <tr className="border-b border-border">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Date
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Type
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Amount
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Description
                           </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-surface-border">
                         {deal.transactions.map((tx) => (
-                          <tr key={tx.id} className="hover:bg-surface-hover transition-colors">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
+                          <tr key={tx.id} className="hover:bg-muted transition-colors">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                               {new Date(tx.date).toLocaleDateString()}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                               {tx.type}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                               {formatCurrency(tx.amount, deal.currency)}
                             </td>
-                            <td className="px-6 py-4 text-sm text-text-secondary">
+                            <td className="px-6 py-4 text-sm text-muted-foreground">
                               {tx.description}
                             </td>
                           </tr>
@@ -487,13 +487,13 @@ export default function DealDetailPage() {
                       <Card key={doc.id} variant="gradient" className="hover:shadow-lg transition-shadow cursor-pointer">
                         <CardContent>
                           <DocumentTextIcon className="w-8 h-8 text-primary-300 mb-2" />
-                          <h4 className="text-sm font-semibold text-text-primary truncate">
+                          <h4 className="text-sm font-semibold text-foreground truncate">
                             {doc.name}
                           </h4>
-                          <p className="text-xs text-text-secondary mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             {doc.type} • {doc.size}
                           </p>
-                          <p className="text-xs text-text-tertiary mt-2">
+                          <p className="text-xs text-muted-foreground/70 mt-2">
                             Uploaded {new Date(doc.uploaded_date).toLocaleDateString()}
                           </p>
                         </CardContent>

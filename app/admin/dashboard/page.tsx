@@ -34,13 +34,13 @@ function Stat({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm text-text-secondary">{label}</CardTitle>
+        <CardTitle className="text-sm text-muted-foreground">{label}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-semibold tracking-tight text-text-primary">
+        <div className="text-3xl font-semibold tracking-tight text-foreground">
           {value}
         </div>
-        {sub && <div className="text-xs text-text-tertiary mt-1">{sub}</div>}
+        {sub && <div className="text-xs text-muted-foreground/70 mt-1">{sub}</div>}
       </CardContent>
     </Card>
   );
@@ -68,7 +68,7 @@ export default function AdminDashboardPage() {
     load();
   }, []);
 
-  if (loading) return <div className="text-text-secondary">Loading…</div>;
+  if (loading) return <div className="text-muted-foreground">Loading…</div>;
   if (error) return <div className="text-error-400">{error}</div>;
   if (!data) return null;
 
@@ -104,7 +104,7 @@ export default function AdminDashboardPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-surface-border text-left text-sm text-text-secondary">
+                <tr className="border-b border-border text-left text-sm text-muted-foreground">
                   <th className="py-2">Deal</th>
                   <th className="py-2">Gross Capital</th>
                   <th className="py-2">Net Capital</th>
@@ -114,13 +114,13 @@ export default function AdminDashboardPage() {
                 {data.capital_by_deal.map((d) => (
                   <tr
                     key={d.deal_id}
-                    className="border-b border-surface-border/60"
+                    className="border-b border-border/60"
                   >
                     <td className="py-2">
-                      <div className="text-text-primary">
+                      <div className="text-foreground">
                         {d.deal_name || `Deal #${d.deal_id}`}
                       </div>
-                      <div className="text-xs text-text-tertiary">
+                      <div className="text-xs text-muted-foreground/70">
                         {d.currency || "USD"}
                       </div>
                     </td>
@@ -132,7 +132,7 @@ export default function AdminDashboardPage() {
                   <tr>
                     <td
                       colSpan={3}
-                      className="py-6 text-center text-text-secondary"
+                      className="py-6 text-center text-muted-foreground"
                     >
                       No data
                     </td>

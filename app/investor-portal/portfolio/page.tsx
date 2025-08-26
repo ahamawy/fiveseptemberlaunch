@@ -103,10 +103,10 @@ export default function PortfolioPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background-deep flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <div className="w-12 h-12 border-4 border-primary-300 border-t-transparent rounded-full animate-spin" />
-          <div className="text-text-secondary">Loading portfolio...</div>
+          <div className="text-muted-foreground">Loading portfolio...</div>
         </div>
       </div>
     );
@@ -114,7 +114,7 @@ export default function PortfolioPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-background-deep flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-error-400">Error loading portfolio data</div>
       </div>
     );
@@ -192,18 +192,18 @@ export default function PortfolioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background-deep">
+    <div className="min-h-screen bg-background">
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-mesh opacity-20 pointer-events-none" />
 
         <div className="relative z-10 p-6 lg:p-8 space-y-8">
           {/* Header */}
           <MotionSection>
-            <div className="pb-6 border-b border-surface-border">
+            <div className="pb-6 border-b border-border">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
                 Portfolio Overview
               </h1>
-              <p className="mt-2 text-text-secondary">
+              <p className="mt-2 text-muted-foreground">
                 Detailed view of your investment portfolio
               </p>
             </div>
@@ -217,11 +217,11 @@ export default function PortfolioPage() {
                 className="hover:shadow-lg transition-shadow"
               >
                 <CardContent className="p-5">
-                  <dt className="text-sm font-medium text-text-secondary">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Total Portfolio Value
                   </dt>
                   <dd
-                    className="mt-3 text-3xl font-extrabold text-text-primary tracking-tight"
+                    className="mt-3 text-3xl font-extrabold text-foreground tracking-tight"
                     data-testid="portfolio-total-value"
                   >
                     {formatCurrency(data.summary.totalValue)}
@@ -233,10 +233,10 @@ export default function PortfolioPage() {
                 className="hover:shadow-lg transition-shadow"
               >
                 <CardContent className="p-5">
-                  <dt className="text-sm font-medium text-text-secondary">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Total Deals
                   </dt>
-                  <dd className="mt-3 text-3xl font-bold text-text-primary">
+                  <dd className="mt-3 text-3xl font-bold text-foreground">
                     {data.summary.totalDeals}
                   </dd>
                 </CardContent>
@@ -246,7 +246,7 @@ export default function PortfolioPage() {
                 className="hover:shadow-lg transition-shadow"
               >
                 <CardContent className="p-5">
-                  <dt className="text-sm font-medium text-text-secondary">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Active Deals
                   </dt>
                   <dd className="mt-3 text-3xl font-extrabold text-success-400">
@@ -259,7 +259,7 @@ export default function PortfolioPage() {
                 className="hover:shadow-lg transition-shadow"
               >
                 <CardContent className="p-5">
-                  <dt className="text-sm font-medium text-text-secondary">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Exited Deals
                   </dt>
                   <dd className="mt-3 text-3xl font-extrabold text-info-400">
@@ -316,10 +316,10 @@ export default function PortfolioPage() {
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex flex-wrap gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-text-secondary">
+                      <span className="text-xs text-muted-foreground">
                         Sector
                       </span>
-                      <div className="flex gap-1 p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                      <div className="flex gap-1 p-1 bg-card rounded-lg border border-border">
                         {sectors.map((s) => (
                           <button
                             key={s}
@@ -327,7 +327,7 @@ export default function PortfolioPage() {
                             className={`px-2 py-1 rounded text-xs font-medium transition-all ${
                               filterSector === s
                                 ? "bg-primary-300 text-white"
-                                : "text-text-secondary hover:text-text-primary"
+                                : "text-muted-foreground hover:text-foreground"
                             }`}
                           >
                             {s}
@@ -336,8 +336,8 @@ export default function PortfolioPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-text-secondary">Type</span>
-                      <div className="flex gap-1 p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                      <span className="text-xs text-muted-foreground">Type</span>
+                      <div className="flex gap-1 p-1 bg-card rounded-lg border border-border">
                         {types.map((t) => (
                           <button
                             key={t}
@@ -345,7 +345,7 @@ export default function PortfolioPage() {
                             className={`px-2 py-1 rounded text-xs font-medium transition-all ${
                               filterType === t
                                 ? "bg-primary-300 text-white"
-                                : "text-text-secondary hover:text-text-primary"
+                                : "text-muted-foreground hover:text-foreground"
                             }`}
                           >
                             {t}
@@ -442,29 +442,29 @@ export default function PortfolioPage() {
                 >
                   <table className="min-w-full">
                     <thead>
-                      <tr className="border-b border-surface-border">
-                        <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                      <tr className="border-b border-border">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Deal
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Company
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Type
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Committed
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Current Value
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           IRR
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           MOIC
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Status
                         </th>
                       </tr>
@@ -473,14 +473,14 @@ export default function PortfolioPage() {
                       {visibleDeals.map((deal) => (
                         <tr
                           key={deal.dealId}
-                          className="hover:bg-surface-hover transition-colors cursor-pointer"
+                          className="hover:bg-muted transition-colors cursor-pointer"
                           onClick={() =>
                             (window.location.href = `/investor-portal/deals/${
                               deal.dealId
                             }?investor=${resolveInvestorId()}`)
                           }
                         >
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-primary">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                             <a
                               href={`/investor-portal/deals/${
                                 deal.dealId
@@ -493,10 +493,10 @@ export default function PortfolioPage() {
                                 <img
                                   src={deal.companyLogoUrl}
                                   alt="logo"
-                                  className="w-5 h-5 rounded object-cover border border-surface-border"
+                                  className="w-5 h-5 rounded object-cover border border-border"
                                 />
                               ) : (
-                                <span className="w-5 h-5 rounded bg-surface-elevated border border-surface-border inline-block" />
+                                <span className="w-5 h-5 rounded bg-card border border-border inline-block" />
                               )}
                               {deal.dealName}
                               {/* Quick info badges */}
@@ -516,18 +516,18 @@ export default function PortfolioPage() {
                               </div>
                             </a>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                             {deal.companyName}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary capitalize">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground capitalize">
                             {deal.dealType === "fund"
                               ? "Partnership"
                               : deal.dealType.replace("_", " ")}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                             {formatCurrency(deal.committed, deal.currency)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                             {formatCurrency(deal.currentValue, deal.currency)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -535,7 +535,7 @@ export default function PortfolioPage() {
                               {formatPercentage(deal.irr)}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                             {deal.moic.toFixed(2)}x
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -573,12 +573,12 @@ export default function PortfolioPage() {
                               <img
                                 src={deal.companyLogoUrl}
                                 alt="logo"
-                                className="w-6 h-6 rounded object-cover border border-surface-border"
+                                className="w-6 h-6 rounded object-cover border border-border"
                               />
                             ) : (
-                              <span className="w-6 h-6 rounded bg-surface-elevated border border-surface-border inline-block" />
+                              <span className="w-6 h-6 rounded bg-card border border-border inline-block" />
                             )}
-                            <h4 className="text-sm font-semibold text-text-primary hover:text-primary-300 transition-colors flex-1">
+                            <h4 className="text-sm font-semibold text-foreground hover:text-primary-300 transition-colors flex-1">
                               {deal.dealName}
                             </h4>
                           </div>
@@ -600,7 +600,7 @@ export default function PortfolioPage() {
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-text-secondary">
+                          <p className="text-xs text-muted-foreground">
                             {deal.companyName}
                             <span className="ml-2 px-2 py-0.5 rounded-full border border-white/10 text-[10px] uppercase tracking-wide text-white/70">
                               {deal.dealType === "fund"
@@ -611,23 +611,23 @@ export default function PortfolioPage() {
                         </div>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="text-text-tertiary">
+                            <span className="text-muted-foreground/70">
                               Committed:
                             </span>
-                            <span className="font-medium text-text-primary">
+                            <span className="font-medium text-foreground">
                               {formatCurrency(deal.committed, deal.currency)}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-text-tertiary">
+                            <span className="text-muted-foreground/70">
                               Current Value:
                             </span>
-                            <span className="font-medium text-text-primary">
+                            <span className="font-medium text-foreground">
                               {formatCurrency(deal.currentValue, deal.currency)}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-text-tertiary">IRR:</span>
+                            <span className="text-muted-foreground/70">IRR:</span>
                             <span
                               className={`font-medium ${
                                 getStatusColor(deal.irr).text
@@ -637,8 +637,8 @@ export default function PortfolioPage() {
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-text-tertiary">MOIC:</span>
-                            <span className="font-medium text-text-primary">
+                            <span className="text-muted-foreground/70">MOIC:</span>
+                            <span className="font-medium text-foreground">
                               {deal.moic.toFixed(2)}x
                             </span>
                           </div>
@@ -651,7 +651,7 @@ export default function PortfolioPage() {
                           >
                             {deal.status}
                           </span>
-                          <ChevronRightIcon className="w-4 h-4 text-text-tertiary" />
+                          <ChevronRightIcon className="w-4 h-4 text-muted-foreground/70" />
                         </div>
                       </CardContent>
                     </Card>

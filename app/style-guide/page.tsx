@@ -62,21 +62,21 @@ function StyleGuideContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background-deep">
+    <div className="min-h-screen bg-background">
       <div className="relative">
         {/* Background gradient mesh */}
         <div className="fixed inset-0 bg-gradient-mesh opacity-20 pointer-events-none" />
 
         <div className="relative z-10">
           {/* Header */}
-          <div className="sticky top-0 z-50 bg-background-deep/80 backdrop-blur-xl border-b border-surface-border">
+          <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
             <div className="p-6 lg:p-8">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h1 className="text-5xl font-bold bg-gradient-to-r from-primary-300 via-accent-blue to-accent-green text-gradient animate-gradient">
                     Equitie Design System
                   </h1>
-                  <p className="mt-3 text-lg text-text-secondary">
+                  <p className="mt-3 text-lg text-muted-foreground">
                     Complete style guide with modern components, animations, and
                     interactions
                   </p>
@@ -86,14 +86,14 @@ function StyleGuideContent() {
                 <div className="flex flex-col gap-3 ml-8">
                   {/* Theme Toggle */}
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-text-secondary">Theme:</span>
-                    <div className="flex items-center p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                    <span className="text-sm text-muted-foreground">Theme:</span>
+                    <div className="flex items-center p-1 bg-card rounded-lg border border-border">
                       <button
                         onClick={() => setTheme("dark")}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                           theme === "dark"
                             ? "bg-primary-300 text-white shadow-sm"
-                            : "text-text-secondary hover:text-text-primary"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         Dark
@@ -103,7 +103,7 @@ function StyleGuideContent() {
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                           theme === "light"
                             ? "bg-primary-300 text-white shadow-sm"
-                            : "text-text-secondary hover:text-text-primary"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         Light
@@ -113,8 +113,8 @@ function StyleGuideContent() {
 
                   {/* Color Scheme Selector */}
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-text-secondary">Colors:</span>
-                    <div className="flex items-center gap-1 p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                    <span className="text-sm text-muted-foreground">Colors:</span>
+                    <div className="flex items-center gap-1 p-1 bg-card rounded-lg border border-border">
                       {colorSchemes.map((scheme) => (
                         <button
                           key={scheme.id}
@@ -122,7 +122,7 @@ function StyleGuideContent() {
                           className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                             colorScheme === scheme.id
                               ? `${scheme.color} text-white shadow-sm`
-                              : "text-text-secondary hover:text-text-primary hover:bg-surface-hover"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted"
                           }`}
                         >
                           {scheme.label}

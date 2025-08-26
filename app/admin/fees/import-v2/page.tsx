@@ -147,7 +147,7 @@ export default function FeeImportV2Page() {
   };
 
   return (
-    <div className="min-h-screen bg-background-deep">
+    <div className="min-h-screen bg-background">
       <div className="p-6 space-y-6">
         <FeeHubBanner />
         {/* Header */}
@@ -213,7 +213,7 @@ export default function FeeImportV2Page() {
               <h2 className="text-lg font-semibold mb-4 text-white">Upload CSV File</h2>
               
               <div className="space-y-4">
-                <div className="border-2 border-dashed border-surface-border rounded-lg p-8 text-center">
+                <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
                   <ArrowUpTrayIcon className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                   <p className="text-sm text-gray-400 mb-4">
                     Drag and drop your CSV file here, or click to browse
@@ -321,7 +321,7 @@ export default function FeeImportV2Page() {
                   <button
                     onClick={() => applyFees(true)}
                     disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-surface-border text-white hover:bg-surface-light"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-white hover:bg-surface-light"
                   >
                     <EyeIcon className="w-4 h-4" />
                     Dry Run
@@ -339,7 +339,7 @@ export default function FeeImportV2Page() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-surface-border">
+                    <tr className="border-b border-border">
                       <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Status</th>
                       <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Deal</th>
                       <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Transaction</th>
@@ -352,7 +352,7 @@ export default function FeeImportV2Page() {
                   </thead>
                   <tbody>
                     {preview.map((row, idx) => (
-                      <tr key={idx} className="border-b border-surface-border hover:bg-surface-light/50">
+                      <tr key={idx} className="border-b border-border hover:bg-surface-light/50">
                         <td className="py-3 px-4">
                           {row.status === 'valid' && <CheckCircleIcon className="w-4 h-4 text-success-300" />}
                           {row.status === 'warning' && <ExclamationCircleIcon className="w-4 h-4 text-warning-300" />}
@@ -399,7 +399,7 @@ export default function FeeImportV2Page() {
                   setErrors([]);
                   setMessage(null);
                 }}
-                className="px-6 py-2 rounded-lg border border-surface-border text-white hover:bg-surface-light"
+                className="px-6 py-2 rounded-lg border border-border text-white hover:bg-surface-light"
               >
                 Import More
               </button>

@@ -136,7 +136,7 @@ function TransactionsContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-text-secondary">
+        <div className="text-muted-foreground">
           <svg
             className="animate-spin h-8 w-8 text-primary-300 mx-auto mb-4"
             fill="none"
@@ -305,11 +305,11 @@ function TransactionsContent() {
       <div className="absolute inset-0 bg-gradient-mesh opacity-10 pointer-events-none" />
       <div className="relative z-10">
       {/* Header */}
-      <div className="pb-6 border-b border-surface-border">
+      <div className="pb-6 border-b border-border">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
           Transaction History
         </h1>
-        <p className="mt-2 text-text-secondary">
+        <p className="mt-2 text-muted-foreground">
           View all your investment transactions and cash flows
         </p>
       </div>
@@ -318,7 +318,7 @@ function TransactionsContent() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <p className="text-sm text-text-secondary">Capital Calls</p>
+            <p className="text-sm text-muted-foreground">Capital Calls</p>
             <p className="text-2xl font-bold text-error mt-1">
               -{formatCurrency(data.summary.totalCapitalCalls)}
             </p>
@@ -327,7 +327,7 @@ function TransactionsContent() {
 
         <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <p className="text-sm text-text-secondary">Distributions</p>
+            <p className="text-sm text-muted-foreground">Distributions</p>
             <p className="text-2xl font-bold text-success mt-1">
               +{formatCurrency(data.summary.totalDistributions)}
             </p>
@@ -336,7 +336,7 @@ function TransactionsContent() {
 
         <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <p className="text-sm text-text-secondary">Total Fees</p>
+            <p className="text-sm text-muted-foreground">Total Fees</p>
             <p className="text-2xl font-bold text-warning mt-1">
               -{formatCurrency(data.summary.totalFees)}
             </p>
@@ -345,7 +345,7 @@ function TransactionsContent() {
 
         <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <p className="text-sm text-text-secondary">Pending</p>
+            <p className="text-sm text-muted-foreground">Pending</p>
             <p className="text-2xl font-bold text-accent-yellow mt-1">
               {data.summary.pendingTransactions}
             </p>
@@ -354,8 +354,8 @@ function TransactionsContent() {
 
         <Card variant="gradient" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <p className="text-sm text-text-secondary">Completed</p>
-            <p className="text-2xl font-bold text-text-primary mt-1">
+            <p className="text-sm text-muted-foreground">Completed</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {data.summary.completedTransactions}
             </p>
           </CardContent>
@@ -371,7 +371,7 @@ function TransactionsContent() {
           {/* Filters */}
           <div className="flex flex-wrap gap-4 mb-6">
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Type
               </label>
               <select
@@ -380,7 +380,7 @@ function TransactionsContent() {
                   setFilterType(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="block w-full px-3 py-2 bg-background-surface border border-surface-border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300/50 focus:border-primary-300 text-text-primary"
+                className="block w-full px-3 py-2 bg-card border border-border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300/50 focus:border-primary-300 text-foreground"
               >
                 <option value="">All Types</option>
                 <option value="capital_call">Capital Call</option>
@@ -391,7 +391,7 @@ function TransactionsContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Status
               </label>
               <select
@@ -400,7 +400,7 @@ function TransactionsContent() {
                   setFilterStatus(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="block w-full px-3 py-2 bg-background-surface border border-surface-border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300/50 focus:border-primary-300 text-text-primary"
+                className="block w-full px-3 py-2 bg-card border border-border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300/50 focus:border-primary-300 text-foreground"
               >
                 <option value="">All Status</option>
                 <option value="pending">Pending</option>
@@ -428,7 +428,7 @@ function TransactionsContent() {
               <TableBody>
                 {data.transactions.map((transaction) => (
                   <TableRow key={transaction.id}>
-                    <TableCell className="text-text-primary">
+                    <TableCell className="text-foreground">
                       {formatDate(transaction.occurredOn)}
                     </TableCell>
                     <TableCell>
@@ -439,13 +439,13 @@ function TransactionsContent() {
                         {transaction.type.replace("_", " ")}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-text-primary">
+                    <TableCell className="text-foreground">
                       {transaction.description}
                     </TableCell>
                     <TableCell>
                       {transaction.dealName ? (
                         <div>
-                          <div className="text-sm text-text-primary">
+                          <div className="text-sm text-foreground">
                             {transaction.dealName}
                           </div>
                           <div className="text-xs text-text-muted">
@@ -475,7 +475,7 @@ function TransactionsContent() {
                         )}
                       </span>
                     </TableCell>
-                    <TableCell className="text-text-secondary text-sm">
+                    <TableCell className="text-muted-foreground text-sm">
                       {transaction.reference}
                     </TableCell>
                     <TableCell>
@@ -504,7 +504,7 @@ function TransactionsContent() {
                   d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
                 />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-text-primary">
+              <h3 className="mt-2 text-sm font-medium text-foreground">
                 No transactions found
               </h3>
               <p className="mt-1 text-sm text-text-muted">
@@ -518,7 +518,7 @@ function TransactionsContent() {
           {/* Pagination */}
           {data.transactions.length > 0 && (
             <div className="mt-6 flex items-center justify-between">
-              <div className="text-sm text-text-secondary">
+              <div className="text-sm text-muted-foreground">
                 Showing page {data.pagination.page} of{" "}
                 {data.pagination.totalPages} ({data.pagination.totalCount} total
                 transactions)
@@ -554,7 +554,7 @@ export default function TransactionsPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center h-64 text-text-secondary">
+        <div className="flex items-center justify-center h-64 text-muted-foreground">
           Loading transactions…
         </div>
       }

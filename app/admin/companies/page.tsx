@@ -67,7 +67,7 @@ export default function AdminCompaniesPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-text-secondary">Loading…</div>
+            <div className="text-muted-foreground">Loading…</div>
           ) : error ? (
             <div className="text-error-400">{error}</div>
           ) : (
@@ -93,17 +93,17 @@ export default function AdminCompaniesPage() {
                       <TableCell className="font-mono text-xs">
                         {r.deal_count}
                       </TableCell>
-                      <TableCell className="text-text-primary">
+                      <TableCell className="text-foreground">
                         <div className="flex items-center gap-3">
                           {r.logo_url ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={r.logo_url}
                               alt="logo"
-                              className="w-8 h-8 rounded object-cover border border-surface-border"
+                              className="w-8 h-8 rounded object-cover border border-border"
                             />
                           ) : (
-                            <div className="w-8 h-8 rounded bg-surface-elevated border border-surface-border" />
+                            <div className="w-8 h-8 rounded bg-card border border-border" />
                           )}
                           <div>{r.name || "-"}</div>
                         </div>
@@ -136,7 +136,7 @@ export default function AdminCompaniesPage() {
                 </TableBody>
               </Table>
               {rows.length === 0 && (
-                <div className="text-center text-text-secondary py-8">
+                <div className="text-center text-muted-foreground py-8">
                   No companies found
                 </div>
               )}
@@ -151,7 +151,7 @@ export default function AdminCompaniesPage() {
         <CardContent>
           {rows.length > 0 ? (
             <div>
-              <div className="text-sm text-text-tertiary mb-2">
+              <div className="text-sm text-muted-foreground/70 mb-2">
                 Top Companies by Deals
               </div>
               <BarChart
@@ -161,7 +161,7 @@ export default function AdminCompaniesPage() {
               />
             </div>
           ) : (
-            <div className="text-text-secondary">No data</div>
+            <div className="text-muted-foreground">No data</div>
           )}
         </CardContent>
       </Card>

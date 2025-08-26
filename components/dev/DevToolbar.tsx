@@ -496,13 +496,13 @@ export function DevToolbar() {
             <div className="fixed inset-0 z-0 pointer-events-none" />
 
             {/* Dropdown Menu */}
-            <div className="absolute bottom-full right-0 mb-2 w-80 max-h-[600px] overflow-y-auto bg-background-elevated border border-surface-border rounded-xl shadow-2xl">
+            <div className="absolute bottom-full right-0 mb-2 w-80 max-h-[600px] overflow-y-auto bg-background-elevated border border-border rounded-xl shadow-2xl">
               {/* Header */}
-              <div className="sticky top-0 bg-background-elevated border-b border-surface-border p-4">
-                <h3 className="text-lg font-semibold text-text-primary">
+              <div className="sticky top-0 bg-background-elevated border-b border-border p-4">
+                <h3 className="text-lg font-semibold text-foreground">
                   Quick Navigation
                 </h3>
-                <p className="text-xs text-text-secondary mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Current:{" "}
                   <span className="text-primary-300">{currentPath || "/"}</span>
                 </p>
@@ -513,7 +513,7 @@ export function DevToolbar() {
                 {PAGE_ROUTES.map((category) => (
                   <div key={category.category} className="mb-4">
                     <div className="px-3 py-2">
-                      <h4 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">
+                      <h4 className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider">
                         {category.category}
                       </h4>
                     </div>
@@ -533,7 +533,7 @@ export function DevToolbar() {
                               ${
                                 isActive
                                   ? "bg-primary-300/20 text-primary-300 border border-primary-300/30"
-                                  : "hover:bg-surface-hover text-text-primary hover:text-primary-300"
+                                  : "hover:bg-muted text-foreground hover:text-primary-300"
                               }
                             `}
                           >
@@ -554,11 +554,11 @@ export function DevToolbar() {
                                 )}
                               </div>
                               {page.description && (
-                                <div className="text-xs text-text-secondary mt-0.5">
+                                <div className="text-xs text-muted-foreground mt-0.5">
                                   {page.description}
                                 </div>
                               )}
-                              <div className="text-xs text-text-tertiary mt-1 font-mono">
+                              <div className="text-xs text-muted-foreground/70 mt-1 font-mono">
                                 {page.path}
                               </div>
                             </div>
@@ -574,17 +574,17 @@ export function DevToolbar() {
               </div>
 
               {/* Footer with Theme Controls */}
-              <div className="sticky bottom-0 bg-background-elevated border-t border-surface-border p-4 space-y-3">
+              <div className="sticky bottom-0 bg-background-elevated border-t border-border p-4 space-y-3">
                 {/* Theme Toggle */}
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-text-secondary">Theme</span>
-                  <div className="flex items-center gap-1 p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                  <span className="text-xs text-muted-foreground">Theme</span>
+                  <div className="flex items-center gap-1 p-1 bg-card rounded-lg border border-border">
                     <button
                       onClick={() => handleThemeChange("dark")}
                       className={`px-3 py-1 rounded text-xs font-medium transition-all ${
                         currentTheme === "dark"
                           ? "bg-primary-300 text-white"
-                          : "text-text-secondary hover:text-text-primary"
+                          : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       Dark
@@ -594,7 +594,7 @@ export function DevToolbar() {
                       className={`px-3 py-1 rounded text-xs font-medium transition-all ${
                         currentTheme === "light"
                           ? "bg-primary-300 text-white"
-                          : "text-text-secondary hover:text-text-primary"
+                          : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       Light
@@ -604,8 +604,8 @@ export function DevToolbar() {
 
                 {/* Color Scheme Selector */}
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-text-secondary">Colors</span>
-                  <div className="flex items-center gap-1 p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                  <span className="text-xs text-muted-foreground">Colors</span>
+                  <div className="flex items-center gap-1 p-1 bg-card rounded-lg border border-border">
                     {["purple", "blue", "green", "monochrome"].map((scheme) => (
                       <button
                         key={scheme}
@@ -613,7 +613,7 @@ export function DevToolbar() {
                         className={`px-2 py-1 rounded text-xs font-medium transition-all ${
                           currentScheme === scheme
                             ? "bg-primary-300 text-white"
-                            : "text-text-secondary hover:text-text-primary"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         {scheme === "monochrome"
@@ -626,16 +626,16 @@ export function DevToolbar() {
 
                 {/* Data Source Toggle */}
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-text-secondary">
+                  <span className="text-xs text-muted-foreground">
                     Data Source
                   </span>
-                  <div className="flex items-center gap-1 p-1 bg-surface-elevated rounded-lg border border-surface-border">
+                  <div className="flex items-center gap-1 p-1 bg-card rounded-lg border border-border">
                     <button
                       onClick={() => handleDataSourceChange(true)}
                       className={`px-3 py-1 rounded text-xs font-medium transition-all ${
                         useMockData
                           ? "bg-primary-300 text-white"
-                          : "text-text-secondary hover:text-text-primary"
+                          : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       Mock
@@ -645,7 +645,7 @@ export function DevToolbar() {
                       className={`px-3 py-1 rounded text-xs font-medium transition-all ${
                         !useMockData
                           ? "bg-primary-300 text-white"
-                          : "text-text-secondary hover:text-text-primary"
+                          : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       Supabase
@@ -654,15 +654,15 @@ export function DevToolbar() {
                 </div>
 
                 {/* Environment Info */}
-                <div className="pt-2 border-t border-surface-border">
+                <div className="pt-2 border-t border-border">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-text-tertiary">Environment</span>
+                    <span className="text-muted-foreground/70">Environment</span>
                     <span className="text-primary-300 font-mono">
                       development
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-xs mt-1">
-                    <span className="text-text-tertiary">Data Mode</span>
+                    <span className="text-muted-foreground/70">Data Mode</span>
                     <span
                       className={`font-mono ${
                         useMockData ? "text-yellow-400" : "text-green-400"
@@ -672,11 +672,11 @@ export function DevToolbar() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-xs mt-1">
-                    <span className="text-text-tertiary">Supabase</span>
+                    <span className="text-muted-foreground/70">Supabase</span>
                     <span className="font-mono text-sm">{supabaseStatus}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs mt-1">
-                    <span className="text-text-tertiary">Host</span>
+                    <span className="text-muted-foreground/70">Host</span>
                     <span className="text-primary-300 font-mono">
                       {typeof window !== "undefined"
                         ? window.location.host
@@ -693,7 +693,7 @@ export function DevToolbar() {
       {/* Additional Dev Tools Button */}
       <button
         onClick={() => (window.location.href = "/style-guide")}
-        className="p-2.5 bg-surface-elevated border border-surface-border rounded-lg shadow-lg hover:bg-surface-hover transition-all duration-200 hover:scale-105 text-primary-300"
+        className="p-2.5 bg-card border border-border rounded-lg shadow-lg hover:bg-muted transition-all duration-200 hover:scale-105 text-primary-300"
         title="Style Guide"
       >
         {Icons.palette}

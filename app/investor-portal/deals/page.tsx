@@ -142,7 +142,7 @@ function DealsContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-text-secondary">
+        <div className="text-muted-foreground">
           <svg
             className="animate-spin h-8 w-8 text-primary-300 mx-auto mb-4"
             fill="none"
@@ -219,11 +219,11 @@ function DealsContent() {
       <div className="absolute inset-0 bg-gradient-mesh opacity-10 pointer-events-none" />
       <div className="relative z-10">
       {/* Header */}
-      <div className="pb-6 border-b border-surface-border">
+      <div className="pb-6 border-b border-border">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
           Deals & Commitments
         </h1>
-        <p className="mt-2 text-text-secondary">
+        <p className="mt-2 text-muted-foreground">
           Manage your investment commitments and track deal progress
         </p>
       </div>
@@ -232,8 +232,8 @@ function DealsContent() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
         <Card variant="gradient" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <p className="text-sm text-text-secondary">Total Committed</p>
-            <p className="text-2xl font-bold text-text-primary mt-1">
+            <p className="text-sm text-muted-foreground">Total Committed</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {formatCurrency(data.summary.totalCommitted)}
             </p>
           </CardContent>
@@ -241,8 +241,8 @@ function DealsContent() {
 
         <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <p className="text-sm text-text-secondary">Capital Called</p>
-            <p className="text-2xl font-bold text-text-primary mt-1">
+            <p className="text-sm text-muted-foreground">Capital Called</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {formatCurrency(data.summary.totalCalled)}
             </p>
           </CardContent>
@@ -250,7 +250,7 @@ function DealsContent() {
 
         <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <p className="text-sm text-text-secondary">Distributed</p>
+            <p className="text-sm text-muted-foreground">Distributed</p>
             <p className="text-2xl font-bold text-accent-green mt-1">
               {formatCurrency(data.summary.totalDistributed)}
             </p>
@@ -259,8 +259,8 @@ function DealsContent() {
 
         <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <p className="text-sm text-text-secondary">Remaining</p>
-            <p className="text-2xl font-bold text-text-primary mt-1">
+            <p className="text-sm text-muted-foreground">Remaining</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {formatCurrency(data.summary.totalRemaining)}
             </p>
           </CardContent>
@@ -268,7 +268,7 @@ function DealsContent() {
 
         <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <p className="text-sm text-text-secondary">Active Deals</p>
+            <p className="text-sm text-muted-foreground">Active Deals</p>
             <p className="text-2xl font-bold text-primary-300 mt-1">
               {data.summary.activeCommitments}
             </p>
@@ -277,8 +277,8 @@ function DealsContent() {
 
         <Card variant="glass" className="hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <p className="text-sm text-text-secondary">Average MOIC</p>
-            <p className="text-2xl font-bold text-text-primary mt-1">
+            <p className="text-sm text-muted-foreground">Average MOIC</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {/* averageCallPercentage holds 100 (quick-win); compute avg MOIC from commitments' moic */}
               {(() => {
                 const moics = data.commitments
@@ -328,10 +328,10 @@ function DealsContent() {
                   className="hover:shadow-lg transition-shadow"
                 >
                   <CardContent className="p-4">
-                    <p className="text-sm text-text-secondary">
+                    <p className="text-sm text-muted-foreground">
                       {call.dealName}
                     </p>
-                    <p className="text-lg font-bold text-text-primary mt-1">
+                    <p className="text-lg font-bold text-foreground mt-1">
                       {formatCurrency(call.amount, call.currency)}
                     </p>
                     <p className="text-xs text-text-muted mt-1">
@@ -396,7 +396,7 @@ function DealsContent() {
                   <TableRow key={commitment.id}>
                     <TableCell>
                       <div>
-                        <div className="font-medium text-text-primary">
+                        <div className="font-medium text-foreground">
                           {commitment.dealName}
                         </div>
                         <div className="text-xs text-text-muted">
@@ -406,7 +406,7 @@ function DealsContent() {
                     </TableCell>
                     <TableCell>
                       <div>
-                        <div className="text-sm text-text-primary">
+                        <div className="text-sm text-foreground">
                           {commitment.companyName}
                         </div>
                         <div className="text-xs text-text-muted">
@@ -419,25 +419,25 @@ function DealsContent() {
                         {commitment.dealStage.replace("_", " ")}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-text-primary">
+                    <TableCell className="text-foreground">
                       {formatCurrency(
                         commitment.committedAmount,
                         commitment.currency
                       )}
                     </TableCell>
-                    <TableCell className="text-text-primary">
+                    <TableCell className="text-foreground">
                       {formatCurrency(
                         commitment.capitalCalled,
                         commitment.currency
                       )}
                     </TableCell>
-                    <TableCell className="text-text-primary">
+                    <TableCell className="text-foreground">
                       {formatCurrency(
                         commitment.capitalRemaining,
                         commitment.currency
                       )}
                     </TableCell>
-                    <TableCell className="text-text-primary">
+                    <TableCell className="text-foreground">
                       {/* @ts-ignore */}
                       {Number((commitment as any).moic || 1).toFixed(2)}x
                     </TableCell>
@@ -473,7 +473,7 @@ function DealsContent() {
                   d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                 />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-text-primary">
+              <h3 className="mt-2 text-sm font-medium text-foreground">
                 No deals found
               </h3>
               <p className="mt-1 text-sm text-text-muted">
@@ -492,7 +492,7 @@ export default function DealsPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center h-64 text-text-secondary">
+        <div className="flex items-center justify-center h-64 text-muted-foreground">
           Loading deals…
         </div>
       }

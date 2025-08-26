@@ -12,7 +12,7 @@ export function FeeHubBanner() {
   return (
     <div className="bg-primary-300/10 border border-primary-300/20 rounded-lg p-3 mb-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-text-secondary">
+        <p className="text-sm text-muted-foreground">
           This is one of several fee management interfaces. View all tools in the unified dashboard.
         </p>
         <a 
@@ -36,7 +36,7 @@ export function FeeHubBannerCompact() {
   return (
     <a 
       href="/admin/fees"
-      className="inline-flex items-center text-xs text-text-secondary hover:text-primary-300 mb-2 transition-colors"
+      className="inline-flex items-center text-xs text-muted-foreground hover:text-primary-300 mb-2 transition-colors"
     >
       <span>← Back to Fee Hub</span>
     </a>

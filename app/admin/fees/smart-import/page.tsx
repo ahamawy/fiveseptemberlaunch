@@ -162,7 +162,7 @@ export default function SmartImportPage() {
   };
   
   return (
-    <div className="min-h-screen bg-background-deep">
+    <div className="min-h-screen bg-background">
       <div className="p-6 space-y-6">
         <FeeHubBanner />
         <div className="mb-8">
@@ -184,7 +184,7 @@ export default function SmartImportPage() {
           </div>
           
           <div className="space-y-4">
-            <div className="border-2 border-dashed border-surface-border rounded-lg p-8 text-center">
+            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
               <DocumentTextIcon className="w-12 h-12 mx-auto mb-3 text-gray-500" />
               <input
                 type="file"
@@ -238,7 +238,7 @@ export default function SmartImportPage() {
                       <select
                         value={mapping[header] || ''}
                         onChange={(e) => handleMappingChange(header, e.target.value)}
-                        className="px-3 py-1 rounded bg-surface border border-surface-border text-white"
+                        className="px-3 py-1 rounded bg-surface border border-border text-white"
                       >
                         <option value="">-- Select Field --</option>
                         {dbFields.map(field => (
@@ -268,7 +268,7 @@ export default function SmartImportPage() {
             <button
               onClick={validateMapping}
               disabled={loading || Object.keys(mapping).length === 0}
-              className="mt-4 px-6 py-2 rounded-lg font-medium bg-surface border border-surface-border text-white hover:bg-surface-light disabled:opacity-50"
+              className="mt-4 px-6 py-2 rounded-lg font-medium bg-surface border border-border text-white hover:bg-surface-light disabled:opacity-50"
             >
               <CheckCircleIcon className="w-5 h-5 inline mr-2" />
               Validate Mapping

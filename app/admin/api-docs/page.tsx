@@ -533,8 +533,8 @@ export default function ApiDocumentationPortal() {
     <div className="p-6 max-w-screen-2xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-primary mb-2">API Documentation Portal</h1>
-        <p className="text-text-secondary">
+        <h1 className="text-3xl font-bold text-foreground mb-2">API Documentation Portal</h1>
+        <p className="text-muted-foreground">
           Interactive documentation for all available API endpoints
         </p>
       </div>
@@ -551,7 +551,7 @@ export default function ApiDocumentationPortal() {
               <input
                 type="text"
                 placeholder="Search endpoints..."
-                className="mt-3 w-full px-3 py-2 bg-surface-elevated rounded-lg text-text-primary placeholder-text-tertiary"
+                className="mt-3 w-full px-3 py-2 bg-card rounded-lg text-foreground placeholder-text-tertiary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -562,15 +562,15 @@ export default function ApiDocumentationPortal() {
                   <div key={category} className="border-b border-border last:border-0">
                     <button
                       onClick={() => toggleCategory(category)}
-                      className="w-full px-4 py-3 flex items-center justify-between hover:bg-surface-elevated transition-colors"
+                      className="w-full px-4 py-3 flex items-center justify-between hover:bg-card transition-colors"
                     >
-                      <span className="font-medium text-text-primary">{category}</span>
+                      <span className="font-medium text-foreground">{category}</span>
                       <div className="flex items-center gap-2">
                         <Badge variant="info">{categoryEndpoints.length}</Badge>
                         {expandedCategories.has(category) ? (
-                          <ChevronDownIcon className="w-4 h-4 text-text-secondary" />
+                          <ChevronDownIcon className="w-4 h-4 text-muted-foreground" />
                         ) : (
-                          <ChevronRightIcon className="w-4 h-4 text-text-secondary" />
+                          <ChevronRightIcon className="w-4 h-4 text-muted-foreground" />
                         )}
                       </div>
                     </button>
@@ -581,15 +581,15 @@ export default function ApiDocumentationPortal() {
                           <button
                             key={endpoint.id}
                             onClick={() => setSelectedEndpoint(endpoint)}
-                            className={`w-full px-4 py-2 flex items-center gap-3 hover:bg-surface-elevated transition-colors ${
-                              selectedEndpoint?.id === endpoint.id ? "bg-surface-elevated border-l-2 border-primary" : ""
+                            className={`w-full px-4 py-2 flex items-center gap-3 hover:bg-card transition-colors ${
+                              selectedEndpoint?.id === endpoint.id ? "bg-card border-l-2 border-primary" : ""
                             }`}
                           >
                             <Badge className={`text-xs px-2 py-0.5 ${getMethodColor(endpoint.method)}`}>
                               {endpoint.method}
                             </Badge>
                             <div className="flex-1 text-left">
-                              <div className="text-sm text-text-primary truncate">
+                              <div className="text-sm text-foreground truncate">
                                 {endpoint.path}
                               </div>
                               {endpoint.deprecated && (
@@ -618,11 +618,11 @@ export default function ApiDocumentationPortal() {
                       <Badge className={`text-sm px-3 py-1 ${getMethodColor(selectedEndpoint.method)}`}>
                         {selectedEndpoint.method}
                       </Badge>
-                      <code className="text-lg font-mono text-text-primary">
+                      <code className="text-lg font-mono text-foreground">
                         {selectedEndpoint.path}
                       </code>
                     </div>
-                    <p className="text-text-secondary mt-2">{selectedEndpoint.description}</p>
+                    <p className="text-muted-foreground mt-2">{selectedEndpoint.description}</p>
                     
                     <div className="flex flex-wrap gap-2 mt-4">
                       {selectedEndpoint.authentication && (
@@ -685,11 +685,11 @@ export default function ApiDocumentationPortal() {
                     {selectedEndpoint.parameters && selectedEndpoint.parameters.length > 0 ? (
                       <div className="space-y-3">
                         {selectedEndpoint.parameters.map((param) => (
-                          <div key={param.name} className="p-3 bg-surface-elevated rounded-lg">
+                          <div key={param.name} className="p-3 bg-card rounded-lg">
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2">
-                                  <code className="font-mono text-sm text-text-primary">
+                                  <code className="font-mono text-sm text-foreground">
                                     {param.name}
                                   </code>
                                   <Badge variant="outline" className="text-xs">
@@ -699,7 +699,7 @@ export default function ApiDocumentationPortal() {
                                     <Badge variant="error" className="text-xs">Required</Badge>
                                   )}
                                 </div>
-                                <p className="text-sm text-text-secondary mt-1">
+                                <p className="text-sm text-muted-foreground mt-1">
                                   {param.description}
                                 </p>
                                 {param.enum && (
@@ -712,7 +712,7 @@ export default function ApiDocumentationPortal() {
                                   </div>
                                 )}
                                 {param.default !== undefined && (
-                                  <div className="mt-2 text-xs text-text-tertiary">
+                                  <div className="mt-2 text-xs text-muted-foreground/70">
                                     Default: <code>{JSON.stringify(param.default)}</code>
                                   </div>
                                 )}
@@ -722,13 +722,13 @@ export default function ApiDocumentationPortal() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-text-secondary">No parameters required</p>
+                      <p className="text-muted-foreground">No parameters required</p>
                     )}
                   </TabsContent>
                   
                   {selectedEndpoint.requestBody && (
                     <TabsContent value="request" className="mt-4">
-                      <div className="p-3 bg-surface-elevated rounded-lg">
+                      <div className="p-3 bg-card rounded-lg">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">{selectedEndpoint.requestBody.type}</Badge>
                           {selectedEndpoint.requestBody.required && (
@@ -747,12 +747,12 @@ export default function ApiDocumentationPortal() {
                   <TabsContent value="responses" className="mt-4">
                     <div className="space-y-3">
                       {selectedEndpoint.responses.map((response, idx) => (
-                        <div key={idx} className="p-3 bg-surface-elevated rounded-lg">
+                        <div key={idx} className="p-3 bg-card rounded-lg">
                           <div className="flex items-center gap-2 mb-2">
                             <Badge variant={response.status < 300 ? "success" : response.status < 400 ? "warning" : "error"}>
                               {response.status}
                             </Badge>
-                            <span className="text-sm text-text-secondary">{response.description}</span>
+                            <span className="text-sm text-muted-foreground">{response.description}</span>
                           </div>
                           {response.example && (
                             <pre className="mt-3 p-3 bg-surface-base rounded text-xs overflow-x-auto">
@@ -766,7 +766,7 @@ export default function ApiDocumentationPortal() {
                   
                   {testResult && (
                     <TabsContent value="test" className="mt-4">
-                      <div className="p-3 bg-surface-elevated rounded-lg">
+                      <div className="p-3 bg-card rounded-lg">
                         {testResult.error ? (
                           <div className="text-red-500">
                             <p className="font-medium">Error:</p>
@@ -778,7 +778,7 @@ export default function ApiDocumentationPortal() {
                               <Badge variant={testResult.status < 300 ? "success" : "error"}>
                                 {testResult.status} {testResult.statusText}
                               </Badge>
-                              <span className="text-xs text-text-tertiary">{testResult.timestamp}</span>
+                              <span className="text-xs text-muted-foreground/70">{testResult.timestamp}</span>
                             </div>
                             <pre className="p-3 bg-surface-base rounded text-xs overflow-x-auto">
                               <code>{JSON.stringify(testResult.data, null, 2)}</code>
@@ -794,8 +794,8 @@ export default function ApiDocumentationPortal() {
           ) : (
             <Card>
               <CardContent className="py-12 text-center">
-                <DocumentTextIcon className="w-12 h-12 mx-auto text-text-tertiary mb-3" />
-                <p className="text-text-secondary">Select an endpoint to view documentation</p>
+                <DocumentTextIcon className="w-12 h-12 mx-auto text-muted-foreground/70 mb-3" />
+                <p className="text-muted-foreground">Select an endpoint to view documentation</p>
               </CardContent>
             </Card>
           )}

@@ -132,7 +132,7 @@ export function CardFooter({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('mt-4 pt-4 border-t border-surface-border', className)} {...props}>
+    <div className={cn('mt-4 pt-4 border-t border-border', className)} {...props}>
       {children}
     </div>
   );

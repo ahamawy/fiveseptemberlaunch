@@ -17,7 +17,7 @@ export function EquationFormulaDisplay({
 }) {
   if (!components || components.length === 0) {
     return (
-      <div className="text-text-secondary text-sm">No equation available.</div>
+      <div className="text-muted-foreground text-sm">No equation available.</div>
     );
   }
 

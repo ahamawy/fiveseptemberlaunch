@@ -47,7 +47,7 @@ export const SHADOWS = {
 export const COMPONENT_STYLES = {
   // Card Variants
   card: {
-    default: 'bg-background-card border border-surface-border',
+    default: 'bg-background-card border border-border',
     glass: 'glass-adaptive', // Automatically adapts to theme
     gradient: 'bg-gradient-to-br from-primary-300/10 to-primary-500/5 border border-primary-300/20',
     elevated: 'bg-background-card shadow-card',
@@ -56,7 +56,7 @@ export const COMPONENT_STYLES = {
   // Button Variants
   button: {
     primary: 'bg-primary-300 text-white hover:bg-primary-400 shadow-glow-purpleSubtle',
-    secondary: 'bg-surface-elevated text-text-primary hover:bg-surface-hover',
+    secondary: 'bg-card text-foreground hover:bg-muted',
     outline: 'border border-primary-300/20 hover:bg-primary-300/10',
   },
   
@@ -64,7 +64,7 @@ export const COMPONENT_STYLES = {
   metric: {
     positive: 'text-status-success',
     negative: 'text-status-error',
-    neutral: 'text-text-secondary',
+    neutral: 'text-muted-foreground',
   },
 } as const;
 

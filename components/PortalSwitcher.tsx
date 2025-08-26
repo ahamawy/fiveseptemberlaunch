@@ -50,21 +50,21 @@ export default function PortalSwitcher() {
             onClick={() => setIsOpen(!isOpen)}
             className={cn(
               "flex items-center gap-2 px-4 py-2 rounded-lg",
-              "bg-white/90 dark:bg-background-surface/90 backdrop-blur-md",
-              "border border-surface-border",
+              "bg-white/90 dark:bg-card/90 backdrop-blur-md",
+              "border border-border",
               "shadow-lg dark:shadow-glow-purple/10",
-              "hover:bg-gray-50 dark:hover:bg-background-surface",
+              "hover:bg-gray-50 dark:hover:bg-card",
               "transition-all duration-200"
             )}
           >
             <ArrowsRightLeftIcon className="w-4 h-4 text-primary-300" />
-            <span className="text-sm font-medium text-text-primary">
+            <span className="text-sm font-medium text-foreground">
               {currentPortal === 'investor' ? 'Investor Portal' : 'Admin Portal'}
             </span>
           </button>
 
           {isOpen && (
-            <div className="absolute top-full right-0 mt-2 w-64 rounded-lg bg-white dark:bg-background-surface shadow-xl dark:shadow-glow-purple/20 border border-surface-border overflow-hidden">
+            <div className="absolute top-full right-0 mt-2 w-64 rounded-lg bg-white dark:bg-card shadow-xl dark:shadow-glow-purple/20 border border-border overflow-hidden">
               <div className="p-2">
                 <button
                   onClick={() => switchPortal('investor')}
@@ -74,13 +74,13 @@ export default function PortalSwitcher() {
                     "transition-colors duration-200",
                     currentPortal === 'investor'
                       ? "bg-primary-500/10 text-primary-300 cursor-not-allowed"
-                      : "hover:bg-gray-100 dark:hover:bg-background-surface/50 text-text-primary"
+                      : "hover:bg-gray-100 dark:hover:bg-card/50 text-foreground"
                   )}
                 >
                   <UserIcon className="w-5 h-5" />
                   <div className="text-left">
                     <div className="text-sm font-medium">Investor Portal</div>
-                    <div className="text-xs text-text-secondary">View as investor</div>
+                    <div className="text-xs text-muted-foreground">View as investor</div>
                   </div>
                 </button>
 
@@ -92,20 +92,20 @@ export default function PortalSwitcher() {
                     "transition-colors duration-200",
                     currentPortal === 'admin'
                       ? "bg-primary-500/10 text-primary-300 cursor-not-allowed"
-                      : "hover:bg-gray-100 dark:hover:bg-background-surface/50 text-text-primary"
+                      : "hover:bg-gray-100 dark:hover:bg-card/50 text-foreground"
                   )}
                 >
                   <CogIcon className="w-5 h-5" />
                   <div className="text-left">
                     <div className="text-sm font-medium">Admin Portal</div>
-                    <div className="text-xs text-text-secondary">Manage platform</div>
+                    <div className="text-xs text-muted-foreground">Manage platform</div>
                   </div>
                 </button>
               </div>
 
               {/* Journey Indicator */}
-              <div className="border-t border-surface-border px-3 py-2 bg-gray-50 dark:bg-background-deep">
-                <div className="text-xs text-text-secondary">
+              <div className="border-t border-border px-3 py-2 bg-gray-50 dark:bg-background">
+                <div className="text-xs text-muted-foreground">
                   Current journey: <span className="font-medium text-primary-300">
                     {pathname?.split('/').slice(2).join(' → ') || 'Dashboard'}
                   </span>
@@ -132,7 +132,7 @@ export default function PortalSwitcher() {
         </button>
 
         {isOpen && (
-          <div className="absolute bottom-full right-0 mb-2 w-48 rounded-lg bg-white dark:bg-background-surface shadow-xl dark:shadow-glow-purple/20 border border-surface-border">
+          <div className="absolute bottom-full right-0 mb-2 w-48 rounded-lg bg-white dark:bg-card shadow-xl dark:shadow-glow-purple/20 border border-border">
             <div className="p-2">
               <button
                 onClick={() => switchPortal(currentPortal === 'investor' ? 'admin' : 'investor')}

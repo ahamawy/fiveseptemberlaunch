@@ -243,7 +243,7 @@ export default function TestTransactionsPage() {
       case "fee":
         return <CurrencyDollarIcon className="w-4 h-4 text-warning-400" />;
       default:
-        return <DocumentTextIcon className="w-4 h-4 text-text-tertiary" />;
+        return <DocumentTextIcon className="w-4 h-4 text-muted-foreground/70" />;
     }
   };
 
@@ -263,7 +263,7 @@ export default function TestTransactionsPage() {
       fee: "Fee",
       capital_call: "Capital Call",
     };
-    return <span className="text-xs text-text-secondary">{labels[type] || type}</span>;
+    return <span className="text-xs text-muted-foreground">{labels[type] || type}</span>;
   };
 
   const exportData = () => {
@@ -292,11 +292,11 @@ export default function TestTransactionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background-deep p-6 lg:p-8">
+    <div className="min-h-screen bg-background p-6 lg:p-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Test Transactions Page</h1>
-        <p className="text-text-secondary">Development page for testing transaction functionality</p>
+        <p className="text-muted-foreground">Development page for testing transaction functionality</p>
       </div>
 
       {/* Controls */}
@@ -304,7 +304,7 @@ export default function TestTransactionsPage() {
         <CardContent className="p-4">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex items-center gap-4">
-              <label className="text-sm text-text-secondary">Data Source:</label>
+              <label className="text-sm text-muted-foreground">Data Source:</label>
               <div className="flex gap-2">
                 <Button
                   variant={testMode === "mock" ? "primary" : "glass"}
@@ -415,7 +415,7 @@ export default function TestTransactionsPage() {
         <CardHeader>
           <CardTitle>
             Transaction History
-            <span className="ml-2 text-sm text-text-secondary">
+            <span className="ml-2 text-sm text-muted-foreground">
               ({filteredTransactions.length} transactions)
             </span>
           </CardTitle>
@@ -426,26 +426,26 @@ export default function TestTransactionsPage() {
               <div className="w-8 h-8 border-4 border-primary-300 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : filteredTransactions.length === 0 ? (
-            <div className="text-center py-8 text-text-secondary">
+            <div className="text-center py-8 text-muted-foreground">
               No transactions found
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-surface-border">
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Type</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Transaction</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Deal</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Amount</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Date</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Status</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Reference</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Type</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Transaction</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Deal</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Amount</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Date</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Status</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Reference</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredTransactions.map((transaction) => (
-                    <tr key={transaction.id} className="border-b border-surface-border hover:bg-surface-hover transition-colors">
+                    <tr key={transaction.id} className="border-b border-border hover:bg-muted transition-colors">
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
                           {getTypeIcon(transaction.type)}
@@ -455,7 +455,7 @@ export default function TestTransactionsPage() {
                       <td className="py-4 px-4">
                         <div>
                           <div className="text-white font-medium">{transaction.id}</div>
-                          <div className="text-xs text-text-tertiary mt-1">{transaction.description}</div>
+                          <div className="text-xs text-muted-foreground/70 mt-1">{transaction.description}</div>
                         </div>
                       </td>
                       <td className="py-4 px-4 text-white">
@@ -477,7 +477,7 @@ export default function TestTransactionsPage() {
                       <td className="py-4 px-4">
                         {getStatusBadge(transaction.status)}
                       </td>
-                      <td className="py-4 px-4 text-text-secondary text-sm">
+                      <td className="py-4 px-4 text-muted-foreground text-sm">
                         {transaction.reference || "-"}
                       </td>
                     </tr>
@@ -494,23 +494,23 @@ export default function TestTransactionsPage() {
         <CardContent className="p-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
             <div>
-              <span className="text-text-secondary">Net Position:</span>
+              <span className="text-muted-foreground">Net Position:</span>
               <span className={`ml-2 font-medium ${totalDistributed - totalInvested - totalFees >= 0 ? 'text-success-400' : 'text-error-400'}`}>
                 {formatCurrency(totalDistributed - totalInvested - totalFees)}
               </span>
             </div>
             <div>
-              <span className="text-text-secondary">Total Transactions:</span>
+              <span className="text-muted-foreground">Total Transactions:</span>
               <span className="ml-2 text-white font-medium">{filteredTransactions.length}</span>
             </div>
             <div>
-              <span className="text-text-secondary">Completed:</span>
+              <span className="text-muted-foreground">Completed:</span>
               <span className="ml-2 text-white font-medium">
                 {filteredTransactions.filter(t => t.status === "completed").length}
               </span>
             </div>
             <div>
-              <span className="text-text-secondary">Pending:</span>
+              <span className="text-muted-foreground">Pending:</span>
               <span className="ml-2 text-warning-400 font-medium">
                 {filteredTransactions.filter(t => t.status === "pending").length}
               </span>

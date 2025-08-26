@@ -37,16 +37,16 @@ test.describe('Light Mode Visual Testing', () => {
     });
 
     // Check text contrast
-    const primaryText = await page.locator('.text-text-primary').first();
+    const primaryText = await page.locator('.text-foreground').first();
     const primaryTextColor = await primaryText.evaluate((el) => 
       window.getComputedStyle(el).color
     );
     console.log('Primary text color:', primaryTextColor);
 
     // Check secondary text if it exists
-    const secondaryTextElements = await page.locator('.text-text-secondary').count();
+    const secondaryTextElements = await page.locator('.text-muted-foreground').count();
     if (secondaryTextElements > 0) {
-      const secondaryText = await page.locator('.text-text-secondary').first();
+      const secondaryText = await page.locator('.text-muted-foreground').first();
       const secondaryTextColor = await secondaryText.evaluate((el) => 
         window.getComputedStyle(el).color
       );
@@ -64,14 +64,14 @@ test.describe('Light Mode Visual Testing', () => {
     }
 
     // Check background colors
-    const deepBg = await page.locator('.bg-background-deep').first();
+    const deepBg = await page.locator('.bg-background').first();
     const deepBgColor = await deepBg.evaluate((el) => 
       window.getComputedStyle(el).backgroundColor
     );
     console.log('Deep background color:', deepBgColor);
 
     // Check border visibility
-    const borderElement = await page.locator('.border-surface-border').first();
+    const borderElement = await page.locator('.border-border').first();
     const borderColor = await borderElement.evaluate((el) => 
       window.getComputedStyle(el).borderColor
     );
@@ -287,10 +287,10 @@ test.describe('Light Mode Visual Testing', () => {
     };
     
     // Check various text/background combinations
-    await checkContrast('.text-text-primary', '.bg-background-deep', 'Primary text on deep background');
-    await checkContrast('.text-text-secondary', '.bg-background-deep', 'Secondary text on deep background');
-    await checkContrast('.text-text-muted', '.bg-background-deep', 'Muted text on deep background');
-    await checkContrast('.text-text-primary', '.bg-background-surface', 'Primary text on surface');
+    await checkContrast('.text-foreground', '.bg-background', 'Primary text on deep background');
+    await checkContrast('.text-muted-foreground', '.bg-background', 'Secondary text on deep background');
+    await checkContrast('.text-text-muted', '.bg-background', 'Muted text on deep background');
+    await checkContrast('.text-foreground', '.bg-card', 'Primary text on surface');
   });
 
   test('Visual regression - Compare dark vs light', async ({ page }) => {

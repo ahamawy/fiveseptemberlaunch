@@ -67,7 +67,7 @@ export default function AdminInvestorsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-text-secondary">Loading…</div>
+            <div className="text-muted-foreground">Loading…</div>
           ) : error ? (
             <div className="text-error-400">{error}</div>
           ) : (
@@ -91,7 +91,7 @@ export default function AdminInvestorsPage() {
                       <TableCell className="font-mono text-sm">
                         {r.id}
                       </TableCell>
-                      <TableCell className="text-text-primary">
+                      <TableCell className="text-foreground">
                         {r.name || "-"}
                       </TableCell>
                       <TableCell>{r.email || "-"}</TableCell>
@@ -117,7 +117,7 @@ export default function AdminInvestorsPage() {
                 </TableBody>
               </Table>
               {rows.length === 0 && (
-                <div className="text-center text-text-secondary py-8">
+                <div className="text-center text-muted-foreground py-8">
                   No investors found
                 </div>
               )}
@@ -132,7 +132,7 @@ export default function AdminInvestorsPage() {
         <CardContent>
           {rows.length > 0 ? (
             <div>
-              <div className="text-sm text-text-tertiary mb-2">
+              <div className="text-sm text-muted-foreground/70 mb-2">
                 Top Investors by Transactions
               </div>
               <BarChart
@@ -142,7 +142,7 @@ export default function AdminInvestorsPage() {
               />
             </div>
           ) : (
-            <div className="text-text-secondary">No data</div>
+            <div className="text-muted-foreground">No data</div>
           )}
         </CardContent>
       </Card>

@@ -31,7 +31,7 @@ export default function DealsList() {
   if (loading) {
     return (
       <div data-testid="deals-loading" className="min-h-[400px] flex items-center justify-center">
-        <div className="text-text-secondary">Loading deals...</div>
+        <div className="text-muted-foreground">Loading deals...</div>
       </div>
     );
   }
@@ -57,7 +57,7 @@ export default function DealsList() {
   return (
     <div className="space-y-6" data-testid="deals-list">
       <div className="flex justify-between items-center">
-        <h2 data-testid="deals-title" className="text-2xl font-bold text-text-primary">
+        <h2 data-testid="deals-title" className="text-2xl font-bold text-foreground">
           Deals
         </h2>
         <button 
@@ -68,17 +68,17 @@ export default function DealsList() {
         </button>
       </div>
 
-      <div className="bg-background-surface rounded-xl border border-surface-border overflow-hidden">
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-surface-base border-b border-surface-border">
+            <thead className="bg-surface-base border-b border-border">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-medium text-text-secondary">Name</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-text-secondary">Company</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-text-secondary">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-text-secondary">Target Raise</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-text-secondary">Closing Date</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-text-secondary"></th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Name</th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Company</th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Status</th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Target Raise</th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Closing Date</th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-border">
@@ -86,13 +86,13 @@ export default function DealsList() {
                 <tr 
                   key={deal.id} 
                   data-testid="deals-item"
-                  className="hover:bg-surface-hover transition-colors"
+                  className="hover:bg-muted transition-colors"
                 >
                   <td className="px-6 py-4">
-                    <div className="font-medium text-text-primary">{deal.name}</div>
-                    <div className="text-sm text-text-secondary">{deal.type || 'Investment'}</div>
+                    <div className="font-medium text-foreground">{deal.name}</div>
+                    <div className="text-sm text-muted-foreground">{deal.type || 'Investment'}</div>
                   </td>
-                  <td className="px-6 py-4 text-text-secondary">
+                  <td className="px-6 py-4 text-muted-foreground">
                     {deal.company_name || '-'}
                   </td>
                   <td className="px-6 py-4">
@@ -100,10 +100,10 @@ export default function DealsList() {
                       {deal.stage || 'Active'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-text-primary">
+                  <td className="px-6 py-4 text-foreground">
                     {deal.target_raise ? formatCurrency(deal.target_raise, deal.currency || 'USD') : '-'}
                   </td>
-                  <td className="px-6 py-4 text-text-secondary">
+                  <td className="px-6 py-4 text-muted-foreground">
                     {deal.closing_date ? new Date(deal.closing_date).toLocaleDateString() : '-'}
                   </td>
                   <td className="px-6 py-4">
@@ -121,7 +121,7 @@ export default function DealsList() {
         </div>
 
         {deals.length === 0 && (
-          <div data-testid="deals-empty" className="text-center py-12 text-text-secondary">
+          <div data-testid="deals-empty" className="text-center py-12 text-muted-foreground">
             No deals found. Create your first deal to get started.
           </div>
         )}

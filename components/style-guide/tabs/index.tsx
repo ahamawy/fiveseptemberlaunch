@@ -281,8 +281,8 @@ export function TypographySection() {
         </CardHeader>
         <CardContent className="space-y-6">
           {typographyExamples.map((example) => (
-            <div key={example.name} className="py-4 border-b border-surface-border last:border-0">
-              <p className="text-sm text-text-secondary mb-2">{example.name}</p>
+            <div key={example.name} className="py-4 border-b border-border last:border-0">
+              <p className="text-sm text-muted-foreground mb-2">{example.name}</p>
               <p className={example.className}>{example.text}</p>
             </div>
           ))}
@@ -795,10 +795,10 @@ export function PatternsSection() {
               <h3 className="text-lg font-semibold mb-3">Card List</h3>
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <Card key={i} className="bg-surface-elevated">
+                  <Card key={i} className="bg-card">
                     <CardContent className="p-4">
                       <h4 className="font-medium">List Item {i}</h4>
-                      <p className="text-sm text-text-secondary mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         Description for item {i}
                       </p>
                     </CardContent>
@@ -811,9 +811,9 @@ export function PatternsSection() {
               <h3 className="text-lg font-semibold mb-3">Stats Grid</h3>
               <div className="grid grid-cols-2 gap-3">
                 {['Total Value', 'Active Deals', 'IRR', 'MOIC'].map((stat) => (
-                  <Card key={stat} className="bg-surface-elevated">
+                  <Card key={stat} className="bg-card">
                     <CardContent className="p-4">
-                      <p className="text-xs text-text-secondary">{stat}</p>
+                      <p className="text-xs text-muted-foreground">{stat}</p>
                       <p className="text-2xl font-bold mt-1">
                         {Math.floor(Math.random() * 100)}
                       </p>

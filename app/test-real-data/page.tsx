@@ -208,12 +208,12 @@ export default function TestRealDataPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background-deep p-6 lg:p-8">
+    <div className="min-h-screen bg-background p-6 lg:p-8">
       {/* Header */}
       <div className="mb-8 flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Test Real Data Connection</h1>
-          <p className="text-text-secondary">Direct Supabase database testing and validation</p>
+          <p className="text-muted-foreground">Direct Supabase database testing and validation</p>
         </div>
         <Button
           variant="glass"
@@ -234,7 +234,7 @@ export default function TestRealDataPage() {
               <CloudIcon className={`w-6 h-6 ${connected ? 'text-success-400' : 'text-error-400'}`} />
               <div>
                 <p className="text-white font-medium">Supabase Connection</p>
-                <p className="text-sm text-text-secondary">
+                <p className="text-sm text-muted-foreground">
                   {connected ? "Connected to production database" : "Not connected"}
                 </p>
               </div>
@@ -245,7 +245,7 @@ export default function TestRealDataPage() {
           </div>
           {connectionInfo && (
             <div className="mt-4 p-3 bg-surface-base rounded-lg">
-              <pre className="text-xs text-text-secondary overflow-x-auto">
+              <pre className="text-xs text-muted-foreground overflow-x-auto">
                 {JSON.stringify(connectionInfo, null, 2)}
               </pre>
             </div>
@@ -304,23 +304,23 @@ export default function TestRealDataPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-surface-border">
-                      <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Table Name</th>
-                      <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Schema</th>
-                      <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Row Count</th>
-                      <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Status</th>
-                      <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Actions</th>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Table Name</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Schema</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Row Count</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Status</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {tables.map((table, index) => (
-                      <tr key={index} className="border-b border-surface-border hover:bg-surface-hover transition-colors">
+                      <tr key={index} className="border-b border-border hover:bg-muted transition-colors">
                         <td className="py-4 px-4 text-white font-medium">
                           <code className="bg-surface-base px-2 py-1 rounded">
                             {table.name}
                           </code>
                         </td>
-                        <td className="py-4 px-4 text-text-secondary">
+                        <td className="py-4 px-4 text-muted-foreground">
                           {table.schema}
                         </td>
                         <td className="py-4 px-4 text-white">
@@ -367,7 +367,7 @@ export default function TestRealDataPage() {
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm text-text-secondary mb-2">
+                  <label className="block text-sm text-muted-foreground mb-2">
                     Quick Queries
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -388,13 +388,13 @@ export default function TestRealDataPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-text-secondary mb-2">
+                  <label className="block text-sm text-muted-foreground mb-2">
                     Custom Query (Limited to SELECT)
                   </label>
                   <textarea
                     value={customQuery}
                     onChange={(e) => setCustomQuery(e.target.value)}
-                    className="w-full h-32 p-3 bg-surface-base border border-surface-border rounded-lg text-white font-mono text-sm"
+                    className="w-full h-32 p-3 bg-surface-base border border-border rounded-lg text-white font-mono text-sm"
                     placeholder="SELECT * FROM deals LIMIT 10"
                   />
                   <Button
@@ -422,7 +422,7 @@ export default function TestRealDataPage() {
                             ) : (
                               <XCircleIcon className="w-4 h-4 text-error-400" />
                             )}
-                            <span className="text-xs text-text-secondary">
+                            <span className="text-xs text-muted-foreground">
                               {result.executionTime}ms
                             </span>
                           </div>
@@ -431,12 +431,12 @@ export default function TestRealDataPage() {
                           <div className="text-sm text-error-400">{result.error}</div>
                         ) : (
                           <div>
-                            <div className="text-sm text-text-secondary mb-2">
+                            <div className="text-sm text-muted-foreground mb-2">
                               Returned {result.rowCount} rows
                             </div>
                             {result.data && result.data.length > 0 && (
                               <div className="overflow-x-auto">
-                                <pre className="text-xs text-text-tertiary">
+                                <pre className="text-xs text-muted-foreground/70">
                                   {JSON.stringify(result.data[0], null, 2)}
                                 </pre>
                               </div>
@@ -459,7 +459,7 @@ export default function TestRealDataPage() {
               <CardTitle>
                 Data Browser
                 {selectedTable && (
-                  <span className="ml-2 text-sm text-text-secondary">
+                  <span className="ml-2 text-sm text-muted-foreground">
                     - {selectedTable}
                   </span>
                 )}
@@ -467,7 +467,7 @@ export default function TestRealDataPage() {
             </CardHeader>
             <CardContent>
               {!selectedTable ? (
-                <div className="text-center py-8 text-text-secondary">
+                <div className="text-center py-8 text-muted-foreground">
                   Select a table from the Tables tab to browse its data
                 </div>
               ) : loading ? (
@@ -475,7 +475,7 @@ export default function TestRealDataPage() {
                   <div className="w-8 h-8 border-4 border-primary-300 border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : tableData.length === 0 ? (
-                <div className="text-center py-8 text-text-secondary">
+                <div className="text-center py-8 text-muted-foreground">
                   No data found in {selectedTable}
                 </div>
               ) : (
@@ -496,7 +496,7 @@ export default function TestRealDataPage() {
           <CardTitle>Connection Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2 text-sm text-text-secondary">
+          <div className="space-y-2 text-sm text-muted-foreground">
             <div className="flex items-start gap-2">
               <ExclamationTriangleIcon className="w-4 h-4 text-warning-400 mt-0.5" />
               <div>

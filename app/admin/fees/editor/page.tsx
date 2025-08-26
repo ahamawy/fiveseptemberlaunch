@@ -171,7 +171,7 @@ export default function DealFeeEditorPage() {
   };
   
   return (
-    <div className="min-h-screen bg-background-deep">
+    <div className="min-h-screen bg-background">
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="mb-8">
@@ -195,7 +195,7 @@ export default function DealFeeEditorPage() {
                 className={`p-4 rounded-lg border transition-all ${
                   selectedDeal === deal.id
                     ? 'bg-primary-300/20 border-primary-300 text-white'
-                    : 'bg-surface border-surface-border text-gray-300 hover:bg-surface-light'
+                    : 'bg-surface border-border text-gray-300 hover:bg-surface-light'
                 }`}
               >
                 <div className="text-left">
@@ -223,7 +223,7 @@ export default function DealFeeEditorPage() {
               <div className="flex gap-2">
                 <button
                   onClick={copyTemplate}
-                  className="px-3 py-1 rounded text-sm bg-surface border border-surface-border text-white hover:bg-surface-light"
+                  className="px-3 py-1 rounded text-sm bg-surface border border-border text-white hover:bg-surface-light"
                 >
                   <DocumentDuplicateIcon className="w-4 h-4 inline mr-1" />
                   Copy Template
@@ -245,14 +245,14 @@ export default function DealFeeEditorPage() {
                     type="text"
                     value={fee.component}
                     onChange={(e) => updateFeeComponent(index, 'component', e.target.value)}
-                    className="flex-1 px-2 py-1 rounded bg-surface border border-surface-border text-white text-sm"
+                    className="flex-1 px-2 py-1 rounded bg-surface border border-border text-white text-sm"
                     placeholder="Component name"
                   />
                   
                   <select
                     value={fee.basis}
                     onChange={(e) => updateFeeComponent(index, 'basis', e.target.value)}
-                    className="px-2 py-1 rounded bg-surface border border-surface-border text-white text-sm"
+                    className="px-2 py-1 rounded bg-surface border border-border text-white text-sm"
                   >
                     <option value="capital">Capital</option>
                     <option value="gains">Gains</option>
@@ -265,7 +265,7 @@ export default function DealFeeEditorPage() {
                         type="number"
                         value={fee.percent || 0}
                         onChange={(e) => updateFeeComponent(index, 'percent', parseFloat(e.target.value))}
-                        className="w-20 px-2 py-1 rounded bg-surface border border-surface-border text-white text-sm"
+                        className="w-20 px-2 py-1 rounded bg-surface border border-border text-white text-sm"
                         step="0.1"
                       />
                       <span className="text-gray-400 text-sm">%</span>
@@ -279,7 +279,7 @@ export default function DealFeeEditorPage() {
                         type="number"
                         value={fee.amount || 0}
                         onChange={(e) => updateFeeComponent(index, 'amount', parseFloat(e.target.value))}
-                        className="w-24 px-2 py-1 rounded bg-surface border border-surface-border text-white text-sm"
+                        className="w-24 px-2 py-1 rounded bg-surface border border-border text-white text-sm"
                       />
                     </div>
                   )}
@@ -311,7 +311,7 @@ export default function DealFeeEditorPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-surface-border">
+                  <tr className="border-b border-border">
                     <th className="text-left py-2 px-3 text-sm font-medium text-gray-400">Investor</th>
                     <th className="text-right py-2 px-3 text-sm font-medium text-gray-400">Capital</th>
                     {feeTemplate.map(fee => (
@@ -325,7 +325,7 @@ export default function DealFeeEditorPage() {
                 </thead>
                 <tbody>
                   {investorFees.slice(0, 10).map(inv => (
-                    <tr key={inv.investor_id} className="border-b border-surface-border hover:bg-surface-light/30">
+                    <tr key={inv.investor_id} className="border-b border-border hover:bg-surface-light/30">
                       <td className="py-2 px-3 text-sm text-white">{inv.investor_name}</td>
                       <td className="py-2 px-3 text-sm text-right text-white">
                         {formatCurrency(inv.net_capital)}
@@ -344,7 +344,7 @@ export default function DealFeeEditorPage() {
                     </tr>
                   ))}
                 </tbody>
-                <tfoot className="border-t-2 border-surface-border">
+                <tfoot className="border-t-2 border-border">
                   <tr>
                     <td className="py-3 px-3 text-sm font-medium text-white">Total</td>
                     <td className="py-3 px-3 text-sm text-right font-medium text-white">

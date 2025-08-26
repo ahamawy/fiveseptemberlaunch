@@ -65,7 +65,7 @@ export default function TestHubPage() {
           <CardTitle>Test Hub Overview</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-text-secondary mb-4">
+          <p className="text-muted-foreground mb-4">
             Centralized testing interface for all platform components. Run tests to validate functionality across different modules.
           </p>
           
@@ -82,7 +82,7 @@ export default function TestHubPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-text-secondary">{section.description}</p>
+                    <p className="text-sm text-muted-foreground">{section.description}</p>
                     <Button variant="ghost" size="sm" className="mt-2">
                       Run Test →
                     </Button>
@@ -115,8 +115,8 @@ export default function TestHubPage() {
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-text-primary">Test Hub</h1>
-          <p className="text-text-secondary mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Test Hub</h1>
+          <p className="text-muted-foreground mt-2">
             Comprehensive testing suite for all platform features
           </p>
         </div>
@@ -198,10 +198,10 @@ function HealthCheckItem({ name, status }: { name: string; status: "healthy" | "
   const Icon = config.icon;
 
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg bg-surface-elevated">
+    <div className="flex items-center justify-between p-3 rounded-lg bg-card">
       <div className="flex items-center gap-3">
         <Icon className={`w-5 h-5 ${config.color}`} />
-        <span className="text-sm font-medium text-text-primary">{name}</span>
+        <span className="text-sm font-medium text-foreground">{name}</span>
       </div>
       <Badge variant={config.badge}>
         {status === "healthy" ? "Operational" : status === "warning" ? "Degraded" : "Down"}

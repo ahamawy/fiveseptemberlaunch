@@ -22,11 +22,11 @@ export default function PortfolioCard({ title, value, change, currency = 'USD' }
   return (
     <Card variant="glass" className="hover:shadow-lg transition-shadow">
       <CardContent>
-        <dt className="text-sm font-medium text-text-secondary truncate">
+        <dt className="text-sm font-medium text-muted-foreground truncate">
           {title}
         </dt>
         <dd className="mt-3">
-          <span className="text-3xl font-bold text-text-primary">
+          <span className="text-3xl font-bold text-foreground">
             {formatValue(value)}
           </span>
         </dd>
@@ -46,7 +46,7 @@ export default function PortfolioCard({ title, value, change, currency = 'USD' }
               </span>
               {Math.abs(change)}%
             </span>
-            <span className="text-xs text-text-tertiary">
+            <span className="text-xs text-muted-foreground/70">
               vs last quarter
             </span>
           </dd>

@@ -165,7 +165,7 @@ export function FileUploadZone({
           transition-all duration-200
           ${isDragging 
             ? 'border-primary-300 bg-primary-300/10' 
-            : 'border-surface-border bg-surface/50 hover:border-primary-300/50'
+            : 'border-border bg-surface/50 hover:border-primary-300/50'
           }
         `}
       >
@@ -194,7 +194,7 @@ export function FileUploadZone({
 
       {/* Selected File Display */}
       {selectedFile && (
-        <div className="bg-surface border border-surface-border rounded-lg p-4">
+        <div className="bg-surface border border-border rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {getFileIcon(selectedFile)}
@@ -207,7 +207,7 @@ export function FileUploadZone({
             </div>
             <button
               onClick={clearFile}
-              className="p-1 hover:bg-surface-hover rounded"
+              className="p-1 hover:bg-muted rounded"
             >
               <XMarkIcon className="w-5 h-5 text-gray-400" />
             </button>

@@ -149,7 +149,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-text-secondary">
+        <div className="text-muted-foreground">
           <svg
             className="animate-spin h-8 w-8 text-primary-300 mx-auto mb-4"
             fill="none"
@@ -219,11 +219,11 @@ export default function ProfilePage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="pb-6 border-b border-surface-border">
+      <div className="pb-6 border-b border-border">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-accent-blue text-gradient">
           Profile & Settings
         </h1>
-        <p className="mt-2 text-text-secondary">
+        <p className="mt-2 text-muted-foreground">
           Manage your account information and preferences
         </p>
       </div>
@@ -234,13 +234,13 @@ export default function ProfilePage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-text-secondary">Investor Type</p>
-                <p className="text-lg font-semibold text-text-primary mt-1">
+                <p className="text-sm text-muted-foreground">Investor Type</p>
+                <p className="text-lg font-semibold text-foreground mt-1">
                   {data.investorInfo.type}
                 </p>
               </div>
               <svg
-                className="w-6 h-6 text-text-secondary"
+                className="w-6 h-6 text-muted-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -260,7 +260,7 @@ export default function ProfilePage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-text-secondary">KYC Status</p>
+                <p className="text-sm text-muted-foreground">KYC Status</p>
                 <Badge
                   variant={getKYCStatusBadge(data.kycStatus.status)}
                   className="mt-1"
@@ -269,7 +269,7 @@ export default function ProfilePage() {
                 </Badge>
               </div>
               <svg
-                className="w-6 h-6 text-text-secondary"
+                className="w-6 h-6 text-muted-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -289,7 +289,7 @@ export default function ProfilePage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-text-secondary">
+                <p className="text-sm text-muted-foreground">
                   Active Investments
                 </p>
                 <p className="text-2xl font-bold text-primary-300 mt-1">
@@ -297,7 +297,7 @@ export default function ProfilePage() {
                 </p>
               </div>
               <svg
-                className="w-6 h-6 text-text-secondary"
+                className="w-6 h-6 text-muted-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -317,13 +317,13 @@ export default function ProfilePage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-text-secondary">Member Since</p>
-                <p className="text-lg font-semibold text-text-primary mt-1">
+                <p className="text-sm text-muted-foreground">Member Since</p>
+                <p className="text-lg font-semibold text-foreground mt-1">
                   {new Date(data.investorInfo.investorSince).getFullYear()}
                 </p>
               </div>
               <svg
-                className="w-6 h-6 text-text-secondary"
+                className="w-6 h-6 text-muted-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -360,59 +360,59 @@ export default function ProfilePage() {
           {/* Personal Information Tab */}
           {activeTab === "personal" && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-text-primary mb-4">
+              <h3 className="text-xl font-semibold text-foreground mb-4">
                 Personal Information
               </h3>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Full Name
                   </label>
-                  <p className="text-text-primary">
+                  <p className="text-foreground">
                     {data.personalInfo.fullName}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Email Address
                   </label>
-                  <p className="text-text-primary">{data.personalInfo.email}</p>
+                  <p className="text-foreground">{data.personalInfo.email}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Phone Number
                   </label>
-                  <p className="text-text-primary">{data.personalInfo.phone}</p>
+                  <p className="text-foreground">{data.personalInfo.phone}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Date of Birth
                   </label>
-                  <p className="text-text-primary">
+                  <p className="text-foreground">
                     {formatDate(data.personalInfo.dateOfBirth)}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Nationality
                   </label>
-                  <p className="text-text-primary">
+                  <p className="text-foreground">
                     {data.personalInfo.nationality}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Country of Residence
                   </label>
-                  <p className="text-text-primary">
+                  <p className="text-foreground">
                     {data.personalInfo.residenceCountry}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Tax ID
                   </label>
-                  <p className="text-text-primary font-mono">
+                  <p className="text-foreground font-mono">
                     {data.personalInfo.taxId}
                   </p>
                 </div>
@@ -431,18 +431,18 @@ export default function ProfilePage() {
           {/* Investor Profile Tab */}
           {activeTab === "investor" && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-text-primary mb-4">
+              <h3 className="text-xl font-semibold text-foreground mb-4">
                 Investor Profile
               </h3>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Investor Type
                   </label>
-                  <p className="text-text-primary">{data.investorInfo.type}</p>
+                  <p className="text-foreground">{data.investorInfo.type}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Accreditation Status
                   </label>
                   <Badge variant="success">
@@ -450,7 +450,7 @@ export default function ProfilePage() {
                   </Badge>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Risk Profile
                   </label>
                   <Badge
@@ -462,16 +462,16 @@ export default function ProfilePage() {
                   </Badge>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Investor Since
                   </label>
-                  <p className="text-text-primary">
+                  <p className="text-foreground">
                     {formatDate(data.investorInfo.investorSince)}
                   </p>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Preferred Sectors
                 </label>
                 <div className="flex gap-2 flex-wrap">
@@ -496,7 +496,7 @@ export default function ProfilePage() {
           {/* KYC & Compliance Tab */}
           {activeTab === "kyc" && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-text-primary mb-4">
+              <h3 className="text-xl font-semibold text-foreground mb-4">
                 KYC & Compliance
               </h3>
 
@@ -533,10 +533,10 @@ export default function ProfilePage() {
                         </svg>
                       </div>
                       <div>
-                        <p className="font-semibold text-text-primary">
+                        <p className="font-semibold text-foreground">
                           KYC Status
                         </p>
-                        <p className="text-sm text-text-secondary">
+                        <p className="text-sm text-muted-foreground">
                           Last updated: {formatDate(data.kycStatus.lastUpdated)}
                         </p>
                       </div>
@@ -558,14 +558,14 @@ export default function ProfilePage() {
 
               {/* Documents List */}
               <div>
-                <h4 className="text-lg font-medium text-text-primary mb-3">
+                <h4 className="text-lg font-medium text-foreground mb-3">
                   Verification Documents
                 </h4>
                 <div className="space-y-2">
                   {data.kycStatus.documents.map((doc, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between p-3 bg-background-surface rounded-lg"
+                      className="flex items-center justify-between p-3 bg-card rounded-lg"
                     >
                       <div className="flex items-center gap-3">
                         <svg
@@ -582,7 +582,7 @@ export default function ProfilePage() {
                           />
                         </svg>
                         <div>
-                          <p className="text-sm font-medium text-text-primary">
+                          <p className="text-sm font-medium text-foreground">
                             {doc.type}
                           </p>
                           <p className="text-xs text-text-muted">
@@ -620,54 +620,54 @@ export default function ProfilePage() {
           {/* Banking Tab */}
           {activeTab === "banking" && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-text-primary mb-4">
+              <h3 className="text-xl font-semibold text-foreground mb-4">
                 Banking Information
               </h3>
               <Card variant="glass">
                 <CardContent className="p-4">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="block text-sm font-medium text-text-secondary mb-1">
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">
                         Account Name
                       </label>
-                      <p className="text-text-primary">
+                      <p className="text-foreground">
                         {data.bankDetails.accountName}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-text-secondary mb-1">
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">
                         Bank Name
                       </label>
-                      <p className="text-text-primary">
+                      <p className="text-foreground">
                         {data.bankDetails.bankName}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-text-secondary mb-1">
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">
                         Account Number
                       </label>
-                      <p className="text-text-primary font-mono">
+                      <p className="text-foreground font-mono">
                         {data.bankDetails.accountNumber}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-text-secondary mb-1">
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">
                         Routing Number
                       </label>
-                      <p className="text-text-primary font-mono">
+                      <p className="text-foreground font-mono">
                         {data.bankDetails.routingNumber}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-text-secondary mb-1">
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">
                         SWIFT Code
                       </label>
-                      <p className="text-text-primary font-mono">
+                      <p className="text-foreground font-mono">
                         {data.bankDetails.swiftCode}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-text-secondary mb-1">
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">
                         Currency
                       </label>
                       <Badge variant="info">{data.bankDetails.currency}</Badge>
@@ -689,19 +689,19 @@ export default function ProfilePage() {
           {/* Preferences Tab */}
           {activeTab === "preferences" && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-text-primary mb-4">
+              <h3 className="text-xl font-semibold text-foreground mb-4">
                 Preferences
               </h3>
 
               {/* Notification Settings */}
               <div>
-                <h4 className="text-lg font-medium text-text-primary mb-3">
+                <h4 className="text-lg font-medium text-foreground mb-3">
                   Notifications
                 </h4>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-background-surface rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-card rounded-lg">
                     <div>
-                      <p className="text-sm font-medium text-text-primary">
+                      <p className="text-sm font-medium text-foreground">
                         Email Notifications
                       </p>
                       <p className="text-xs text-text-muted">
@@ -720,9 +720,9 @@ export default function ProfilePage() {
                         : "Disabled"}
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-background-surface rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-card rounded-lg">
                     <div>
-                      <p className="text-sm font-medium text-text-primary">
+                      <p className="text-sm font-medium text-foreground">
                         SMS Notifications
                       </p>
                       <p className="text-xs text-text-muted">
@@ -741,9 +741,9 @@ export default function ProfilePage() {
                         : "Disabled"}
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-background-surface rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-card rounded-lg">
                     <div>
-                      <p className="text-sm font-medium text-text-primary">
+                      <p className="text-sm font-medium text-foreground">
                         Marketing Emails
                       </p>
                       <p className="text-xs text-text-muted">
@@ -760,9 +760,9 @@ export default function ProfilePage() {
                         : "Disabled"}
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-background-surface rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-card rounded-lg">
                     <div>
-                      <p className="text-sm font-medium text-text-primary">
+                      <p className="text-sm font-medium text-foreground">
                         Quarterly Reports
                       </p>
                       <p className="text-xs text-text-muted">
@@ -786,23 +786,23 @@ export default function ProfilePage() {
 
               {/* Regional Settings */}
               <div>
-                <h4 className="text-lg font-medium text-text-primary mb-3">
+                <h4 className="text-lg font-medium text-foreground mb-3">
                   Regional Settings
                 </h4>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-1">
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">
                       Language
                     </label>
-                    <p className="text-text-primary">
+                    <p className="text-foreground">
                       {data.preferences.language}
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-1">
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">
                       Timezone
                     </label>
-                    <p className="text-text-primary">
+                    <p className="text-foreground">
                       {data.preferences.timezone}
                     </p>
                   </div>

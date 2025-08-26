@@ -106,14 +106,14 @@ const statusBadges = {
 
 export default function FeeHubPage() {
   return (
-    <div className="min-h-screen bg-background-deep">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
             Fee Management Hub
           </h1>
-          <p className="text-text-secondary">
+          <p className="text-muted-foreground">
             Central dashboard for all fee calculation and import tools
           </p>
         </div>
@@ -124,7 +124,7 @@ export default function FeeHubPage() {
             <CardTitle className="text-primary-300">Quick Start Guide</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 text-sm text-text-secondary">
+            <div className="space-y-2 text-sm text-muted-foreground">
               <p><strong className="text-white">New Deal Setup:</strong> Start with Fee Profiles to configure your fee structure</p>
               <p><strong className="text-white">Importing Fees:</strong> Use Smart Import for automatic mapping or Import V2 for manual control</p>
               <p><strong className="text-white">Testing Calculations:</strong> Use ARCHON Fee Engine to validate your fee logic</p>
@@ -176,12 +176,12 @@ export default function FeeHubPage() {
         </div>
 
         {/* Documentation Link */}
-        <Card className="mt-8 border-surface-border">
+        <Card className="mt-8 border-border">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-white mb-1">Need Help?</h3>
-                <p className="text-sm text-text-secondary">
+                <p className="text-sm text-muted-foreground">
                   View the complete documentation for fee management and ARCHON engine
                 </p>
               </div>
@@ -215,7 +215,7 @@ function ToolCard({ tool }: { tool: FeeToolCard }) {
           <CardTitle className="text-white mt-2">{tool.title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <CardDescription className="text-text-secondary text-sm">
+          <CardDescription className="text-muted-foreground text-sm">
             {tool.description}
           </CardDescription>
         </CardContent>

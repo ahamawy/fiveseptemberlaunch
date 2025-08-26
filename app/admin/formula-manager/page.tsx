@@ -132,20 +132,20 @@ export default function FormulaManagerPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background-deep flex items-center justify-center">
-        <div className="text-text-secondary">Loading formulas...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Loading formulas...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background-deep p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center pb-6 border-b border-surface-border">
+        <div className="flex justify-between items-center pb-6 border-b border-border">
           <div>
-            <h1 className="text-3xl font-bold text-text-primary">Formula Manager</h1>
-            <p className="mt-2 text-text-secondary">Manage deal economics formulas</p>
+            <h1 className="text-3xl font-bold text-foreground">Formula Manager</h1>
+            <p className="mt-2 text-muted-foreground">Manage deal economics formulas</p>
           </div>
           <Button
             onClick={() => {
@@ -192,13 +192,13 @@ export default function FormulaManagerPage() {
                       className={`p-3 rounded-lg cursor-pointer transition-colors ${
                         selectedFormula?.id === formula.id
                           ? 'bg-primary-500/20 border border-primary-400'
-                          : 'bg-surface-elevated hover:bg-surface-hover'
+                          : 'bg-card hover:bg-muted'
                       }`}
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <div className="font-medium text-text-primary">{formula.formula_name}</div>
-                          <div className="text-sm text-text-secondary">{formula.formula_code}</div>
+                          <div className="font-medium text-foreground">{formula.formula_name}</div>
+                          <div className="text-sm text-muted-foreground">{formula.formula_code}</div>
                         </div>
                         {formula.is_active ? (
                           <CheckCircleIcon className="w-5 h-5 text-success-400" />
@@ -272,7 +272,7 @@ export default function FormulaManagerPage() {
                     {/* Basic Info */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-text-secondary mb-1">
+                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                           Formula Code
                         </label>
                         <input
@@ -283,11 +283,11 @@ export default function FormulaManagerPage() {
                             formula_code: e.target.value
                           })}
                           disabled={!isEditing}
-                          className="w-full px-3 py-2 bg-surface-elevated border border-surface-border rounded-lg text-text-primary disabled:opacity-50"
+                          className="w-full px-3 py-2 bg-card border border-border rounded-lg text-foreground disabled:opacity-50"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-text-secondary mb-1">
+                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                           Formula Name
                         </label>
                         <input
@@ -298,7 +298,7 @@ export default function FormulaManagerPage() {
                             formula_name: e.target.value
                           })}
                           disabled={!isEditing}
-                          className="w-full px-3 py-2 bg-surface-elevated border border-surface-border rounded-lg text-text-primary disabled:opacity-50"
+                          className="w-full px-3 py-2 bg-card border border-border rounded-lg text-foreground disabled:opacity-50"
                         />
                       </div>
                     </div>
@@ -306,7 +306,7 @@ export default function FormulaManagerPage() {
                     {/* Formulas */}
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium text-text-secondary mb-1">
+                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                           Net Capital Formula
                         </label>
                         <div className="relative">
@@ -317,7 +317,7 @@ export default function FormulaManagerPage() {
                               nc_formula: e.target.value
                             })}
                             disabled={!isEditing}
-                            className="w-full px-3 py-2 bg-surface-elevated border border-surface-border rounded-lg text-text-primary font-mono text-sm disabled:opacity-50"
+                            className="w-full px-3 py-2 bg-card border border-border rounded-lg text-foreground font-mono text-sm disabled:opacity-50"
                             rows={2}
                           />
                           <Button
@@ -332,7 +332,7 @@ export default function FormulaManagerPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-text-secondary mb-1">
+                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                           Investor Proceeds Formula
                         </label>
                         <div className="relative">
@@ -343,7 +343,7 @@ export default function FormulaManagerPage() {
                               investor_proceeds_formula: e.target.value
                             })}
                             disabled={!isEditing}
-                            className="w-full px-3 py-2 bg-surface-elevated border border-surface-border rounded-lg text-text-primary font-mono text-sm disabled:opacity-50"
+                            className="w-full px-3 py-2 bg-card border border-border rounded-lg text-foreground font-mono text-sm disabled:opacity-50"
                             rows={3}
                           />
                           <Button
@@ -358,7 +358,7 @@ export default function FormulaManagerPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-text-secondary mb-1">
+                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                           Investor Proceeds (Post-Discount) Formula
                         </label>
                         <div className="relative">
@@ -369,7 +369,7 @@ export default function FormulaManagerPage() {
                               investor_proceeds_discount_formula: e.target.value
                             })}
                             disabled={!isEditing}
-                            className="w-full px-3 py-2 bg-surface-elevated border border-surface-border rounded-lg text-text-primary font-mono text-sm disabled:opacity-50"
+                            className="w-full px-3 py-2 bg-card border border-border rounded-lg text-foreground font-mono text-sm disabled:opacity-50"
                             rows={3}
                           />
                           <Button
@@ -395,9 +395,9 @@ export default function FormulaManagerPage() {
                             has_dual_mgmt_fee: e.target.checked
                           })}
                           disabled={!isEditing}
-                          className="rounded border-surface-border"
+                          className="rounded border-border"
                         />
-                        <span className="text-sm text-text-primary">Has Dual Management Fee</span>
+                        <span className="text-sm text-foreground">Has Dual Management Fee</span>
                       </label>
                       <label className="flex items-center space-x-2">
                         <input
@@ -408,9 +408,9 @@ export default function FormulaManagerPage() {
                             has_premium: e.target.checked
                           })}
                           disabled={!isEditing}
-                          className="rounded border-surface-border"
+                          className="rounded border-border"
                         />
-                        <span className="text-sm text-text-primary">Has Premium</span>
+                        <span className="text-sm text-foreground">Has Premium</span>
                       </label>
                       <label className="flex items-center space-x-2">
                         <input
@@ -421,9 +421,9 @@ export default function FormulaManagerPage() {
                             has_structuring: e.target.checked
                           })}
                           disabled={!isEditing}
-                          className="rounded border-surface-border"
+                          className="rounded border-border"
                         />
-                        <span className="text-sm text-text-primary">Has Structuring Fee</span>
+                        <span className="text-sm text-foreground">Has Structuring Fee</span>
                       </label>
                       <label className="flex items-center space-x-2">
                         <input
@@ -434,9 +434,9 @@ export default function FormulaManagerPage() {
                             has_other_fees: e.target.checked
                           })}
                           disabled={!isEditing}
-                          className="rounded border-surface-border"
+                          className="rounded border-border"
                         />
-                        <span className="text-sm text-text-primary">Has Other Fees</span>
+                        <span className="text-sm text-foreground">Has Other Fees</span>
                       </label>
                     </div>
 
@@ -451,7 +451,7 @@ export default function FormulaManagerPage() {
                           {testResult.success ? 'Test Successful' : 'Test Failed'}
                         </div>
                         {testResult.success ? (
-                          <div className="text-text-primary">
+                          <div className="text-foreground">
                             Result: <span className="font-mono font-bold">
                               {typeof testResult.result === 'number' 
                                 ? testResult.result.toLocaleString('en-US', {
@@ -472,7 +472,7 @@ export default function FormulaManagerPage() {
             ) : (
               <Card variant="glass">
                 <CardContent>
-                  <div className="text-center py-12 text-text-secondary">
+                  <div className="text-center py-12 text-muted-foreground">
                     Select a formula template or create a new one
                   </div>
                 </CardContent>

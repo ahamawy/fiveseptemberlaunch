@@ -143,7 +143,7 @@ function DashboardContent() {
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center space-y-4">
           <div className="w-12 h-12 border-4 border-primary-300 border-t-transparent rounded-full animate-spin" />
-          <div className="text-text-secondary">Loading dashboard...</div>
+          <div className="text-muted-foreground">Loading dashboard...</div>
         </div>
       </div>
     );
@@ -154,7 +154,7 @@ function DashboardContent() {
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center space-y-4">
           <div className="text-error-400 text-xl">Failed to load dashboard</div>
-          <div className="text-text-secondary">
+          <div className="text-muted-foreground">
             {error || "No data available"}
           </div>
           <button
@@ -173,10 +173,10 @@ function DashboardContent() {
       <div className="absolute inset-0 bg-gradient-mesh opacity-10 pointer-events-none" />
       <div className="relative z-10">
       {/* Top bar: Lead + Guest Mode */}
-      <div className="flex items-start justify-between pb-6 border-b border-surface-border mb-8">
+      <div className="flex items-start justify-between pb-6 border-b border-border mb-8">
         <div>
           <h1 className="text-4xl font-bold text-white">Welcome back</h1>
-          <p className="mt-2 text-text-secondary">
+          <p className="mt-2 text-muted-foreground">
             Your capital is working quietly.
           </p>
         </div>
@@ -218,7 +218,7 @@ function DashboardContent() {
         <Card variant="glass" className="mb-6">
           <CardContent className="p-5">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="text-text-secondary">
+              <div className="text-muted-foreground">
                 <div className="text-sm">
                   {`+${Math.round(percentSinceEntry)}% since entry`} ·{" "}
                   {data.activeDeals} positions
@@ -270,16 +270,16 @@ function DashboardContent() {
                 </ButtonGroup>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 ml-2">
                   <div>
-                    <p className="text-xs text-text-tertiary">Current value</p>
-                    <p className="text-lg font-semibold text-text-primary">
+                    <p className="text-xs text-muted-foreground/70">Current value</p>
+                    <p className="text-lg font-semibold text-foreground">
                       {displayMode === "percent"
                         ? "100%"
                         : maskIfHidden(formatCurrency(currentValue))}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-text-tertiary">Invested</p>
-                    <p className="text-lg font-semibold text-text-primary">
+                    <p className="text-xs text-muted-foreground/70">Invested</p>
+                    <p className="text-lg font-semibold text-foreground">
                       {displayMode === "percent"
                         ? `${Math.round(
                             (investedAmount / (currentValue || 1)) * 100
@@ -288,8 +288,8 @@ function DashboardContent() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-text-tertiary">Gain</p>
-                    <p className="text-lg font-semibold text-text-primary">
+                    <p className="text-xs text-muted-foreground/70">Gain</p>
+                    <p className="text-lg font-semibold text-foreground">
                       {displayMode === "percent"
                         ? `${Math.round(
                             ((currentValue - investedAmount) /
@@ -302,15 +302,15 @@ function DashboardContent() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-text-tertiary">MOIC</p>
-                    <p className="text-lg font-semibold text-text-primary">
+                    <p className="text-xs text-muted-foreground/70">MOIC</p>
+                    <p className="text-lg font-semibold text-foreground">
                       {(data.performance.moic || 1).toFixed(1)}×
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            <p className="text-xs text-text-tertiary mt-3">
+            <p className="text-xs text-muted-foreground/70 mt-3">
               Estimates; updated as new information arrives.
             </p>
           </CardContent>
@@ -324,7 +324,7 @@ function DashboardContent() {
             <CardTitle className="text-white flex items-center gap-2">
               What matters now
               <InformationCircleIcon
-                className="w-4 h-4 text-text-tertiary"
+                className="w-4 h-4 text-muted-foreground/70"
                 title="Plain-language highlights for your portfolio."
               />
             </CardTitle>
@@ -345,7 +345,7 @@ function DashboardContent() {
             {/* Waterfall chip */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="text-sm text-text-secondary">
+                <div className="text-sm text-muted-foreground">
                   $50k → Current Value (scenario)
                 </div>
                 <ButtonGroup>
@@ -392,7 +392,7 @@ function DashboardContent() {
                   Math.max(0, (Math.max(0, adjustedUnrealized) / total) * 100)
                 );
                 return (
-                  <div className="w-full h-3 rounded-full bg-surface-base border border-surface-border overflow-hidden">
+                  <div className="w-full h-3 rounded-full bg-surface-base border border-border overflow-hidden">
                     <div
                       className="h-full bg-primary-300"
                       style={{ width: `${investedPct}%` }}
@@ -408,7 +408,7 @@ function DashboardContent() {
                   </div>
                 );
               })()}
-              <div className="mt-2 flex items-center gap-4 text-xs text-text-secondary">
+              <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-primary-300" />{" "}
                   Invested
@@ -427,7 +427,7 @@ function DashboardContent() {
             {/* Thin wealth-over-time area (hide if unavailable) */}
             <div className="h-40">
               {/* If we have a series in future, render here; otherwise keep space minimal */}
-              <div className="w-full h-full rounded-lg border border-surface-border flex items-center justify-center text-text-tertiary text-sm">
+              <div className="w-full h-full rounded-lg border border-border flex items-center justify-center text-muted-foreground/70 text-sm">
                 Wealth over time
               </div>
             </div>
@@ -482,7 +482,7 @@ function DashboardContent() {
           </KPIGrid>
         </div>
 
-        <div className="bg-surface-elevated rounded-xl p-6 border border-surface-border">
+        <div className="bg-card rounded-xl p-6 border border-border">
           <h2 className="text-xl font-semibold text-white mb-4">
             Quick Actions
           </h2>
@@ -492,16 +492,16 @@ function DashboardContent() {
               className="block p-3 bg-primary-300/20 rounded-lg hover:bg-primary-300/30 transition-colors"
             >
               <p className="text-white font-medium">View Active Deals</p>
-              <p className="text-sm text-text-secondary">
+              <p className="text-sm text-muted-foreground">
                 {data.activeDeals} deals available
               </p>
             </a>
             <a
               href="/investor-portal/documents"
-              className="block p-3 bg-surface-base rounded-lg hover:bg-surface-hover transition-colors"
+              className="block p-3 bg-surface-base rounded-lg hover:bg-muted transition-colors"
             >
               <p className="text-white font-medium">Documents</p>
-              <p className="text-sm text-text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Access your documents
               </p>
             </a>
@@ -511,7 +511,7 @@ function DashboardContent() {
 
       {/* Recent Activity */}
       <div
-        className="bg-surface-elevated rounded-xl p-6 border border-surface-border"
+        className="bg-card rounded-xl p-6 border border-border"
         data-testid="section-recent-activity"
       >
         <h2 className="text-xl font-semibold text-white mb-4">
@@ -521,11 +521,11 @@ function DashboardContent() {
           {data.recentActivity.slice(0, 5).map((activity) => (
             <div
               key={activity.id}
-              className="flex justify-between items-start pb-4 border-b border-surface-border last:border-0"
+              className="flex justify-between items-start pb-4 border-b border-border last:border-0"
             >
               <div>
                 <p className="text-white font-medium">{activity.description}</p>
-                <p className="text-sm text-text-secondary mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   {activity.type.replace("_", " ").toUpperCase()}
                 </p>
               </div>
@@ -535,7 +535,7 @@ function DashboardContent() {
                     ${activity.amount.toLocaleString()}
                   </p>
                 )}
-                <p className="text-sm text-text-secondary mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   {new Date(activity.date).toLocaleDateString()}
                 </p>
               </div>
@@ -552,7 +552,7 @@ export default function DashboardPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center h-64 text-text-secondary">
+        <div className="flex items-center justify-center h-64 text-muted-foreground">
           Loading...
         </div>
       }

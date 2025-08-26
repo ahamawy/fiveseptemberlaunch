@@ -179,11 +179,11 @@ export default function TestDealsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background-deep p-6 lg:p-8">
+    <div className="min-h-screen bg-background p-6 lg:p-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Test Deals Page</h1>
-        <p className="text-text-secondary">Development page for testing deal functionality</p>
+        <p className="text-muted-foreground">Development page for testing deal functionality</p>
       </div>
 
       {/* Controls */}
@@ -191,7 +191,7 @@ export default function TestDealsPage() {
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <label className="text-sm text-text-secondary">Data Source:</label>
+              <label className="text-sm text-muted-foreground">Data Source:</label>
               <div className="flex gap-2">
                 <Button
                   variant={testMode === "mock" ? "primary" : "glass"}
@@ -272,36 +272,36 @@ export default function TestDealsPage() {
               <div className="w-8 h-8 border-4 border-primary-300 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : deals.length === 0 ? (
-            <div className="text-center py-8 text-text-secondary">
+            <div className="text-center py-8 text-muted-foreground">
               No deals found
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-surface-border">
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Deal</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Company</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Stage</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Progress</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Min Investment</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Target Close</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Status</th>
-                    <th className="text-left py-3 px-4 text-text-secondary text-sm font-medium">Metrics</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Deal</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Company</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Stage</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Progress</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Min Investment</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Target Close</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Status</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground text-sm font-medium">Metrics</th>
                   </tr>
                 </thead>
                 <tbody>
                   {deals.map((deal) => (
-                    <tr key={deal.id} className="border-b border-surface-border hover:bg-surface-hover transition-colors">
+                    <tr key={deal.id} className="border-b border-border hover:bg-muted transition-colors">
                       <td className="py-4 px-4">
                         <div>
                           <div className="text-white font-medium">{deal.name}</div>
-                          <div className="text-xs text-text-tertiary mt-1">{deal.description}</div>
+                          <div className="text-xs text-muted-foreground/70 mt-1">{deal.description}</div>
                         </div>
                       </td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
-                          <BuildingOfficeIcon className="w-4 h-4 text-text-tertiary" />
+                          <BuildingOfficeIcon className="w-4 h-4 text-muted-foreground/70" />
                           <span className="text-white">{deal.company}</span>
                         </div>
                       </td>
@@ -319,7 +319,7 @@ export default function TestDealsPage() {
                               style={{ width: formatProgress(deal.currentRaise, deal.targetRaise) }}
                             />
                           </div>
-                          <div className="text-xs text-text-tertiary mt-1">
+                          <div className="text-xs text-muted-foreground/70 mt-1">
                             {formatProgress(deal.currentRaise, deal.targetRaise)}
                           </div>
                         </div>
@@ -329,7 +329,7 @@ export default function TestDealsPage() {
                       </td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
-                          <CalendarIcon className="w-4 h-4 text-text-tertiary" />
+                          <CalendarIcon className="w-4 h-4 text-muted-foreground/70" />
                           <span className="text-white text-sm">{deal.targetClose}</span>
                         </div>
                       </td>
@@ -339,7 +339,7 @@ export default function TestDealsPage() {
                       <td className="py-4 px-4">
                         <div className="text-sm">
                           {deal.irr && <div className="text-white">IRR: {deal.irr}%</div>}
-                          {deal.moic && <div className="text-text-secondary">MOIC: {deal.moic}x</div>}
+                          {deal.moic && <div className="text-muted-foreground">MOIC: {deal.moic}x</div>}
                         </div>
                       </td>
                     </tr>
@@ -362,10 +362,10 @@ export default function TestDealsPage() {
             ) : (
               <CheckCircleIcon className="w-5 h-5 text-success-400" />
             )}
-            <span className="text-sm text-text-secondary">
+            <span className="text-sm text-muted-foreground">
               Test Status: {loading ? "Loading..." : error ? "Error (using fallback)" : "Success"}
             </span>
-            <span className="text-xs text-text-tertiary ml-auto">
+            <span className="text-xs text-muted-foreground/70 ml-auto">
               Mode: {testMode} | Count: {deals.length} deals
             </span>
           </div>
