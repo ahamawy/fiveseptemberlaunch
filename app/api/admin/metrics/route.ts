@@ -7,18 +7,18 @@ export async function GET(_request: NextRequest) {
 
     // Counts
     const [{ count: dealsCount }, { count: investorsCount }, { count: txCount }] = await Promise.all([
-      sb.from("deals.deal").select("deal_id", { count: "exact", head: true }),
+      sb.from("deals_clean").select("deal_id", { count: "exact", head: true }),
       sb
-        .from("investors.investor")
+        .from("investors_clean")
         .select("investor_id", { count: "exact", head: true }),
       sb
-        .from("transactions.transaction.primary")
+        .from("transactions_clean")
         .select("transaction_id", { count: "exact", head: true }),
     ]);
 
     // Capital by deal (simple sense check from transactions)
     const { data: tx } = await sb
-      .from("transactions.transaction.primary")
+      .from("transactions_clean")
       .select("deal_id, net_capital, gross_capital");
 
     const capitalByDeal: Record<string, { gross: number; net: number }> = {};
@@ -66,7 +66,7 @@ export async function GET(_request: NextRequest) {
     let dealsNameMap = new Map<number, { name: string; currency: string | null }>();
     if (dealIds.length > 0) {
       const { data: deals } = await sb
-        .from("deals.deal")
+        .from("deals_clean")
         .select("deal_id, deal_name, deal_currency")
         .in("deal_id", dealIds);
       (deals || []).forEach((d: any) => {

@@ -311,7 +311,7 @@ export class TransactionGenerator {
     const supabase = this.client.getClient();
     
     const { data: deal } = await supabase
-      .from('deals.deal')
+      .from('deals_clean')
       .select('deal_category')
       .eq('deal_id', dealId)
       .single();

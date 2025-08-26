@@ -67,7 +67,7 @@ export class FeeMatchingEngine {
     
     // Build query based on available fields
     let query = this.client
-      .from('transactions.transaction.primary')
+      .from('transactions_clean')
       .select(`
         transaction_id,
         investor_id,
@@ -282,7 +282,7 @@ export class FeeMatchingEngine {
         
         // Update net transfer
         const { data: tx } = await this.client
-          .from('transactions.transaction.primary')
+          .from('transactions_clean')
           .select('gross_capital')
           .eq('transaction_id', match.transaction_id)
           .single();
@@ -293,7 +293,7 @@ export class FeeMatchingEngine {
         
         // Apply update
         const { error } = await this.client
-          .from('transactions.transaction.primary')
+          .from('transactions_clean')
           .update(updateData)
           .eq('transaction_id', match.transaction_id);
         

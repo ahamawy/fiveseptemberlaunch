@@ -25,7 +25,7 @@ export async function GET(
       (investors || []).map(async (inv: any) => {
         // Try to get investor name
         const { data: investorInfo } = await client
-          .from('investors.investor')
+          .from('investors_clean')
           .select('full_name, primary_email')
           .eq('investor_id', inv.investor_id)
           .single();

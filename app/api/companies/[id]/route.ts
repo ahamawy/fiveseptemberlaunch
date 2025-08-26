@@ -9,7 +9,7 @@ export async function GET(
     const id = Number(params.id);
     const sb = getServiceClient();
     const { data, error } = await sb
-      .from("companies.company")
+      .from("companies_clean")
       .select("*")
       .eq("company_id", id)
       .single();
@@ -42,7 +42,7 @@ export async function PUT(
     if (body?.sector) update.company_sector = body.sector;
     const sb = getServiceClient();
     const { data, error } = await sb
-      .from("companies.company")
+      .from("companies_clean")
       .update(update)
       .eq("company_id", id)
       .select("*")
@@ -71,7 +71,7 @@ export async function DELETE(
     const id = Number(params.id);
     const sb = getServiceClient();
     const { error } = await sb
-      .from("companies.company")
+      .from("companies_clean")
       .delete()
       .eq("company_id", id);
     if (error)

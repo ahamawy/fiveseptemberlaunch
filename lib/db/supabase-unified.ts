@@ -450,9 +450,8 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getTransactions(filters?: TransactionFilters): Promise<Transaction[]> {
     try {
-      const tableName = this.useViews
-        ? "transactions.transaction.primary"
-        : "transactions_clean";
+      // Always use clean tables - views are deprecated
+      const tableName = "transactions_clean";
       let query = this.client
         .from(tableName)
         .select("*")
@@ -492,9 +491,8 @@ export class UnifiedSupabaseAdapter implements IDataClient {
 
   async getTransactionById(id: number): Promise<Transaction | null> {
     try {
-      const tableName = this.useViews
-        ? "transactions.transaction.primary"
-        : "transactions_clean";
+      // Always use clean tables - views are deprecated
+      const tableName = "transactions_clean";
       const { data, error } = await this.client
         .from(tableName)
         .select("*")

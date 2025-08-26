@@ -12,9 +12,9 @@ export async function GET(request: NextRequest) {
     const offset = Math.max(0, parseInt(searchParams.get('offset') || '0'));
     const status = searchParams.get('status'); // 'active' | 'exited' | undefined
     
-    // Build query with actual columns from deals.deal table
+    // Build query with actual columns from deals_clean table
     let query = supabase
-      .from('deals.deal')
+      .from('deals_clean')
       .select(`
         deal_id,
         deal_name,
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     const { data, error } = await supabase
-      .from('deals.deal')
+      .from('deals_clean')
       .insert(body)
       .select()
       .single();

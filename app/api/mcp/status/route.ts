@@ -12,8 +12,8 @@ export async function GET() {
       mcpBridge.testDotNamedTables(),
     ]);
 
-    // Get relationships for investors.investor
-    const relationships = await mcpBridge.getTableRelationships('investors.investor');
+    // Get relationships for investors_clean
+    const relationships = await mcpBridge.getTableRelationships('investors_clean');
 
     return NextResponse.json({
       success: true,
@@ -22,7 +22,7 @@ export async function GET() {
       tables: {
         dotNamed: dotTables,
         relationships: {
-          'investors.investor': relationships,
+          'investors_clean': relationships,
         },
       },
       timestamp: new Date().toISOString(),

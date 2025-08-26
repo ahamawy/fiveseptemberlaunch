@@ -33,8 +33,8 @@ export const EnrichmentTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'deal_id', references: 'deals.deal(deal_id)' },
-      { column: 'investor_id', references: 'investors.investor(id)' }
+      { column: 'deal_id', references: 'deals_clean(deal_id)' },
+      { column: 'investor_id', references: 'investors_clean(id)' }
     ]
   },
 
@@ -59,7 +59,7 @@ export const EnrichmentTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'company_id', references: 'companies.company(company_id)' }
+      { column: 'company_id', references: 'companies_clean(company_id)' }
     ]
   },
 
@@ -88,7 +88,7 @@ export const EnrichmentTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'matched_investor_id', references: 'investors.investor(id)' }
+      { column: 'matched_investor_id', references: 'investors_clean(id)' }
     ]
   }
 };

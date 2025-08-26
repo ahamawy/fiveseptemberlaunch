@@ -304,7 +304,7 @@ export class EnhancedFeeService {
           
           // Update transaction with calculated net capital
           await supabase
-            .from('transactions.transaction.primary')
+            .from('transactions_clean')
             .update({
               initial_net_capital: item.gross_capital - item.transferPostDiscount
             })

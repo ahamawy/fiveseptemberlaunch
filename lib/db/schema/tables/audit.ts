@@ -116,8 +116,8 @@ export const AuditTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'company_id', references: 'companies.company(company_id)' },
-      { column: 'investor_id', references: 'investors.investor(id)' },
+      { column: 'company_id', references: 'companies_clean(company_id)' },
+      { column: 'investor_id', references: 'investors_clean(id)' },
       { column: 'id', references: 'auth.users(id)' }
     ]
   }

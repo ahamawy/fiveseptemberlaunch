@@ -50,10 +50,10 @@ async function checkCurrentPolicies(): Promise<PolicyCheck[]> {
     WHERE c.relkind = 'r'
       AND c.relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')
       AND c.relname IN (
-        'investors.investor',
-        'deals.deal',
-        'companies.company',
-        'transactions.transaction.primary',
+        'investors_clean',
+        'deals_clean',
+        'companies_clean',
+        'transactions_clean',
         'transactions.transaction.secondary',
         'documents',
         'investor_analytics',
@@ -138,19 +138,19 @@ async function testRLSPolicies(): Promise<void> {
     {
       name: 'Admin can see all investors',
       role: 'admin',
-      query: 'SELECT COUNT(*) FROM "investors.investor"',
+      query: 'SELECT COUNT(*) FROM "investors_clean"',
       expected: 'Should return all rows',
     },
     {
       name: 'Investor can only see own data',
       role: 'investor',
-      query: 'SELECT * FROM "investors.investor" WHERE id = auth.get_investor_id()',
+      query: 'SELECT * FROM "investors_clean" WHERE id = auth.get_investor_id()',
       expected: 'Should return only own row',
     },
     {
       name: 'Anon cannot see investor data',
       role: 'anon',
-      query: 'SELECT COUNT(*) FROM "investors.investor"',
+      query: 'SELECT COUNT(*) FROM "investors_clean"',
       expected: 'Should return 0 rows',
     },
   ];

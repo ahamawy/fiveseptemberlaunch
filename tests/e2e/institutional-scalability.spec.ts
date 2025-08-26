@@ -117,10 +117,10 @@ test.describe('Institutional Scalability - Database Performance', () => {
   test('Backward compatibility views should work correctly', async ({ request }) => {
     // Test that old dot-notation views still return data
     const oldTableNames = [
-      'deals.deal',
-      'companies.company', 
-      'investors.investor',
-      'transactions.transaction.primary'
+      'deals_clean',
+      'companies_clean', 
+      'investors_clean',
+      'transactions_clean'
     ];
     
     for (const tableName of oldTableNames) {

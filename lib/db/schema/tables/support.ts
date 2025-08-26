@@ -20,8 +20,8 @@ export const SupportTables = {
     },
     primaryKey: 'spv_name',
     foreignKeys: [
-      { column: 'company_id', references: 'companies.company(company_id)' },
-      { column: 'linked_deal_id', references: 'deals.deal(deal_id)' }
+      { column: 'company_id', references: 'companies_clean(company_id)' },
+      { column: 'linked_deal_id', references: 'deals_clean(deal_id)' }
     ]
   },
 
@@ -69,7 +69,7 @@ export const SupportTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'company_id', references: 'companies.company(company_id)' }
+      { column: 'company_id', references: 'companies_clean(company_id)' }
     ],
     constraints: [
       { name: 'asset_type_check', check: "asset_type IN ('logo', 'hero_image', 'gallery', 'screenshot', 'team_photo', 'office_image', 'video', 'document', 'background')" }

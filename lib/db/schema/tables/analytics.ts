@@ -50,7 +50,7 @@ export const AnalyticsTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'investor_id', references: 'investors.investor(id)' }
+      { column: 'investor_id', references: 'investors_clean(id)' }
     ]
   },
 
@@ -106,7 +106,7 @@ export const AnalyticsTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'deal_id', references: 'deals.deal(deal_id)' }
+      { column: 'deal_id', references: 'deals_clean(deal_id)' }
     ]
   },
 
@@ -127,8 +127,8 @@ export const AnalyticsTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'investor_id', references: 'investors.investor(id)' },
-      { column: 'deal_id', references: 'deals.deal(deal_id)' }
+      { column: 'investor_id', references: 'investors_clean(id)' },
+      { column: 'deal_id', references: 'deals_clean(deal_id)' }
     ],
     constraints: [
       { name: 'score_range_check', check: 'score >= 0 AND score <= 100' },
@@ -151,7 +151,7 @@ export const AnalyticsTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'investor_id', references: 'investors.investor(id)' }
+      { column: 'investor_id', references: 'investors_clean(id)' }
     ]
   },
 

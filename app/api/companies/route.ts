@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const sb = getServiceClient();
     const { data, error } = await sb
-      .from("companies.company")
+      .from("companies_clean")
       .select("*")
       .order("company_id");
     if (error)
@@ -18,7 +18,7 @@ export async function GET() {
     let countsMap = new Map<number, number>();
     if (companyIds.length > 0) {
       const { data: deals } = await sb
-        .from("deals.deal")
+        .from("deals_clean")
         .select("underlying_company_id")
         .in("underlying_company_id", companyIds);
       (deals || []).forEach((d: any) => {
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "name is required" }, { status: 400 });
     const sb = getServiceClient();
     const { data, error } = await sb
-      .from("companies.company")
+      .from("companies_clean")
       .insert({
         company_name: name,
         company_type: body?.company_type || "PORTFOLIO",

@@ -307,7 +307,7 @@ async function calculatePreview(client: any, parsedData: any[]): Promise<any> {
     let investorId = row.investor_id;
     if (!investorId && row.investor) {
       const { data } = await client
-        .from('investors.investor')
+        .from('investors_clean')
         .select('investor_id')
         .ilike('full_name', `%${row.investor}%`)
         .limit(1)

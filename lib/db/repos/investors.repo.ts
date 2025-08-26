@@ -113,9 +113,9 @@ export class InvestorsRepo extends BaseRepo {
     }
 
     const dealIds = perDeal.map((d) => d.deal_id).filter(Boolean);
-    // Note: "deals.deal" is a table name in the public schema, not a schema.table reference
+    // Note: "deals_clean" is a table name in the public schema, not a schema.table reference
     const { data: deals } = await this.db
-      .from("deals.deal")
+      .from("deals_clean")
       .select(
         "deal_id, deal_name, deal_type, deal_status, deal_currency, underlying_company_id"
       )
@@ -126,9 +126,9 @@ export class InvestorsRepo extends BaseRepo {
       dealIdToDeal.set(d.deal_id, d);
       if (d.underlying_company_id) companyIds.add(d.underlying_company_id);
     });
-    // Note: "companies.company" is a table name in the public schema
+    // Note: "companies_clean" is a table name in the public schema
     const { data: companies } = await this.db
-      .from("companies.company")
+      .from("companies_clean")
       .select("company_id, company_name, company_sector")
       .in("company_id", Array.from(companyIds));
     const companyIdTo = new Map<

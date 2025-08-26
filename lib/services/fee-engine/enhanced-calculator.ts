@@ -482,7 +482,7 @@ export class EnhancedFeeCalculator {
 
     // Resolve deal_id from transaction for persistence compatibility
     const { data: txMeta, error: txErr } = await supabase
-      .from("transactions.transaction.primary")
+      .from("transactions_clean")
       .select("deal_id")
       .eq("transaction_id", transactionId)
       .single();
@@ -574,7 +574,7 @@ export class EnhancedFeeCalculator {
 
     // Get transaction details
     const { data: transaction, error } = await supabase
-      .from("transactions.transaction.primary")
+      .from("transactions_clean")
       .select("*")
       .eq("transaction_id", transactionId)
       .single();

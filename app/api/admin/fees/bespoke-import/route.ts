@@ -116,7 +116,7 @@ async function calculateFees(
   if (!investorId && row.investor_name) {
     // Try to match investor by name
     const { data } = await client
-      .from('investors.investor')
+      .from('investors_clean')
       .select('investor_id')
       .or(`full_name.ilike.%${row.investor_name}%,primary_email.ilike.%${row.investor_name}%`)
       .limit(1)

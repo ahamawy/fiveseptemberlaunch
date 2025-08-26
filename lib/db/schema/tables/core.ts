@@ -4,8 +4,8 @@
  */
 
 export const CoreTables = {
-  'companies.company': {
-    name: 'companies.company',
+  'companies_clean': {
+    name: 'companies_clean',
     schema: 'public',
     columns: {
       company_id: 'integer NOT NULL DEFAULT nextval(companies_company_id_seq)',
@@ -29,8 +29,8 @@ export const CoreTables = {
     foreignKeys: []
   },
 
-  'deals.deal': {
-    name: 'deals.deal',
+  'deals_clean': {
+    name: 'deals_clean',
     schema: 'public',
     columns: {
       deal_id: 'integer NOT NULL DEFAULT nextval(deals_deal_id_seq)',
@@ -73,13 +73,13 @@ export const CoreTables = {
     },
     primaryKey: 'deal_id',
     foreignKeys: [
-      { column: 'underlying_company_id', references: 'companies.company(company_id)' },
-      { column: 'holding_entity', references: 'companies.company(company_id)' }
+      { column: 'underlying_company_id', references: 'companies_clean(company_id)' },
+      { column: 'holding_entity', references: 'companies_clean(company_id)' }
     ]
   },
 
-  'investors.investor': {
-    name: 'investors.investor',
+  'investors_clean': {
+    name: 'investors_clean',
     schema: 'public',
     columns: {
       id: 'integer NOT NULL DEFAULT nextval(investors_id_seq)',
@@ -176,7 +176,7 @@ export const CoreTables = {
     },
     primaryKey: 'valuation_id',
     foreignKeys: [
-      { column: 'company_id', references: 'companies.company(company_id)' }
+      { column: 'company_id', references: 'companies_clean(company_id)' }
     ]
   }
 };

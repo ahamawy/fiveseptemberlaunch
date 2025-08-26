@@ -27,9 +27,9 @@ test.describe('Data Consistency - Migration Validation', () => {
   test('Backward compatibility views should return same data as clean tables', async ({ request }) => {
     // Compare data between views and clean tables
     const comparisons = [
-      { view: 'deals.deal', table: 'deals_clean', key: 'deal_id' },
-      { view: 'companies.company', table: 'companies_clean', key: 'company_id' },
-      { view: 'investors.investor', table: 'investors_clean', key: 'investor_id' }
+      { view: 'deals_clean', table: 'deals_clean', key: 'deal_id' },
+      { view: 'companies_clean', table: 'companies_clean', key: 'company_id' },
+      { view: 'investors_clean', table: 'investors_clean', key: 'investor_id' }
     ];
     
     for (const comp of comparisons) {
@@ -435,7 +435,7 @@ test.describe('Data Consistency - Deduplication Validation', () => {
     // Query view
     const viewResponse = await request.post('/api/test/query', {
       data: {
-        table: 'transactions.transaction.primary',
+        table: 'transactions_clean',
         ...query
       }
     });

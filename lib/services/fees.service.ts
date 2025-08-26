@@ -55,7 +55,7 @@ export class FeesService extends BaseService {
   async lock(transaction_id: number, locked: boolean){
     const client = this.direct.getClient();
     const { data, error } = await client
-      .from('transactions.transaction.primary')
+      .from('transactions_clean')
       .update({ fee_calc_is_locked: locked, fee_calc_locked_at: locked ? new Date().toISOString() : null })
       .eq('transaction_id', transaction_id)
       .select('*')

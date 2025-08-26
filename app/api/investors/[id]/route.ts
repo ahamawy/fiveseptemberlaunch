@@ -18,7 +18,7 @@ export async function GET(
       if (!isNaN(asNumber)) {
         const sb = getServiceClient();
         const { data: tx } = await sb
-          .from("transactions.transaction.primary")
+          .from("transactions_clean")
           .select("investor_id")
           .eq("investor_id", asNumber)
           .limit(1);

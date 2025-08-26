@@ -14,7 +14,7 @@ async function main() {
 
   // Fetch recent real transactions
   const { data: txs, error: txErr } = await client
-    .from('transactions.transaction.primary')
+    .from('transactions_clean')
     .select('transaction_id, deal_id, unit_price, gross_capital')
     .order('transaction_id', { ascending: false })
     .limit(3);

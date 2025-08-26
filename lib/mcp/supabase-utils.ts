@@ -110,7 +110,7 @@ export class SupabaseMCPClient {
   async analyzePortfolio(investorId: number) {
     const queries = [
       {
-        table: 'investors.investor',
+        table: 'investors_clean',
         operation: 'select' as const,
         filters: { id: investorId },
       },
@@ -388,7 +388,7 @@ export class SupabaseMCPClient {
   async healthCheck() {
     try {
       const { count, error } = await this.client
-        .from('investors.investor')
+        .from('investors_clean')
         .select('*', { count: 'exact', head: true });
 
       return {

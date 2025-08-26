@@ -94,7 +94,7 @@ async function getUserRole(supabase: any, userId: string): Promise<UserRole | nu
     let investorData = null;
     if (profile?.investor_id) {
       const { data: investor } = await supabase
-        .from('investors.investor')
+        .from('investors_clean')
         .select('id, public_id, email')
         .eq('id', profile.investor_id)
         .single();

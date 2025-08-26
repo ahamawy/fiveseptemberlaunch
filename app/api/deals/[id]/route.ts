@@ -11,7 +11,7 @@ export async function GET(
     
     // Get deal details
     const { data: deal, error: dealError } = await sb
-      .from("deals.deal")
+      .from("deals_clean")
       .select("*")
       .eq("deal_id", id)
       .single();
@@ -23,7 +23,7 @@ export async function GET(
     let company = null;
     if (deal.underlying_company_id) {
       const { data: companyData } = await sb
-        .from("companies.company")
+        .from("companies_clean")
         .select("company_id, company_name, company_sector")
         .eq("company_id", deal.underlying_company_id)
         .single();
@@ -101,7 +101,7 @@ export async function PUT(
 
     const sb = getServiceClient();
     const { data, error } = await sb
-      .from("deals.deal")
+      .from("deals_clean")
       .update(update)
       .eq("deal_id", id)
       .select("*")
@@ -130,7 +130,7 @@ export async function DELETE(
     }
     const id = Number(params.id);
     const sb = getServiceClient();
-    const { error } = await sb.from("deals.deal").delete().eq("deal_id", id);
+    const { error } = await sb.from("deals_clean").delete().eq("deal_id", id);
     if (error)
       return NextResponse.json({ error: error.message }, { status: 400 });
     return NextResponse.json({ success: true });

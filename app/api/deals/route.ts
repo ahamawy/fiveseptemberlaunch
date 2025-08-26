@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
     // Server-only read ensures cross-schema access works regardless of anon exposure
     const sb = getServiceClient();
     
-    // Query from deals.deal table (in public schema)
-    let query = sb.from("deals.deal").select("*");
+    // Query from deals_clean table (in public schema)
+    let query = sb.from("deals_clean").select("*");
     if (search) query = query.ilike("deal_name", `%${search}%`);
     if (stage) query = query.eq("deal_status", stage);
     query = query
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     >();
     if (companyIds.length > 0) {
       const { data: companies } = await sb
-        .from("companies.company")
+        .from("companies_clean")
         .select("company_id, company_name, company_description")
         .in("company_id", companyIds);
       (companies || []).forEach((c: any) => {
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
     // Note: deal_type omitted to avoid enum mismatches across environments
 
     const { data, error } = await sb
-      .from("deals.deal")
+      .from("deals_clean")
       .insert(insertPayload)
       .select("*")
       .single();

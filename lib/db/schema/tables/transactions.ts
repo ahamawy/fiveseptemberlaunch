@@ -4,8 +4,8 @@
  */
 
 export const TransactionTables = {
-  'transactions.transaction.primary': {
-    name: 'transactions.transaction.primary',
+  'transactions_clean': {
+    name: 'transactions_clean',
     schema: 'public',
     columns: {
       transaction_id: 'integer NOT NULL DEFAULT nextval(transactions_transaction_id_seq)',
@@ -48,8 +48,8 @@ export const TransactionTables = {
     },
     primaryKey: 'transaction_id',
     foreignKeys: [
-      { column: 'deal_id', references: 'deals.deal(deal_id)' },
-      { column: 'investor_id', references: 'investors.investor(id)' }
+      { column: 'deal_id', references: 'deals_clean(deal_id)' },
+      { column: 'investor_id', references: 'investors_clean(id)' }
     ],
     constraints: [
       { name: 'transaction_status_check', check: "status IN ('pending', 'completed', 'cancelled')" }
@@ -76,10 +76,10 @@ export const TransactionTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'transaction', references: 'transactions.transaction.primary(transaction_id)' },
-      { column: 'buyer_name', references: 'investors.investor(id)' },
-      { column: 'deal_name_link', references: 'deals.deal(deal_id)' },
-      { column: 'seller_name', references: 'investors.investor(id)' },
+      { column: 'transaction', references: 'transactions_clean(transaction_id)' },
+      { column: 'buyer_name', references: 'investors_clean(id)' },
+      { column: 'deal_name_link', references: 'deals_clean(deal_id)' },
+      { column: 'seller_name', references: 'investors_clean(id)' },
       { column: 'subnominee_seller', references: 'transactions.transaction.subnominee(subnominee_id)' }
     ]
   },
@@ -100,8 +100,8 @@ export const TransactionTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'holding_entity', references: 'companies.company(company_id)' },
-      { column: 'deal_link', references: 'deals.deal(deal_id)' }
+      { column: 'holding_entity', references: 'companies_clean(company_id)' },
+      { column: 'deal_link', references: 'deals_clean(deal_id)' }
     ]
   },
 
@@ -121,8 +121,8 @@ export const TransactionTables = {
     },
     primaryKey: 'subnominee_id',
     foreignKeys: [
-      { column: 'transaction', references: 'transactions.transaction.primary(transaction_id)' },
-      { column: 'sub_nominee_investor_link', references: 'investors.investor(id)' }
+      { column: 'transaction', references: 'transactions_clean(transaction_id)' },
+      { column: 'sub_nominee_investor_link', references: 'investors_clean(id)' }
     ]
   },
 
@@ -173,9 +173,9 @@ export const TransactionTables = {
     },
     primaryKey: 'snapshot_id',
     foreignKeys: [
-      { column: 'deal_id', references: 'deals.deal(deal_id)' },
-      { column: 'company_id', references: 'companies.company(company_id)' },
-      { column: 'investor_id', references: 'investors.investor(id)' }
+      { column: 'deal_id', references: 'deals_clean(deal_id)' },
+      { column: 'company_id', references: 'companies_clean(company_id)' },
+      { column: 'investor_id', references: 'investors_clean(id)' }
     ]
   }
 };

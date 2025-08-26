@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       const sb = getServiceClient();
       const term = `%${search}%`;
       const { data: searchRows } = await sb
-        .from("investors.investor")
+        .from("investors_clean")
         .select(
           "investor_id, full_name, primary_email, investor_type, created_at"
         )
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     if (!dataArray || dataArray.length === 0) {
       const sb = getServiceClient();
       const { data: tx } = await sb
-        .from("transactions.transaction.primary")
+        .from("transactions_clean")
         .select("investor_id, deal_id")
         .not("investor_id", "is", null)
         .limit(limit);
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     if (ids.length > 0) {
       const sb = getServiceClient();
       const { data: tx } = await sb
-        .from("transactions.transaction.primary")
+        .from("transactions_clean")
         .select("investor_id, deal_id")
         .in("investor_id", ids);
       const txCount = new Map<number, number>();

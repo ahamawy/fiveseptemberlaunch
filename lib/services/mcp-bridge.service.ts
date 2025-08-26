@@ -334,17 +334,17 @@ class MCPBridgeService {
    * Test dot-named table access
    */
   async testDotNamedTables(): Promise<{
-    'investors.investor': number;
-    'deals.deal': number;
-    'companies.company': number;
-    'transactions.transaction.primary': number;
+    'investors_clean': number;
+    'deals_clean': number;
+    'companies_clean': number;
+    'transactions_clean': number;
     'transactions.transaction.secondary': number;
   }> {
     const tables = [
-      'investors.investor',
-      'deals.deal',
-      'companies.company',
-      'transactions.transaction.primary',
+      'investors_clean',
+      'deals_clean',
+      'companies_clean',
+      'transactions_clean',
       'transactions.transaction.secondary',
     ];
 

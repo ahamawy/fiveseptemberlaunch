@@ -71,9 +71,9 @@ export default function TestRealDataPage() {
     try {
       // Test key tables
       const testTables = [
-        { name: "deals.deal", schema: "deals" },
-        { name: "companies.company", schema: "companies" },
-        { name: "investors.investor", schema: "investors" },
+        { name: "deals_clean", schema: "deals" },
+        { name: "companies_clean", schema: "companies" },
+        { name: "investors_clean", schema: "investors" },
         { name: "transactions", schema: "public" },
         { name: "documents", schema: "public" },
         { name: "deal_valuations", schema: "public" },
@@ -515,7 +515,7 @@ export default function TestRealDataPage() {
               <DocumentMagnifyingGlassIcon className="w-4 h-4 text-info-400 mt-0.5" />
               <div>
                 <p className="text-white font-medium">Table Naming:</p>
-                <p className="text-xs">Dot-named tables like "deals.deal" are in public schema</p>
+                <p className="text-xs">Dot-named tables like "deals_clean" are in public schema</p>
               </div>
             </div>
           </div>

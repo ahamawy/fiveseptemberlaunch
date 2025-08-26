@@ -75,7 +75,7 @@ export class TransactionsService extends BaseService {
 
     const client = this.direct.getClient();
     const { data: transaction, error } = await client
-      .from('transactions.transaction.primary')
+      .from('transactions_clean')
       .insert(payload)
       .select('*')
       .single();

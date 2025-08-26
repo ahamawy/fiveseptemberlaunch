@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
     // Seed companies
     const { data: companies, error: companiesErr } = await sb
-      .from("companies.company")
+      .from("companies_clean")
       .select("company_id")
       .limit(1);
     if (companiesErr) throw companiesErr;
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
         : null;
     if (!companyId) {
       const { data: inserted, error: insertCompanyErr } = await sb
-        .from("companies.company")
+        .from("companies_clean")
         .insert({
           company_name: "Acme Corp",
           company_website: "https://acme.example",
@@ -35,13 +35,13 @@ export async function POST(req: NextRequest) {
 
     // Seed deals
     const { data: deals, error: dealsErr } = await sb
-      .from("deals.deal")
+      .from("deals_clean")
       .select("deal_id")
       .limit(1);
     if (dealsErr) throw dealsErr;
 
     if (!deals || deals.length === 0) {
-      const { error: insertDealErr } = await sb.from("deals.deal").insert({
+      const { error: insertDealErr } = await sb.from("deals_clean").insert({
         deal_name: "Sample Growth Round",
         deal_status: "ACTIVE",
         deal_type: "INVESTMENT",
@@ -54,14 +54,14 @@ export async function POST(req: NextRequest) {
 
     // Seed investors
     const { data: investors, error: investorsErr } = await sb
-      .from("investors.investor")
+      .from("investors_clean")
       .select("investor_id")
       .limit(1);
     if (investorsErr) throw investorsErr;
 
     if (!investors || investors.length === 0) {
       const { error: insertInvestorErr } = await sb
-        .from("investors.investor")
+        .from("investors_clean")
         .insert({
           full_name: "John Doe",
           primary_email: "john.doe@example.com",

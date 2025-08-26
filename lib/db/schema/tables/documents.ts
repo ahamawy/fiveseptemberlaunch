@@ -32,10 +32,10 @@ export const DocumentTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'investor_id', references: 'investors.investor(id)' },
-      { column: 'transaction_id', references: 'transactions.transaction.primary(transaction_id)' },
-      { column: 'company_id', references: 'companies.company(company_id)' },
-      { column: 'deal_id', references: 'deals.deal(deal_id)' }
+      { column: 'investor_id', references: 'investors_clean(id)' },
+      { column: 'transaction_id', references: 'transactions_clean(transaction_id)' },
+      { column: 'company_id', references: 'companies_clean(company_id)' },
+      { column: 'deal_id', references: 'deals_clean(deal_id)' }
     ]
   },
 
@@ -54,7 +54,7 @@ export const DocumentTables = {
     primaryKey: 'id',
     foreignKeys: [
       { column: 'document_id', references: 'documents(id)' },
-      { column: 'transaction_id', references: 'transactions.transaction.primary(transaction_id)' }
+      { column: 'transaction_id', references: 'transactions_clean(transaction_id)' }
     ]
   },
 
@@ -78,10 +78,10 @@ export const DocumentTables = {
     },
     primaryKey: 'id',
     foreignKeys: [
-      { column: 'transaction_id', references: 'transactions.transaction.primary(transaction_id)' },
+      { column: 'transaction_id', references: 'transactions_clean(transaction_id)' },
       { column: 'document_id', references: 'documents(id)' },
-      { column: 'investor_id', references: 'investors.investor(id)' },
-      { column: 'deal_id', references: 'deals.deal(deal_id)' }
+      { column: 'investor_id', references: 'investors_clean(id)' },
+      { column: 'deal_id', references: 'deals_clean(deal_id)' }
     ],
     constraints: [
       { name: 'status_check', check: "status IN ('pending', 'sent', 'signed', 'countersigned', 'completed', 'expired')" }

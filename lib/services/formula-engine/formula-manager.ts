@@ -419,7 +419,7 @@ export class FormulaManager {
     }
 
     // Since we can't access core.deals directly with anon client,
-    // and public.deals.deal doesn't have formula_template_id,
+    // and public.deals_clean doesn't have formula_template_id,
     // we'll rely on the assignments table only
     return null;
   }
