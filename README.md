@@ -4,19 +4,21 @@
 
 ```bash
 npm install
-npm run dev   # http://localhost:3000
+npm run dev   # http://localhost:3001
 ```
 
-If port 3000 is already in use (EADDRINUSE), keep the existing dev server running or free the port before starting a new one.
+**Default port is 3001** to avoid conflicts with Docker and other services. The app automatically configures itself for this port.
 
 ## Key Features
 
 ### Investor Portal
 
-- `/investor-portal/dashboard` - Portfolio metrics
-- `/investor-portal/portfolio` - Holdings
-- `/investor-portal/transactions` - History
-- `/investor-portal/deals` - Opportunities
+- `/investor-portal/dashboard` - Portfolio metrics and performance
+- `/investor-portal/portfolio` - Holdings with real-time valuations
+- `/investor-portal/transactions` - Transaction history
+- `/investor-portal/deals` - Investment opportunities
+- `/investor-portal/documents` - Document management
+- `/investor-portal/profile` - Investor profile settings
 
 ### Admin Tools
 

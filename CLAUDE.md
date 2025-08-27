@@ -3,9 +3,12 @@
 ## Quick Start
 
 ```bash
-npm run dev                    # Start app on http://localhost:3000
-node SCRIPTS/health-check.js  # Verify all endpoints work
+npm run dev                    # Start app on http://localhost:3001
+node SCRIPTS/health-check.js   # Verify all endpoints work
+npm run test:e2e               # Run Playwright tests (uses port 3001)
 ```
+
+**Note:** Default port changed from 3000 to 3001 to avoid Docker conflicts.
 
 ## Supabase Setup
 
@@ -134,7 +137,7 @@ npm test
 npm run test:e2e
 
 # Test formula engine
-open http://localhost:3001/formula-validator
+open http://localhost:3001/admin/formula-validation
 ```
 
 ## Formula Templates
@@ -179,11 +182,29 @@ Deals now use formula templates for fee calculations:
 7. SupabaseAdapter uses `useViews: false` by default for performance
 8. All repos should query clean tables directly
 
+## Testing Configuration
+
+### Playwright E2E Tests
+- Tests run on port 3001 with auth bypass
+- Middleware detects test environment via SKIP_AUTH=true
+- Test config in `playwright.config.ts`
+- Run with: `SKIP_AUTH=true npm run test:e2e`
+
+## Current Status (2025-08-27)
+
+- ✅ All APIs operational
+- ✅ Database connected (Supabase)
+- ✅ Authentication bypass for tests working
+- ✅ Formula engine integrated
+- ✅ 683 total database records
+- ✅ $20.9M portfolio value tracked
+
 ## Need Help?
 
 - Health not passing? Check `.env.local` has all keys
 - Database errors? Verify table names (dots matter!)
 - Import errors? Use `@/` for absolute imports
+- Tests redirecting to login? Ensure SKIP_AUTH=true is set
 
 ---
 *Keep it simple. Ship features. Don't over-engineer.*

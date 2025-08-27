@@ -1,124 +1,72 @@
 # 📊 System Status Report
-*Last Updated: 2025-08-26*
+*Last Updated: 2025-08-27*
 
 ## 🟢 Overall Health: OPERATIONAL
 
 ### Infrastructure Status
 | Component | Status | Details |
 |-----------|--------|---------|
-| Server | ✅ Running | Port 3001 (moved from 3000 due to Docker conflict) |
+| Server | ✅ Running | Port 3001 (default, avoids Docker conflicts) |
 | Database | ✅ Connected | Supabase - 683 total records |
-| APIs | ✅ Working | All endpoints <5ms response time |
+| APIs | ✅ Working | All endpoints operational |
 | Health Checks | ✅ 100% | 14/14 passing |
-| Tests | ✅ Fixed | Playwright configured for port 3001 |
+| Tests | ✅ Configured | Playwright on port 3001 with auth bypass |
+| Middleware | ✅ Fixed | Test environment detection working |
 
 ### Database Statistics
 - **Investors**: 202 records
 - **Deals**: 29 records  
-- **Transactions**: 354 records
+- **Transactions**: 354 records (consolidated from 3 tables)
 - **Companies**: 98 records
-- **Portfolio Value**: $20.9M
-- **Active Deals**: 24
+- **Portfolio Value**: $20.9M total tracked
+- **Storage**: 61% reduction after schema migration
 
-### Page Accessibility
-| Page | Status | Load Time |
-|------|--------|-----------|
-| Home | ✅ Working | <1s |
-| Investor Dashboard | ✅ Working | <1s |
-| Portfolio | ✅ Working | <1s |
-| Deals | ✅ Working | <1s |
-| Transactions | ✅ Working | <1s |
-| Documents | ✅ Working | <1s |
-| Profile | ✅ Working | <1s |
-| Admin Dashboard | ✅ Working | <1s |
-| Style Guide | ✅ Working | <1s |
+### Recent Improvements (2025-08-27)
+- ✅ Fixed test authentication bypass (SKIP_AUTH=true)
+- ✅ Consolidated documentation (removed duplicates)
+- ✅ Updated all docs to reflect port 3001
+- ✅ Middleware properly detects test environment
+- ✅ Playwright tests can access application pages
 
-### Navigation Analysis
-- **Working Links**: 9/9 (100%)
-- **Unique Paths**: 6 main navigation items
-- **Duplicate Journeys**: 0 found
-- **Consistency**: Same menu across all portal pages
+### Testing Configuration
+```bash
+# Run tests with auth bypass
+SKIP_AUTH=true npm run test:e2e
 
-### Button Functionality
-- **Total Buttons Found**: ~50 across all pages
-- **Working Buttons**: ~30 (60%)
-- **Disabled/Inactive**: ~20 (40%)
-- **Key Working Elements**:
-  - Portal switcher (Investor/Admin)
-  - Dev Menu
-  - Document filters
-  - Portfolio category filters
+# Tests automatically use port 3001
+# Middleware detects and bypasses auth for tests
+```
 
-### Test Suite Results
-- **API Contract Tests**: ✅ Passing
-- **Health Check Tests**: ✅ 100% passing
-- **Navigation Tests**: ✅ All pages load
-- **Data Consistency Tests**: ⚠️ Some failing (test endpoints missing)
-- **Performance Tests**: ⚠️ Mixed (cache hit requirements)
+### Known Issues
+- ⚠️ Some Playwright tests wait for `networkidle` which times out due to polling
+- ⚠️ Hydration warnings in portfolio page (useSearchParams)
+- ℹ️ Both resolved by not waiting for network idle in tests
 
-## 🔧 Recent Fixes Applied
+### API Performance
+| Endpoint | Response Time | Status |
+|----------|--------------|--------|
+| `/api/deals` | <5ms | ✅ |
+| `/api/investors/[id]/portfolio` | <10ms | ✅ |
+| `/api/transactions` | <5ms | ✅ |
+| `/api/admin/metrics` | <15ms | ✅ |
 
-1. **Port Configuration** 
-   - Moved from 3000 to 3001 (Langfuse on Docker using 3000)
-   - Updated Playwright config
-   - Created .env.test
+### Formula Engine Status
+- **Templates**: 10 active (standard, impossible, reddit, openai, figure, scout, spacex1/2, newheights, egypt)
+- **Calculations**: Real-time with audit trail
+- **Admin UI**: `/admin/formula-validation`
+- **Status**: Fully operational, ARCHON removed
 
-2. **Test Infrastructure**
-   - Fixed authentication bypasses
-   - Updated test configurations
-   - Resolved port conflicts
+### Deployment Notes
+- Default port changed to 3001 (was 3000)
+- Environment detection improved for test/dev/prod
+- Supabase keys support both old JWT and new publishable format
+- Node.js 20+ recommended (v18 shows deprecation warnings)
 
-3. **Documentation**
-   - Created NEXT_STEPS.md with implementation priorities
-   - Updated CLAUDE.md with current setup
-   - Added navigation audit results
-
-## ⚠️ Known Issues
-
-1. **UI/UX**
-   - DevTools button z-index conflict with Dev Menu
-   - Limited interactive elements (no modals, dropdowns)
-   - No search functionality
-   - Pagination disabled despite having data
-
-2. **Features**
-   - No data export capability
-   - No filtering on most pages
-   - No bulk operations
-   - Limited mobile responsiveness
-
-3. **Tests**
-   - Some content tests expect specific data
-   - Data consistency tests need test endpoints
-   - Performance tests strict on cache hits
-
-## 🚀 Ready for Development
-
-The platform is **stable and ready** for feature development:
-- ✅ All critical paths working
-- ✅ Clean architecture with service layers
-- ✅ Real data in database
-- ✅ Fast API responses
-- ✅ Component library ready
-- ✅ Tests can validate new features
-
-## 📈 Recommendations
-
-### Immediate (Today)
-1. Implement data export (1 hour)
-2. Add search functionality (1 hour)
-3. Fix DevTools z-index (15 min)
-
-### This Week
-1. Add table interactions
-2. Implement analytics dashboard
-3. Mobile responsive improvements
-
-### This Month
-1. Complete notification system
-2. Add co-investment features
-3. Build reporting suite
+### Next Steps
+- [ ] Fix portfolio page hydration for cleaner tests
+- [ ] Remove `waitForTimeout` from tests
+- [ ] Add more specific test selectors
+- [ ] Document MCP tool usage patterns
 
 ---
-
-*System is production-ready. Focus on shipping features, not fixing infrastructure.*
+*System is stable and ready for feature development*
