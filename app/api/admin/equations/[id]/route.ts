@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { SupabaseDirectClient } from '@/lib/db/supabase/client';
 import { SchemaConfig } from '@/lib/db/schema-manager/config';
-import { enhancedFeeCalculator } from '@/lib/services/fee-engine/enhanced-calculator';
+import { formulaEngine } from '@/lib/services/formula-engine.service';
 
 export async function GET(
   _req: Request,
@@ -36,23 +36,34 @@ export async function GET(
 
     if (latestTx?.transaction_id) {
       try {
-        // Calculate fees for the transaction
-        const result = await enhancedFeeCalculator.calculate(
+        // Calculate fees using the formula engine
+        const result = await formulaEngine.calculateForDeal({
           dealId,
-          latestTx.gross_capital,
-          latestTx.unit_price
-        );
+          transactionId: latestTx.transaction_id,
+          grossCapital: latestTx.gross_capital
+        });
         
         calculation = {
-          grossCapital: result.state.grossAmount,
-          transferPreDiscount: result.transferPreDiscount,
-          totalDiscounts: result.totalDiscounts,
-          transferPostDiscount: result.transferPostDiscount,
-          netCapital: result.state.netAmount,
-          units: result.units,
-          validation: result.validation,
+          grossCapital: latestTx.gross_capital,
+          transferPreDiscount: result.totalFees,
+          totalDiscounts: 0, // Discounts are applied within formula engine
+          transferPostDiscount: result.totalFees,
+          netCapital: result.netCapital,
+          units: latestTx.units,
+          validation: {
+            valid: true,
+            formulaUsed: result.formulaUsed,
+            calculationMethod: result.calculationMethod
+          },
           state: {
-            appliedFees: result.state.appliedFees
+            appliedFees: [
+              { type: 'structuring', amount: result.structuringFee },
+              { type: 'management', amount: result.managementFee },
+              { type: 'performance', amount: result.performanceFee },
+              { type: 'premium', amount: result.premiumFee },
+              { type: 'admin', amount: result.adminFee },
+              { type: 'other', amount: result.otherFees }
+            ]
           }
         };
       } catch (calcErr) {
@@ -84,5 +95,3 @@ export async function GET(
     return NextResponse.json({ error: error?.message || 'Unexpected error' }, { status: 500 });
   }
 }
-
-

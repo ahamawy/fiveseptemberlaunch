@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { feeService } from '@/lib/services/fee-engine/fee-service';
-import { transactionGenerator } from '@/lib/services/fee-engine/transaction-generator';
 import { SupabaseDirectClient } from '@/lib/db/supabase/client';
 import { SchemaConfig } from '@/lib/db/schema-manager/config';
+import { formulaEngine } from '@/lib/services/formula-engine.service';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,8 +26,20 @@ export async function POST(request: NextRequest) {
       for (const item of preview) {
         try {
           if (item.transaction_id) {
-            // Update existing transaction
-            await transactionGenerator.updateTransactionFees(item.transaction_id);
+            // Calculate fees using formula engine
+            const feeResult = await formulaEngine.calculateForDeal({
+              dealId: item.deal_id,
+              transactionId: item.transaction_id,
+              grossCapital: item.gross_capital || 0
+            });
+            
+            // Update transaction with calculated net capital
+            await client
+              .from('transactions_clean')
+              .update({ 
+                initial_net_capital: feeResult.netCapital
+              })
+              .eq('transaction_id', item.transaction_id);
             
             // Store fee record
             await client

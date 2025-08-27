@@ -12,8 +12,7 @@ export default defineConfig({
     ],
     exclude: [
       'e2e/**',
-      'FEATURES/**',
-      'lib/services/fee-engine/__tests__/**'
+      'FEATURES/**'
     ],
   },
   resolve: {

@@ -1,76 +1,38 @@
-import 'dotenv/config';
-import { enhancedFeeCalculator } from '@/lib/services/fee-engine/enhanced-calculator';
-import { SupabaseDirectClient } from '@/lib/db/supabase/client';
-import { SchemaConfig } from '@/lib/db/schema-manager/config';
+// This script has been deprecated as fee calculations are now handled by formula-engine.service.ts
+// Use the formula engine directly for fee calculations
 
-async function main() {
-  const config = new SchemaConfig();
-  const node = config.validateNodeVersion();
-  if (!node.ok) {
-    console.warn(`Warning: Node ${node.version} < ${node.required}. Supabase JS prefers Node >= 20.`);
-  }
+import { formulaEngine } from '@/lib/services/formula-engine.service';
 
-  const client = new SupabaseDirectClient(config).getClient();
-
-  // Fetch recent real transactions
-  const { data: txs, error: txErr } = await client
-    .from('transactions_clean')
-    .select('transaction_id, deal_id, unit_price, gross_capital')
-    .order('transaction_id', { ascending: false })
-    .limit(3);
-
-  if (txErr) throw txErr;
-  if (!txs || txs.length === 0) {
-    console.log('No transactions found');
-    return;
-  }
-
-  console.log(`Found ${txs.length} recent transactions.`);
-
-  for (const tx of txs) {
-    const txId = (tx as any).transaction_id as number;
-    const dealId = (tx as any).deal_id as number;
-    const unitPrice = parseFloat((tx as any).unit_price);
-    const grossCapital = parseFloat((tx as any).gross_capital);
-
-    console.log(`\n=== Transaction ${txId} (deal ${dealId}) ===`);
-    console.log(`Gross: ${grossCapital}, Unit Price: ${unitPrice}`);
-
-    try {
-      // Calculate from transaction context
-      const calc = await enhancedFeeCalculator.calculateForTransaction(txId);
-      console.log('Calculated:', {
-        pre: calc.transferPreDiscount,
-        discounts: calc.totalDiscounts,
-        post: calc.transferPostDiscount,
-        units: calc.units,
-        valid: calc.validation.valid
-      });
-
-      // Persist fee application records
-      await enhancedFeeCalculator.persistCalculation(txId, calc);
-      console.log('Persisted fee application records.');
-
-      // Verify stored rows
-      const { data: stored, error: storeErr } = await client
-        .from('fee_application_record')
-        .select('component, amount, percent, notes')
-        .eq('transaction_id', txId);
-
-      if (storeErr) throw storeErr;
-      console.log(`Stored ${stored?.length || 0} fee_application_record rows.`);
-      if (stored && stored.length > 0) {
-        console.log(stored.map((r: any) => ({ component: r.component, amount: r.amount, percent: r.percent })).slice(0, 5));
-      }
-    } catch (err: any) {
-      console.error('Error processing transaction', txId, err?.message || err);
-    }
+async function testFeeCalculations() {
+  console.log('Testing fee calculations with formula engine...');
+  
+  try {
+    // Test calculation for deal 1
+    const result = await formulaEngine.calculateForDeal({
+      dealId: 1,
+      grossCapital: 1000000
+    });
+    
+    console.log('Calculation result:', result);
+    console.log('Net Capital:', result.netCapital);
+    console.log('Total Fees:', result.totalFees);
+    console.log('Formula Used:', result.formulaUsed);
+    
+    // Validate all transactions for the deal
+    const validation = await formulaEngine.validateDealTransactions(1);
+    console.log('Validation results:', validation);
+    
+  } catch (error) {
+    console.error('Error testing fees:', error);
   }
 }
 
-main().catch(err => {
-  console.error('Fatal error:', err?.message || err);
-  process.exit(1);
-});
-
-
+// Run if called directly
+if (require.main === module) {
+  testFeeCalculations()
+    .then(() => process.exit(0))
+    .catch(error => {
+      console.error(error);
+      process.exit(1);
+    });
+}

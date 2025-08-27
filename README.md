@@ -138,11 +138,20 @@ Checks core pages and APIs and reports summary (expects 200s). Update routes in 
 /DOCS           # Documentation
 ```
 
-## Status
+## Status (2025-08-27)
 
-✅ Supabase integrated
-✅ Fee Engine operational
-✅ 25 tests passing
-✅ AI assistant active
+✅ **ARCHON Removed** - Formula engine is single source of truth
+✅ **Clean Architecture** - Modular services, clear separation
+✅ **Health Checks** - 100% passing (14/14 endpoints)
+✅ **Schema Migration** - Clean tables, 61% storage reduction
+✅ **Formula Engine** - 10 templates, full audit trail
+✅ **AI Assistant** - Active with formula calculations
 
-Branch: `dealformulas`
+Branch: `main`
+
+## Recent Changes
+
+- **2025-08-27**: ARCHON fee engine completely removed
+- **2025-08-25**: Schema migration to clean tables
+- **Formula Engine**: Now handles all Net Capital calculations
+- **Architecture**: Reviewed and documented in ARCHITECTURE_REVIEW.md

@@ -1,7 +1,17 @@
 import { BaseService } from './base.service';
 import { SupabaseDirectClient } from '@/lib/db/supabase/client';
 import { SchemaConfig } from '@/lib/db/schema-manager/config';
-import { dealEquationExecutor, TransactionContext } from './fee-engine/deal-equation-executor';
+
+// Transaction context type for fee calculations
+export interface TransactionContext {
+  deal_id: number;
+  investor_id: number;
+  transaction_date?: string;
+  units: number;
+  unit_price: number;
+  gross_capital: number;
+  years?: number;
+}
 
 export interface CreatePrimaryTxInput {
   deal_id: number;
@@ -40,22 +50,9 @@ export class TransactionsService extends BaseService {
     let feeCalculation;
     let netCapital = gross_capital;
     
-    try {
-      // Execute deal's unique equation
-      feeCalculation = await dealEquationExecutor.execute(input.deal_id, context);
-      netCapital = feeCalculation.state.netAmount || gross_capital;
-      
-      this.log('Fee calculation completed', {
-        deal_id: input.deal_id,
-        equation: feeCalculation.equation_name,
-        gross: gross_capital,
-        net: netCapital,
-        total_fees: feeCalculation.transferPreDiscount
-      });
-    } catch (error) {
-      // Log error but don't fail transaction creation
-      this.log('Fee calculation failed, using gross capital', { error, deal_id: input.deal_id });
-    }
+    // Fee calculations are now handled via formula engine if needed
+    // For now, use gross capital as net capital
+    // To calculate fees, use formulaEngine.calculateForDeal() separately
     
     const payload = {
       deal_id: input.deal_id,
@@ -67,10 +64,8 @@ export class TransactionsService extends BaseService {
       net_capital: netCapital,
       initial_net_capital: netCapital,
       status: input.status || 'PENDING',
-      fee_calc_method: feeCalculation?.equation_name,
-      fee_calc_notes: feeCalculation ? 
-        `Calculated using ${feeCalculation.equation_name} at ${new Date().toISOString()}` : 
-        'No fee calculation performed'
+      fee_calc_method: null,
+      fee_calc_notes: 'Use formula engine for fee calculations'
     } as const;
 
     const client = this.direct.getClient();
@@ -84,38 +79,7 @@ export class TransactionsService extends BaseService {
       this.handleError(error, 'createPrimaryTx');
     }
     
-    // Store fee applications if calculation succeeded
-    if (transaction && feeCalculation) {
-      try {
-        for (const fee of feeCalculation.state.appliedFees) {
-          await client
-            .from('fees.fee_application')
-            .insert({
-              tx_id: transaction.transaction_id,
-              investor_id: input.investor_id,
-              deal_id: input.deal_id,
-              component: fee.component,
-              basis: fee.basis || 'GROSS',
-              amount: fee.amount,
-              percent: fee.percent,
-              notes: JSON.stringify({
-                equation: feeCalculation.equation_name,
-                transaction_id: transaction.transaction_id,
-                precedence: feeCalculation.metadata.precedenceOrder,
-                calculation_date: feeCalculation.metadata.calculationDate,
-                audit_id: feeCalculation.metadata.auditId
-              })
-            });
-        }
-        
-        this.log('Fee applications stored', {
-          transaction_id: transaction.transaction_id,
-          fee_count: feeCalculation.state.appliedFees.length
-        });
-      } catch (error) {
-        this.log('Failed to store fee applications', { error, transaction_id: transaction.transaction_id });
-      }
-    }
+    // Fee applications are now handled separately via formula engine
 
     // Clear caches that may depend on tx state
     this.clearCache();

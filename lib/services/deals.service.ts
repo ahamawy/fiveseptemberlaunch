@@ -4,11 +4,6 @@
  */
 
 import { BaseService } from "./base.service";
-import {
-  dealEquationExecutor,
-  DealEquation,
-  DealEquationExecutor,
-} from "./fee-engine/deal-equation-executor";
 import type {
   Deal,
   Company,
@@ -327,29 +322,10 @@ export class DealsService extends BaseService {
         slug: this.generateSlug(input.name),
       });
 
-      // Attach fee equation based on deal type
-      const equationName =
-        input.fee_structure_type || this.getDefaultEquationType(input.type);
-      const templates = DealEquationExecutor.getEquationTemplates();
-      const template =
-        templates[equationName] || templates["STANDARD_PRIMARY_V1"];
-
-      const equation: DealEquation = {
+      // Formula template is set on the deal directly in deals_clean table
+      this.log("Deal created", {
         deal_id: deal.id,
-        equation_name: equationName,
-        rules: template.rules || {},
-        metadata: {
-          party_type: "investor",
-          effective_date: new Date(),
-        },
-      };
-
-      // Save equation configuration
-      await dealEquationExecutor.saveEquation(equation);
-
-      this.log("Deal created with equation", {
-        deal_id: deal.id,
-        equation: equationName,
+        formula_template: "standard", // Default template
       });
 
       // Clear cache
@@ -366,31 +342,23 @@ export class DealsService extends BaseService {
    */
   async updateDealEquation(dealId: number, equationType: string) {
     try {
-      const templates = DealEquationExecutor.getEquationTemplates();
-      const template = templates[equationType];
+      // Update formula_template field in deals_clean table
+      const { error } = await this.dataClient.supabase
+        .from("deals_clean")
+        .update({ formula_template: equationType })
+        .eq("deal_id", dealId);
 
-      if (!template) {
-        throw new Error(`Unknown equation type: ${equationType}`);
-      }
+      if (error) throw error;
 
-      const equation: DealEquation = {
+      this.log("Deal formula template updated", {
         deal_id: dealId,
-        equation_name: equationType,
-        rules: template.rules || {},
-        metadata: {
-          party_type: "investor",
-          effective_date: new Date(),
-        },
-      };
-
-      await dealEquationExecutor.saveEquation(equation);
-
-      this.log("Deal equation updated", {
-        deal_id: dealId,
-        equation: equationType,
+        formula_template: equationType,
       });
 
-      return equation;
+      // Clear cache
+      this.clearCache();
+
+      return { deal_id: dealId, formula_template: equationType };
     } catch (error) {
       this.handleError(error, "updateDealEquation");
     }

@@ -36,7 +36,6 @@
     "tests/**/*",
     "**/__tests__/**/*",
     "test-*.ts",
-    "lib/services/fee-engine/__tests__/**/*",
     "app/api/admin/**/*",
     "app/api/debug/**/*",
     "lib/services/formula-engine/**/*",
