@@ -1,6 +1,9 @@
 /**
  * Base Service Class
  * Provides common functionality for all service classes
+ * 
+ * CRITICAL: All data operations MUST go through Supabase
+ * Supabase is the SINGLE SOURCE OF TRUTH
  */
 
 import { getDataClient, simulateDelay } from '../db/client';

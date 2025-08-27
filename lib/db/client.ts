@@ -1,6 +1,9 @@
 /**
  * Database Client Abstraction
- * Switches between mock data and Supabase based on environment configuration
+ * 
+ * CRITICAL: Supabase is the SINGLE SOURCE OF TRUTH
+ * Mock data should NEVER be used in production
+ * All data operations MUST go through Supabase
  */
 
 import { MockAdapter } from "./mock-adapter";
@@ -109,21 +112,38 @@ class DataClientFactory {
   private static supabaseInstance: IDataClient | null = null;
 
   static getClient(): IDataClient {
-    // Always check at runtime
-    const useMockData = checkUseMockData();
+    // PRODUCTION: Always use Supabase as the source of truth
     const supabaseEnabled = checkSupabaseEnabled();
+    
+    // In production, ALWAYS use Supabase
+    if (process.env.NODE_ENV === 'production') {
+      if (!supabaseEnabled) {
+        throw new Error('CRITICAL: Supabase not configured in production. Supabase is the ONLY source of truth.');
+      }
+      if (!this.supabaseInstance) {
+        console.log("🚀 Creating Supabase Adapter (PRODUCTION - Source of Truth)");
+        this.supabaseInstance = new UnifiedSupabaseAdapter({ useViews: false });
+      }
+      return this.supabaseInstance;
+    }
 
-    // Use mock if explicitly set or if Supabase isn't configured
-    if (useMockData || !supabaseEnabled) {
+    // Development only: Allow mock data for testing
+    const useMockData = checkUseMockData();
+    
+    // Use mock ONLY in development and if explicitly set
+    if (useMockData && process.env.NODE_ENV === 'development') {
       if (!this.mockInstance) {
-        console.log("🔧 Creating Mock Data Adapter");
+        console.warn("⚠️ Using Mock Data Adapter (DEVELOPMENT ONLY - Not for production)");
         this.mockInstance = new MockAdapter();
       }
       return this.mockInstance;
     } else {
+      if (!supabaseEnabled) {
+        throw new Error('Supabase not configured. Set NEXT_PUBLIC_SUPABASE_URL and keys.');
+      }
       if (!this.supabaseInstance) {
-        console.log("🚀 Creating Supabase Adapter");
-        this.supabaseInstance = new UnifiedSupabaseAdapter({ useViews: true });
+        console.log("🚀 Creating Supabase Adapter (Source of Truth)");
+        this.supabaseInstance = new UnifiedSupabaseAdapter({ useViews: false });
       }
       return this.supabaseInstance;
     }

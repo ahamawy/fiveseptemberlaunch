@@ -1,5 +1,9 @@
 # Equitie Investor Portal
 
+## 🎯 SUPABASE IS THE SINGLE SOURCE OF TRUTH
+
+All data operations MUST go through Supabase. No mock data in production.
+
 ## Quick Start
 
 ```bash
@@ -31,10 +35,12 @@ npm run dev   # http://localhost:3001
 
 ```env
 # .env.local
+# REQUIRED: Supabase is the ONLY source of truth
 NEXT_PUBLIC_SUPABASE_URL=your-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
 # New API key format (2025+) - both formats supported
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_xxx
+# CRITICAL: Must be false in production - Supabase only!
 NEXT_PUBLIC_USE_MOCK_DATA=false
 OPENROUTER_API_KEY=your-key
 # Database connection (for migrations/scripts)

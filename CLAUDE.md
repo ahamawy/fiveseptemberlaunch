@@ -10,10 +10,15 @@ npm run test:e2e               # Run Playwright tests (uses port 3001)
 
 **Note:** Default port changed from 3000 to 3001 to avoid Docker conflicts.
 
-## Supabase Setup
+## 🎯 SUPABASE: THE SINGLE SOURCE OF TRUTH
 
+**CRITICAL**: Supabase is the ONLY authoritative data source. All data operations MUST go through Supabase.
+
+### Primary Configuration
 **Project ID**: `ikezqzljrupkzmyytgok`  
-**URL**: `https://ikezqzljrupkzmyytgok.supabase.co`
+**URL**: `https://ikezqzljrupkzmyytgok.supabase.co`  
+**Status**: PRODUCTION - PRIMARY DATA SOURCE  
+**Mock Data**: DISABLED - Never use mock data in production
 
 ### Required Environment Variables (.env.local)
 ```env
@@ -43,9 +48,9 @@ mcp__supabase__get_logs({
 })
 ```
 
-## Database Structure (UPDATED - Clean Schema with Formula Engine)
+## Database Structure (Supabase Production Schema)
 
-### Main Tables - Single Source of Truth
+### SUPABASE TABLES - THE ONLY SOURCE OF TRUTH
 - `transactions_clean` - ALL transactions (primary, secondary, advisory, subnominee)
 - `deals_clean` - ALL deals with formula templates
 - `companies_clean` - ALL companies
@@ -85,9 +90,9 @@ The old dot-notation names still work as views:
 - `companies.company` → Points to `companies_clean`
 - `transactions.transaction.primary` → Points to `transactions_clean` (primary type only)
 
-### How to Query
+### How to Query - ALWAYS USE SUPABASE
 ```typescript
-// RECOMMENDED: Use clean tables directly
+// MANDATORY: All queries MUST go through Supabase
 import { getServiceClient } from "@/lib/db/supabase/server-client";
 const sb = getServiceClient();
 const { data } = await sb.from("deals_clean").select("*");
@@ -173,14 +178,16 @@ Deals now use formula templates for fee calculations:
 
 ## Important Rules
 
-1. NO emoji in code files
-2. Use clean table names for new code (`transactions_clean`, `deals_clean`, etc.)
-3. Old dot-notation names work via views for backward compatibility
-4. Always handle errors properly
-5. Use TypeScript types from `/lib/types`
-6. Single source of truth: Each ID comes from ONE table only
-7. SupabaseAdapter uses `useViews: false` by default for performance
-8. All repos should query clean tables directly
+1. **SUPABASE IS THE ONLY SOURCE OF TRUTH** - No exceptions
+2. NO emoji in code files
+3. Use clean table names for new code (`transactions_clean`, `deals_clean`, etc.)
+4. Old dot-notation names work via views for backward compatibility
+5. Always handle errors properly
+6. Use TypeScript types from `/lib/types`
+7. Single source of truth: Supabase tables only
+8. SupabaseAdapter uses `useViews: false` by default for performance
+9. All repos MUST query Supabase directly - no mock data
+10. Service layer MUST use Supabase client, never mock adapter
 
 ## Testing Configuration
 
@@ -192,12 +199,13 @@ Deals now use formula templates for fee calculations:
 
 ## Current Status (2025-08-27)
 
-- ✅ All APIs operational
-- ✅ Database connected (Supabase)
+- ✅ All APIs operational (Supabase-powered)
+- ✅ Supabase as single source of truth
 - ✅ Authentication bypass for tests working
-- ✅ Formula engine integrated
-- ✅ 683 total database records
-- ✅ $20.9M portfolio value tracked
+- ✅ Formula engine integrated with Supabase
+- ✅ 683 total records in Supabase
+- ✅ $20.9M portfolio value in Supabase
+- ✅ Mock data DISABLED - Production only
 
 ## Need Help?
 
