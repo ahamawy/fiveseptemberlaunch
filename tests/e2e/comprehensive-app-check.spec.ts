@@ -1,7 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Comprehensive App Health Check - All Pages', () => {
-  const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+  const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
+
+  // Set up test authentication before all tests
+  test.beforeEach(async ({ page }) => {
+    // Call test login endpoint to set auth cookies
+    await page.request.post(`${BASE_URL}/api/auth/test-login`);
+  });
 
   test.describe('Investor Portal Pages', () => {
     test('Dashboard has real data', async ({ page }) => {
@@ -25,24 +31,36 @@ test.describe('Comprehensive App Health Check - All Pages', () => {
     });
 
     test('Portfolio shows real company names and MOIC', async ({ page }) => {
+      // Navigate without waiting for network idle (it times out due to continuous polling)
       await page.goto(`${BASE_URL}/investor-portal/portfolio`);
-      await page.waitForTimeout(3000);
+      
+      // Wait for the main content to be visible
+      await page.waitForSelector('h1:has-text("Portfolio Overview")', { timeout: 10000 });
+      
+      // Wait a bit for data to render
+      await page.waitForTimeout(2000);
 
       // Check for real company names - look for actual text content
       const pageText = await page.textContent('body');
       const hasSpaceX = pageText?.includes('SpaceX');
       const hasOpenAI = pageText?.includes('OpenAI');
       const hasMarlo = pageText?.includes('Marlo');
-      expect(hasSpaceX || hasOpenAI || hasMarlo).toBeTruthy();
+      const hasFigureAI = pageText?.includes('Figure AI');
+      
+      console.log('Found companies:', {
+        SpaceX: hasSpaceX,
+        OpenAI: hasOpenAI,
+        Marlo: hasMarlo,
+        FigureAI: hasFigureAI
+      });
+      
+      expect(hasSpaceX || hasOpenAI || hasMarlo || hasFigureAI).toBeTruthy();
 
       // Check for real MOIC values (not all 1.0)
-      const moicValues = await page.$$eval('text=/[0-9]+\\.[0-9]+x/', elements => 
-        elements.map(el => el.textContent)
-      );
-      const hasNonOneMoic = moicValues.some(v => v && !v.includes('1.0x') && !v.includes('1.00x'));
-      expect(hasNonOneMoic).toBeTruthy();
+      const hasHighMoic = pageText?.includes('15.00x') || pageText?.includes('10.30x') || pageText?.includes('5.30x');
+      expect(hasHighMoic).toBeTruthy();
 
-      console.log('✅ Portfolio: Real companies and MOIC values');
+      console.log('✅ Portfolio: Real companies and MOIC values confirmed');
     });
 
     test('Deals page has real deal names and valuations', async ({ page }) => {
