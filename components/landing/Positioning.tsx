@@ -3,7 +3,7 @@ import { motion, useInView } from "framer-motion";
 import ix from "@/config/interactions.json";
 import strings from "@/content/strings.en.json";
 import home from "@/content/homepage.json";
-import { BRAND_CONFIG } from "@/BRANDING/brand.config";
+import { BRAND_CONFIG } from "@/lib/config/brand.config";
 import { V, cx } from "@/lib/motion/motion";
 import { useRef } from "react";
 

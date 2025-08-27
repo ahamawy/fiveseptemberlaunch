@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import ix from "@/config/interactions.json";
 import strings from "@/content/strings.en.json";
 import home from "@/content/homepage.json";
-import { BRAND_CONFIG } from "@/BRANDING/brand.config";
+import { BRAND_CONFIG } from "@/lib/config/brand.config";
 import { cx } from "@/lib/motion/motion";
 
 export default function ConvictionLibrary() {

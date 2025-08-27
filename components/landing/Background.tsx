@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import motionCfg from "@/config/motion.json";
-import { BRAND_CONFIG } from "@/BRANDING/brand.config";
+import { BRAND_CONFIG } from "@/lib/config/brand.config";
 
 export default function Background() {
   const glow = (motionCfg as any)?.variants?.glowFollow || { enabled: false };

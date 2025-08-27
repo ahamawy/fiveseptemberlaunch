@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
@@ -14,6 +14,7 @@ import { NivoPie } from "@/components/ui/NivoCharts";
 import { MotionSection } from "@/components/ui/Motion";
 import { resolveInvestorId as resolveId } from "@/lib/utils/investor";
 import { ExportButton } from "@/components/ui/ExportButton";
+import { useSearchParams } from "next/navigation";
 
 interface DealPerformance {
   dealId: number;
@@ -66,18 +67,15 @@ interface PortfolioData {
   }>;
 }
 
-export default function PortfolioPage() {
+function PortfolioContent() {
   const [data, setData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedView, setSelectedView] = useState<"table" | "cards">("table");
   const [filterSector, setFilterSector] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
 
-  const searchParams =
-    typeof window !== "undefined"
-      ? new URLSearchParams(window.location.search)
-      : null;
-  const investorParam = searchParams?.get("investor") || null;
+  const searchParams = useSearchParams();
+  const investorParam = searchParams.get("investor");
   const resolveInvestorId = () => resolveId(investorParam);
 
   useEffect(() => {
@@ -673,5 +671,22 @@ export default function PortfolioPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PortfolioPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-12 h-12 border-4 border-primary-300 border-t-transparent rounded-full animate-spin" />
+            <div className="text-muted-foreground">Loading...</div>
+          </div>
+        </div>
+      }
+    >
+      <PortfolioContent />
+    </Suspense>
   );
 }

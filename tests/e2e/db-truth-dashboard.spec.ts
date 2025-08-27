@@ -18,8 +18,12 @@ test.describe("DB truth on dashboard", () => {
     await page.goto(`/investor-portal/dashboard?investor=${INVESTOR_ID}`);
     const kpi = page.getByTestId("kpi-total-portfolio-value");
     await expect(kpi).toBeVisible({ timeout: 15000 });
-    const text = await kpi.innerText();
-    const uiValue = parseCurrency(text);
+    
+    // Get just the currency value from the HeroKPICard - it's in a text-5xl div
+    const valueElement = kpi.locator('.text-5xl').first();
+    await expect(valueElement).toBeVisible();
+    const valueText = await valueElement.innerText();
+    const uiValue = parseCurrency(valueText);
 
     // Allow small rounding differences (±1%)
     const tolerance = Math.max(1, Math.round(apiValue * 0.01));

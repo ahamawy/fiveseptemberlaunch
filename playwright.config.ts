@@ -16,6 +16,11 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    extraHTTPHeaders: {
+      'x-playwright-test': 'true',
+      'x-skip-auth': 'true',
+      'x-investor-id': '1',
+    },
   },
   projects: [
     {
@@ -24,11 +29,16 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev -- -p 3001',
+    command: 'SKIP_AUTH=true PLAYWRIGHT_TEST=true npm run dev -- -p 3001',
     port: 3001,
     reuseExistingServer: true,
     timeout: 120 * 1000,
     stdout: 'pipe',
     stderr: 'pipe',
+    env: {
+      ...process.env,
+      SKIP_AUTH: 'true',
+      PLAYWRIGHT_TEST: 'true',
+    },
   },
 });

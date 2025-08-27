@@ -4,7 +4,7 @@ import ix from "@/config/interactions.json";
 import strings from "@/content/strings.en.json";
 import home from "@/content/homepage.json";
 import Link from "next/link";
-import { BRAND_CONFIG, COMPONENT_STYLES } from "@/BRANDING/brand.config";
+import { BRAND_CONFIG, COMPONENT_STYLES } from "@/lib/config/brand.config";
 import { V, micro, cx } from "@/lib/motion/motion";
 
 export default function CTA() {

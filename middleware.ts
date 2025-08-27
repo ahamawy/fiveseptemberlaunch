@@ -1,3 +1,19 @@
+/**
+ * Next.js Middleware
+ * 
+ * Handles authentication and route protection for the application.
+ * 
+ * Authentication Bypass:
+ * - Test environment: SKIP_AUTH=true environment variable
+ * - Port 3001: Automatically detected as test port
+ * - Playwright tests: Detected via headers
+ * 
+ * Route Protection:
+ * - Development-only routes blocked in production
+ * - Admin routes require admin role
+ * - Investor portal requires authentication
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { portalAuthMiddleware } from '@/lib/middleware/portal-auth';
 
@@ -17,8 +33,8 @@ const DEV_ONLY_ROUTES = [
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // SKIP_AUTH environment variable is the ULTIMATE override
-  // This should ALWAYS work for tests
+  // PRIMARY AUTH BYPASS: Environment variable for tests
+  // When SKIP_AUTH=true, bypass all authentication checks
   if (process.env.SKIP_AUTH === 'true') {
     console.log('[Middleware] SKIP_AUTH=true - bypassing ALL authentication');
     const response = NextResponse.next();
@@ -28,11 +44,12 @@ export async function middleware(request: NextRequest) {
     return response;
   }
   
-  // Check host header for port 3001 (test port)
+  // SECONDARY AUTH BYPASS: Detect test environment via multiple methods
+  // Port 3001 is the default test port
   const hostHeader = request.headers.get('host') || '';
   const isPort3001 = hostHeader.includes(':3001');
   
-  // Check for test headers
+  // Playwright sends these headers for test detection
   const isPlaywrightHeader = request.headers.get('x-playwright-test') === 'true';
   const isSkipAuthHeader = request.headers.get('x-skip-auth') === 'true';
   
@@ -70,7 +87,7 @@ export async function middleware(request: NextRequest) {
   
   // REMOVED: Duplicate Playwright detection (already handled above)
   
-  // Block development routes in production
+  // PRODUCTION SAFETY: Block test/development routes in production
   if (process.env.NODE_ENV === 'production') {
     const isDevRoute = DEV_ONLY_ROUTES.some(route => 
       pathname === route || pathname.startsWith(`${route}/`)
@@ -82,7 +99,7 @@ export async function middleware(request: NextRequest) {
     }
   }
   
-  // Development mode: bypass auth for all routes
+  // DEVELOPMENT MODE: Bypass auth for easier development
   const isDevelopment = process.env.NODE_ENV !== 'production';
   
   if (isDevelopment) {
@@ -100,7 +117,7 @@ export async function middleware(request: NextRequest) {
     return response;
   }
   
-  // Production: use full auth with security headers
+  // PRODUCTION MODE: Full authentication with Supabase
   const authResponse = await portalAuthMiddleware(request);
   
   // Add institutional-grade security headers

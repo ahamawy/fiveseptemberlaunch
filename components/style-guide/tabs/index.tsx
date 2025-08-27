@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input, Textarea, Select } from '@/components/ui/Input';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
-import { COLORS, GRADIENTS, SHADOWS, COMPONENT_STYLES } from '@/BRANDING/brand.config';
+import { COLORS, GRADIENTS, SHADOWS, COMPONENT_STYLES } from '@/lib/config/brand.config';
 
 // Enhanced demo colors with brand tokens
 const demoColors = {

@@ -3,7 +3,7 @@ import { motion, useMotionValue, useTransform } from "framer-motion";
 import ix from "@/config/interactions.json";
 import strings from "@/content/strings.en.json";
 import home from "@/content/homepage.json";
-import { BRAND_CONFIG, COMPONENT_STYLES } from "@/BRANDING/brand.config";
+import { BRAND_CONFIG, COMPONENT_STYLES } from "@/lib/config/brand.config";
 import { V, micro, cx } from "@/lib/motion/motion";
 import Link from "next/link";
 import { useEffect } from "react";

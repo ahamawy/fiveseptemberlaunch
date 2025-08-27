@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { COMPONENT_STYLES } from "@/BRANDING/brand.config";
+import { COMPONENT_STYLES } from "@/lib/config/brand.config";
 import { motion } from "framer-motion";
 import { micro } from "@/lib/motion/motion";
 

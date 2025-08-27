@@ -2,7 +2,7 @@
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import ix from "@/config/interactions.json";
 import home from "@/content/homepage.json";
-import { BRAND_CONFIG, COMPONENT_STYLES } from "@/BRANDING/brand.config";
+import { BRAND_CONFIG, COMPONENT_STYLES } from "@/lib/config/brand.config";
 import { V, formatNumber, cx, micro } from "@/lib/motion/motion";
 
 export default function Stats() {
