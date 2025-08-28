@@ -3,10 +3,12 @@
 This addendum maps variables and template logic from the Formula Engine to the clean tables and new fields added on 2024-11-26. It also lists invariants and audit requirements.
 
 ## Tables
-- `deals_clean` (per-deal config)
-- `transactions_clean` (per-transaction amounts and results)
-- `formula_templates` (canonical template definitions)
-- `formula_calculation_log` (audit trail)
+- `public.deals_clean` (per-deal config)
+- `public.transactions_clean` (per-transaction amounts and results)
+- `public.formula_templates` (canonical template definitions)
+- `public.formula_calculation_log` (optional audit trail)
+- `portfolio.deal_company_positions` (deal↔company many-to-many; net capital at position level)
+- `audit.investment_entries`, `audit.net_capital_entries` (NC audits)
 
 ## New Fields (recap)
 - `deals_clean.nc_calculation_method` (enum)
@@ -17,7 +19,9 @@ This addendum maps variables and template logic from the Formula Engine to the c
 - `deals_clean.management_fee_tier_2_percent`
 - `deals_clean.tier_1_period`
 - `deals_clean.other_fees_allowed` (boolean)
+- `deals_clean.uses_net_capital_input` (boolean)
 - `transactions_clean.other_fees`, `transactions_clean.other_fees_description`
+- `transactions_clean.net_capital_actual`, `transactions_clean.is_net_capital_provided`, `transactions_clean.calculation_audit_id`
 
 ## Variable-to-Field Mapping
 - GC: `transactions_clean.gross_capital`
@@ -44,7 +48,7 @@ This addendum maps variables and template logic from the Formula Engine to the c
 - Partner fees prefixed `PARTNER_` and validated sum with EquiTie fees ≤ policy caps
 
 ## Audit Trail
-Log to `formula_calculation_log` with:
+Log to `public.formula_calculation_log` (optional) with:
 - `input_variables`: GC, rates, discounts, prices, T
 - `calculation_steps`: ordered fee applications with amounts
 - `output_results`: NC, units, proceeds, fees, MOIC/IRR
@@ -60,6 +64,12 @@ Log to `formula_calculation_log` with:
 ## Testing Hooks
 - UI validator: `/formula-validator`
 - Unit tests: `lib/services/fee-engine/__tests__/enhanced-calculator.test.ts`
+
+## Entry Points and Portfolio Flow
+
+- Provide NC (legacy) at transaction level: `public.record_transaction_net_capital(...)`
+- Provide NC at position level (deal↔company): `portfolio.record_net_capital_investment(...)`
+- Company valuation updates cascade NAV to tokens via `portfolio.update_token_nav` trigger path
 
 ## Change Management
 - Update template text in `formula_templates`

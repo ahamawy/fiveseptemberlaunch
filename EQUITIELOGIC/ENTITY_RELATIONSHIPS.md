@@ -57,6 +57,8 @@
 - **Belongs To** → COMPANIES_CLEAN as `underlying_company_id` (portfolio company)
 - **Belongs To** → COMPANIES_CLEAN as `holding_entity` (SPV/holding company)
 - **Belongs To** → COMPANIES_CLEAN as `partner_company_id` (co-investor)
+ - **Has Many (portfolio)** → `portfolio.deal_company_positions` (via `deal_id`)
+ - **Has One (tokens)** → `portfolio.deal_tokens` (via `deal_id`)
 
 **Business Context:**
 - Represents investment opportunities or deals
@@ -69,6 +71,7 @@
 **Relationships:**
 - **Referenced By** → DEALS_CLEAN (3 different foreign keys)
 - **Has Many** → DOCUMENTS (via `company_id`)
+ - **Has Many (portfolio)** → `portfolio.deal_company_positions` (via `company_id`)
 
 **Company Types:**
 - `portfolio`: Companies being invested in
@@ -112,6 +115,26 @@
 - Tracks investor positions in deals
 - Maintains current valuations and performance metrics
 - Links to fee calculation frameworks
+
+### 7. PORTFOLIO (Deal NAV & Positions)
+
+**Tables:**
+- `portfolio.deal_company_positions` (junction; includes `net_capital_invested`, `shares_owned`, `purchase_price_per_share`, status)
+- `portfolio.company_valuations` (per-company share prices over time)
+- `portfolio.deal_tokens` (per-deal token supply and nav_per_token)
+- `portfolio.investor_token_positions` (investor token holdings and current value)
+
+**Views:**
+- `portfolio.deal_portfolio_composition` (aggregated positions and values per deal)
+- `portfolio.real_time_nav` (NAVs that need update and real-time calculation)
+
+**Functions & Triggers:**
+- `portfolio.calculate_deal_nav`, `portfolio.update_token_nav`
+- Triggers: `trg_cascade_valuation_update` (on company_valuations), `trg_cascade_position_update` (on deal_company_positions)
+
+**Business Context:**
+- Many-to-many between deals and companies is first-class
+- Company valuation changes cascade to token NAV; investor values update accordingly
 
 ### 6. DOCUMENTS (Document Management)
 **Primary Key:** `id` (UUID)

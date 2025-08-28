@@ -272,6 +272,23 @@ function validatePartnerFees(deal) {
 - [ ] Calculate partner splits
 - [ ] Generate audit trail
 
+## Database Integration (Post-Migration)
+
+- Deal configuration columns on `public.deals_clean` drive template selection and fee behavior:
+  - `formula_template`, `nc_calculation_method`, `premium_calculation_method`, `fee_base_capital`,
+    `management_fee_tier_1_percent`, `management_fee_tier_2_percent`, `tier_1_period`, `other_fees_allowed`, `uses_net_capital_input`
+- Transaction-level NC input for legacy: `public.transactions_clean.net_capital_actual` with flag `is_net_capital_provided`
+- Entry points:
+  - `public.record_transaction_net_capital(transaction_id, net_capital, is_legacy, notes)`
+  - `portfolio.record_net_capital_investment(deal_id, company_id, net_capital, shares?, share_price?, investor_id?, transaction_id?, is_legacy?, notes?)`
+- Audit trails:
+  - Formula runs (optional): `public.formula_calculation_log`
+  - Net capital entries: `audit.net_capital_entries`, `audit.investment_entries`
+- Portfolio NAV cascade (company → deal tokens):
+  - Views: `portfolio.deal_portfolio_composition`, `portfolio.real_time_nav`
+  - Functions: `portfolio.calculate_deal_nav`, `portfolio.update_token_nav`
+  - Trigger: `trg_cascade_valuation_update` on `portfolio.company_valuations`
+
 ## Schema Linkage and QA
 - Templates select and behavior: `deals_clean.formula_template`, `deals_clean.nc_calculation_method`, `deals_clean.premium_calculation_method`, `deals_clean.fee_base_capital`
 - Tiering: `management_fee_tier_1_percent`, `management_fee_tier_2_percent`, `tier_1_period`

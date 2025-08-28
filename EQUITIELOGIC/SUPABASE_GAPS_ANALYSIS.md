@@ -1,12 +1,36 @@
 # Supabase Schema Gaps Analysis
 
+## Post-Migration Status (2025-01-28)
+
+The following items have been implemented and are live in Supabase:
+
+- Enums: `nc_calculation_method`, `premium_calculation_method`
+- Deal config columns on `public.deals_clean`:
+  - `nc_calculation_method`, `formula_template`, `fee_base_capital`, `premium_calculation_method`,
+    `management_fee_tier_1_percent`, `management_fee_tier_2_percent`, `tier_1_period`,
+    `other_fees_allowed`, `uses_net_capital_input`
+- Transaction NC columns on `public.transactions_clean`:
+  - `net_capital_actual`, `is_net_capital_provided`, `calculation_audit_id`
+- Formula templates: `public.formula_templates`
+- Net capital entry points:
+  - `public.record_transaction_net_capital(integer, numeric, boolean, text)`
+  - `portfolio.record_net_capital_investment(integer, integer, numeric, numeric, numeric, integer, integer, boolean, text)`
+- Portfolio schema (many-to-many and NAV):
+  - Tables: `portfolio.deal_company_positions`, `portfolio.company_valuations`, `portfolio.deal_tokens`, `portfolio.investor_token_positions`
+  - Views: `portfolio.deal_portfolio_composition`, `portfolio.real_time_nav`
+  - Functions: `portfolio.calculate_deal_nav`, `portfolio.update_token_nav`, `portfolio.check_nav_health`, `portfolio.scheduled_nav_update`
+  - Triggers: `trg_cascade_valuation_update` (on company_valuations), `trg_cascade_position_update` (on deal_company_positions)
+  - Audit: `audit.investment_entries`, `audit.net_capital_entries`, `audit.nav_cascade_log`
+
+Status: All CRITICAL/HIGH gaps below are resolved. Remaining MEDIUM items are optional or tracked in backlog.
+
 ## Executive Summary
 
 After analyzing the deal-specific formulas against the current Supabase schema, we've identified critical gaps that prevent proper tokenization and formula execution for legacy deals. This document outlines required schema changes, migration strategy, and validation requirements.
 
 ## Critical Missing Fields
 
-### 1. Formula Configuration Fields
+### 1. Formula Configuration Fields (RESOLVED)
 
 | Field Name | Table | Type | Purpose | Priority |
 |------------|-------|------|---------|----------|
@@ -16,7 +40,7 @@ After analyzing the deal-specific formulas against the current Supabase schema, 
 | `premium_calculation_method` | deals_clean | enum | How premium is calculated | HIGH |
 | `other_fees` | transactions_clean | numeric | Reddit-specific other fees | MEDIUM |
 
-### 2. Tiered Fee Structure
+### 2. Tiered Fee Structure (RESOLVED)
 
 | Field Name | Table | Type | Purpose | Priority |
 |------------|-------|------|---------|----------|
@@ -24,7 +48,7 @@ After analyzing the deal-specific formulas against the current Supabase schema, 
 | `management_fee_tier_2_percent` | deals_clean | numeric(5,2) | Second tier rate | HIGH |
 | `tier_1_period` | deals_clean | integer | Years for tier 1 | HIGH |
 
-### 3. Partner Fee Discounts
+### 3. Partner Fee Discounts (OPTIONAL)
 
 | Field Name | Table | Type | Purpose | Priority |
 |------------|-------|------|---------|----------|
@@ -73,7 +97,7 @@ CREATE TYPE premium_calculation_method AS ENUM (
 | New Heights 1/2 | newheights | direct | No | none | No | GC |
 | Egypt Growth | egypt | direct | No | valuation_based | No | GC |
 
-## Data Migration Requirements
+## Data Migration Requirements (applied)
 
 ### Phase 1: Schema Updates
 ```sql
