@@ -10,6 +10,24 @@ npm run test:e2e               # Run Playwright tests (uses port 3001)
 
 **Note:** Default port changed from 3000 to 3001 to avoid Docker conflicts.
 
+## 🚨 STOP! READ THIS FIRST - WHAT'S ALREADY DONE
+
+### ✅ Schema Migration - COMPLETE (2025-08-28)
+All formula engine fields are ALREADY in production Supabase:
+- `deals_clean` has: nc_calculation_method, formula_template, fee_base_capital, premium_calculation_method, management_fee_tier_1/2_percent, tier_1_period, other_fees_allowed, discount fields
+- `transactions_clean` has: other_fees, other_fees_description, all discount fields
+- `formula_templates` table exists with 10 templates
+- `formula_calculation_log` table exists for audit trail
+
+### ✅ Formula Templates - POPULATED
+All deals now have formula_template mapped based on deal name matching
+
+### ✅ MCP Tools - CONFIGURED
+Use the MCP tools directly (they work!):
+- `mcp__supabase__list_tables` - Check schema
+- `mcp__supabase__execute_sql` - Run queries  
+- `mcp__supabase__apply_migration` - Apply DDL changes
+
 ## 🎯 SUPABASE: THE SINGLE SOURCE OF TRUTH
 
 **CRITICAL**: Supabase is the ONLY authoritative data source. All data operations MUST go through Supabase.

@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { COLORS } from '@/lib/config/brand.config';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'success' | 'warning' | 'error' | 'info' | 'outline' | 'gradient';
@@ -12,13 +13,13 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   ({ className, variant = 'default', size = 'md', pulse, glow, children, ...props }, ref) => {
     const variants = {
-      default: 'bg-surface-active text-foreground border-border',
-      success: 'bg-success-500/20 text-success-400 border-success-400/30',
-      warning: 'bg-warning-500/20 text-warning-400 border-warning-400/30',
-      error: 'bg-error-500/20 text-error-400 border-error-400/30',
-      info: 'bg-info-500/20 text-info-400 border-info-400/30',
-      outline: 'bg-transparent text-primary-300 border-primary-300/50',
-      gradient: 'bg-gradient-to-r from-primary-300/20 to-accent-blue/20 text-primary-300 border-primary-300/30',
+      default: 'bg-muted text-foreground border-border',
+      success: `bg-accent-green/20 text-accent-green border-accent-green/30`,
+      warning: `bg-yellow-500/20 text-yellow-500 border-yellow-500/30`,
+      error: `bg-red-500/20 text-red-500 border-red-500/30`,
+      info: `bg-accent-blue/20 text-accent-blue border-accent-blue/30`,
+      outline: 'bg-transparent text-primary border-primary/50',
+      gradient: 'bg-gradient-to-r from-primary/20 to-secondary/20 text-primary border-primary/30',
     };
 
     const sizes = {

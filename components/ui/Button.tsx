@@ -1,9 +1,10 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { COMPONENT_STYLES, getGlassStyle } from '@/lib/config/brand.config';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'glass' | 'gradient';
-  size?: 'sm' | 'md' | 'lg' | 'icon';
+  size?: 'sm' | 'md' | 'lg' | 'icon' | 'xs' | 'xl';
   glow?: boolean;
   loading?: boolean;
   children: React.ReactNode;
@@ -26,46 +27,25 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = `
       relative inline-flex items-center justify-center
       font-semibold rounded-lg
-      transition-all duration-150
       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background
       disabled:opacity-50 disabled:cursor-not-allowed
     `;
     
     const variants = {
-      primary: `
-        bg-primary text-primary-foreground
-        hover:bg-primary/90
-        active:scale-[0.98]
-      `,
-      secondary: `
-        bg-secondary text-secondary-foreground
-        hover:bg-secondary/90
-        active:scale-[0.98]
-      `,
-      outline: `
-        border border-input text-foreground
-        hover:bg-accent hover:text-accent-foreground
-        active:scale-[0.98]
-      `,
-      ghost: `
-        text-muted-foreground
-        hover:bg-accent hover:text-accent-foreground
-      `,
-      glass: `
-        glass-card text-foreground
-        hover:shadow-glow-purpleSubtle active:scale-[0.98]
-        border border-border
-      `,
-      gradient: `
-        bg-gradient-hero text-white animate-gradient
-        hover:shadow-glow-purple active:scale-[0.98]
-      `,
+      primary: COMPONENT_STYLES.button.primary,
+      secondary: COMPONENT_STYLES.button.secondary,
+      outline: COMPONENT_STYLES.button.outline,
+      ghost: COMPONENT_STYLES.button.ghost,
+      glass: `${getGlassStyle('medium')} hover:bg-card/40 text-foreground transition-all duration-200`,
+      gradient: `bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg transition-all duration-200`,
     };
     
     const sizes = {
+      xs: 'px-2 py-1 text-xs',
       sm: 'px-3 py-1.5 text-sm',
       md: 'px-4 py-2 text-base',
       lg: 'px-6 py-3 text-lg',
+      xl: 'px-8 py-4 text-xl',
       icon: 'p-2',
     };
     

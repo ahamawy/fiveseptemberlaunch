@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import { ReactNode, HTMLAttributes } from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
+import { COMPONENT_STYLES } from '@/lib/config/brand.config';
 
 interface CardProps extends HTMLMotionProps<"div"> {
   variant?: 'glass' | 'gradient' | 'elevated' | 'default' | 'outline' | 'hero';
@@ -20,12 +21,12 @@ export function Card({
   ...props 
 }: CardProps) {
   const variants = {
-    default: 'bg-card border border-border',
-    glass: 'bg-card/60 backdrop-blur-md border border-border/50',
-    gradient: 'bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20',
-    elevated: 'bg-card border border-border shadow-elevated',
+    default: COMPONENT_STYLES.card.default,
+    glass: COMPONENT_STYLES.card.glass,
+    gradient: COMPONENT_STYLES.card.gradient,
+    elevated: COMPONENT_STYLES.card.elevated,
     outline: 'bg-transparent border border-border',
-    hero: 'bg-gradient-mesh border border-border/30 backdrop-blur-xl'
+    hero: COMPONENT_STYLES.card.hero
   };
 
   const Component: any = animate ? motion.div : 'div';

@@ -19,7 +19,7 @@ export default function AdminLayout({
     { href: "/admin/investors", label: "Investors" },
     { href: "/admin/transactions", label: "Transactions" },
     { href: "/admin/companies", label: "Companies" },
-    { href: "/admin/fees", label: "Fees" },
+    { href: "/admin/formula-validation", label: "Formula Engine" },
     { href: "/admin/monitoring", label: "Monitoring" },
     { href: "/admin/api-docs", label: "API Docs" },
   ];
@@ -63,6 +63,7 @@ export default function AdminLayout({
     </div>
   );
 }
+
 
 
 

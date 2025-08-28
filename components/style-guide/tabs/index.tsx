@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input, Textarea, Select } from '@/components/ui/Input';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
-import { COLORS, GRADIENTS, SHADOWS, COMPONENT_STYLES } from '@/lib/config/brand.config';
+import { COLORS, GRADIENTS, SHADOWS, COMPONENT_STYLES, getGlassStyle } from '@/lib/config/brand.config';
 
 // Enhanced demo colors with brand tokens
 const demoColors = {
@@ -297,44 +297,44 @@ export function ComponentsSection() {
   
   const buttonSizes = ['xs', 'sm', 'md', 'lg', 'xl'];
   const buttonVariants = [
-    { name: 'primary', class: 'bg-primary hover:bg-primary/90 text-white shadow-glow-purpleSubtle' },
-    { name: 'secondary', class: 'bg-secondary hover:bg-secondary/90 text-white shadow-glow-blueSubtle' },
-    { name: 'glass', class: 'bg-card/20 backdrop-blur-md hover:bg-card/30 border border-border/50' },
-    { name: 'outline', class: 'border-2 border-primary hover:bg-primary/10 text-primary' },
-    { name: 'ghost', class: 'hover:bg-muted/50 text-muted-foreground hover:text-foreground' },
-    { name: 'gradient', class: 'bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg' },
+    { name: 'primary', class: COMPONENT_STYLES.button.primary },
+    { name: 'secondary', class: COMPONENT_STYLES.button.secondary },
+    { name: 'glass', class: getGlassStyle('medium') + ' hover:bg-card/40' },
+    { name: 'outline', class: COMPONENT_STYLES.button.outline },
+    { name: 'ghost', class: COMPONENT_STYLES.button.ghost },
+    { name: 'gradient', class: 'bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg transition-all' },
   ];
   
   const cardVariants = [
     { 
-      name: 'Glass Dark',
-      class: 'bg-card/20 backdrop-blur-xl border border-border/50 shadow-elevated',
-      content: 'Ultra glass morphism with heavy blur'
+      name: 'Default',
+      class: COMPONENT_STYLES.card.default,
+      content: 'Standard card with subtle border'
     },
     { 
-      name: 'Glass Light',
-      class: 'bg-white/10 backdrop-blur-md border border-white/20 shadow-lg',
-      content: 'Light glass effect with soft edges'
+      name: 'Glass',
+      class: COMPONENT_STYLES.card.glass,
+      content: 'Glass morphism with backdrop blur'
     },
     { 
-      name: 'Gradient Border',
-      class: 'bg-card border-2 border-transparent bg-gradient-to-r from-primary via-secondary to-accent-blue bg-clip-padding',
-      content: 'Animated gradient border effect'
+      name: 'Gradient',
+      class: COMPONENT_STYLES.card.gradient,
+      content: 'Gradient background with primary colors'
     },
     { 
       name: 'Elevated',
-      class: 'bg-card shadow-elevated hover:shadow-2xl transition-shadow duration-300',
+      class: COMPONENT_STYLES.card.elevated,
       content: 'Deep shadow for elevated appearance'
     },
     { 
-      name: 'Neon Glow',
-      class: 'bg-card border border-primary/50 shadow-glow-primary',
-      content: 'Neon glow effect for emphasis'
+      name: 'Hero',
+      class: COMPONENT_STYLES.card.hero,
+      content: 'Hero card with mesh gradient'
     },
     { 
-      name: 'Holographic',
-      class: 'bg-gradient-to-br from-primary/20 via-secondary/20 to-accent-blue/20 backdrop-blur border border-border/30',
-      content: 'Holographic shimmer effect'
+      name: 'Neon Glow',
+      class: `${COMPONENT_STYLES.card.default} shadow-glow-primary`,
+      content: 'Card with neon glow effect'
     },
   ];
 
@@ -355,15 +355,15 @@ export function ComponentsSection() {
               Buttons
             </h3>
             
-            {/* Button Variants */}
+            {/* Button Variants Grid */}
             <div className="space-y-6">
               <div>
-                <p className="text-sm text-muted-foreground mb-3">Variants</p>
-                <div className="flex flex-wrap gap-3">
+                <p className="text-sm text-muted-foreground mb-4">Variants</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                   {buttonVariants.map((variant) => (
                     <Button
                       key={variant.name}
-                      className={`${variant.class} transition-all duration-300`}
+                      className={`${variant.class} transition-all duration-300 w-full`}
                       onClick={() => setSelectedButton(variant.name)}
                     >
                       {variant.name}
@@ -377,14 +377,14 @@ export function ComponentsSection() {
               
               {/* Button Sizes */}
               <div>
-                <p className="text-sm text-muted-foreground mb-3">Sizes</p>
-                <div className="flex flex-wrap items-center gap-3">
+                <p className="text-sm text-muted-foreground mb-4">Sizes</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                   {buttonSizes.map((size) => (
                     <Button
                       key={size}
                       variant="primary"
                       size={size as any}
-                      className="shadow-glow-purpleSubtle"
+                      className={`${COMPONENT_STYLES.button.primary} w-full`}
                     >
                       Size {size.toUpperCase()}
                     </Button>
@@ -394,21 +394,21 @@ export function ComponentsSection() {
               
               {/* Icon Buttons */}
               <div>
-                <p className="text-sm text-muted-foreground mb-3">With Icons</p>
-                <div className="flex flex-wrap gap-3">
-                  <Button className="bg-primary hover:bg-primary/90 text-white shadow-glow-purpleSubtle">
+                <p className="text-sm text-muted-foreground mb-4">With Icons</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Button className={`${COMPONENT_STYLES.button.primary} w-full`}>
                     <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                     Add Item
                   </Button>
-                  <Button className="bg-red-500 hover:bg-red-600 text-white shadow-glow-purpleSubtle">
+                  <Button className={`bg-red-500 hover:bg-red-600 text-white transition-all w-full`}>
                     <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                     Delete
                   </Button>
-                  <Button className="bg-green-500 hover:bg-green-600 text-white shadow-glow-greenSubtle">
+                  <Button className={`bg-green-500 hover:bg-green-600 text-white transition-all w-full`}>
                     <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
@@ -426,15 +426,15 @@ export function ComponentsSection() {
               Badges
             </h3>
             <div className="space-y-4">
-              <div className="flex flex-wrap gap-3">
-                <Badge variant="default" className="shadow-sm">Default</Badge>
-                <Badge variant="success" className="shadow-glow-greenSubtle">Success</Badge>
-                <Badge variant="warning" className="shadow-sm">Warning</Badge>
-                <Badge variant="error" className="shadow-sm">Error</Badge>
-                <Badge variant="info" className="shadow-glow-blueSubtle">Info</Badge>
-                <Badge className="bg-gradient-to-r from-primary to-secondary text-white">Gradient</Badge>
-                <Badge className="bg-card/20 backdrop-blur-md border border-border/50">Glass</Badge>
-                <Badge className="bg-black text-white border border-white/20">Dark</Badge>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+                <Badge variant="default" className="shadow-sm justify-center">Default</Badge>
+                <Badge variant="success" className="shadow-glow-greenSubtle justify-center">Success</Badge>
+                <Badge variant="warning" className="shadow-sm justify-center">Warning</Badge>
+                <Badge variant="error" className="shadow-sm justify-center">Error</Badge>
+                <Badge variant="info" className="shadow-glow-blueSubtle justify-center">Info</Badge>
+                <Badge className="bg-gradient-to-r from-primary to-secondary text-white justify-center">Gradient</Badge>
+                <Badge className="bg-card/20 backdrop-blur-md border border-border/50 justify-center">Glass</Badge>
+                <Badge className="bg-black text-white border border-white/20 justify-center">Dark</Badge>
               </div>
               
               {/* Badge with icons */}
