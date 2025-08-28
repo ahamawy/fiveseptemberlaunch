@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 interface ValidationResult {
@@ -35,17 +35,7 @@ export default function FormulaValidationDashboard() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  useEffect(() => {
-    loadDeals();
-  }, []);
-
-  useEffect(() => {
-    if (selectedDeal) {
-      validateDeal(selectedDeal);
-    }
-  }, [selectedDeal]);
-
-  const loadDeals = async () => {
+  const loadDeals = useCallback(async () => {
     const { data } = await supabase
       .from('deals_clean')
       .select('deal_id, deal_name, formula_template')
@@ -55,9 +45,13 @@ export default function FormulaValidationDashboard() {
     if (data && data.length > 0) {
       setSelectedDeal(data[0].deal_id);
     }
-  };
+  }, [supabase]);
 
-  const validateDeal = async (dealId: number) => {
+  useEffect(() => {
+    loadDeals();
+  }, [loadDeals]);
+
+  const validateDeal = useCallback(async (dealId: number) => {
     setLoading(true);
     
     // Get deal info
@@ -155,7 +149,13 @@ export default function FormulaValidationDashboard() {
       failed
     });
     setLoading(false);
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    if (selectedDeal) {
+      validateDeal(selectedDeal);
+    }
+  }, [selectedDeal, validateDeal]);
 
   const recalculateAll = async () => {
     if (!selectedDeal) return;

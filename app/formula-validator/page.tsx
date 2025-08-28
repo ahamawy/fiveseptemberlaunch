@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 interface DealFormula {
   dealName: string;
@@ -35,7 +35,7 @@ export default function FormulaValidator() {
   const [activeTab, setActiveTab] = useState<'calculator' | 'gaps' | 'migration'>('calculator');
 
   // Deal templates based on formula analysis
-  const dealTemplates: Record<string, DealFormula> = {
+  const dealTemplates: Record<string, DealFormula> = useMemo(() => ({
     'impossible-foods': {
       dealName: 'Impossible Foods',
       ncFormula: 'GC × (PMSP/ISP)',
@@ -117,7 +117,7 @@ export default function FormulaValidator() {
       hasOtherFees: false,
       feeBaseCapital: 'GC'
     }
-  };
+  }), []);
 
   // Initialize variables when deal changes
   useEffect(() => {
@@ -154,17 +154,9 @@ export default function FormulaValidator() {
 
       setVariables(defaultVars);
     }
-  }, [selectedDeal]);
+  }, [selectedDeal, dealTemplates]);
 
-  // Calculate formulas when variables change
-  useEffect(() => {
-    if (selectedDeal && variables.length > 0) {
-      calculateFormulas();
-      validateSupabaseReadiness();
-    }
-  }, [variables, selectedDeal]);
-
-  const calculateFormulas = () => {
+  const calculateFormulas = useCallback(() => {
     const template = dealTemplates[selectedDeal];
     if (!template) return;
 
@@ -239,9 +231,9 @@ export default function FormulaValidator() {
       moic: moic.toFixed(3),
       irr: (irr * 100).toFixed(2) + '%'
     });
-  };
+  }, [dealTemplates, selectedDeal, variables]);
 
-  const validateSupabaseReadiness = () => {
+  const validateSupabaseReadiness = useCallback(() => {
     const template = dealTemplates[selectedDeal];
     if (!template) return;
 
@@ -309,7 +301,15 @@ export default function FormulaValidator() {
     }
 
     setValidationResults(validation);
-  };
+  }, [dealTemplates, selectedDeal]);
+
+  // Calculate formulas when variables change
+  useEffect(() => {
+    if (selectedDeal && variables.length > 0) {
+      calculateFormulas();
+      validateSupabaseReadiness();
+    }
+  }, [variables, selectedDeal, calculateFormulas, validateSupabaseReadiness]);
 
   const updateVariable = (symbol: string, value: number) => {
     setVariables(vars => 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -75,11 +75,7 @@ export default function DealDetailPage() {
   const investorParam = searchParams?.get("investor") || null;
   const investorId = resolveInvestorId(investorParam);
 
-  useEffect(() => {
-    fetchDealDetails();
-  }, [dealId, investorId]);
-
-  const fetchDealDetails = async () => {
+  const fetchDealDetails = useCallback(async () => {
     try {
       // Fetch deal details
       const dealResponse = await fetch(`/api/deals/${dealId}`);
@@ -169,7 +165,11 @@ export default function DealDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dealId, investorId]);
+
+  useEffect(() => {
+    fetchDealDetails();
+  }, [fetchDealDetails]);
 
   const generateHistoricalValuations = (currentValue: number, currentMoic: number) => {
     const months = 12;

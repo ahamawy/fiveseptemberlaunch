@@ -41,16 +41,16 @@ export function FileUploadZone({
     if (files.length > 0) {
       handleFile(files[0]);
     }
-  }, []);
+  }, [handleFile]);
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       handleFile(files[0]);
     }
-  }, []);
+  }, [handleFile]);
 
-  const handleFile = async (file: File) => {
+  const handleFile = useCallback(async (file: File) => {
     setError(null);
     
     // Validate file size
@@ -98,7 +98,7 @@ export function FileUploadZone({
         setIsProcessing(false);
       }
     }
-  };
+  }, [accept, maxSizeMB, onFileSelect, onTextExtracted, purpose]);
 
   const formatExtractedData = (mapping: any): string => {
     let text = '';

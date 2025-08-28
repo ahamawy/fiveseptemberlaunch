@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -45,7 +45,7 @@ export default function TestRealDataPage() {
   const [tableData, setTableData] = useState<any[]>([]);
   const [connectionInfo, setConnectionInfo] = useState<any>(null);
 
-  const testConnection = async () => {
+  const testConnection = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch("/api/health/supabase");
@@ -65,7 +65,7 @@ export default function TestRealDataPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const fetchTables = async () => {
     try {
@@ -197,7 +197,7 @@ export default function TestRealDataPage() {
 
   useEffect(() => {
     testConnection();
-  }, []);
+  }, [testConnection]);
 
   const predefinedQueries = [
     "SELECT * FROM deals LIMIT 10",
