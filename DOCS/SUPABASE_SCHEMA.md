@@ -97,3 +97,32 @@ All database queries go through the service layer:
 - `lib/services/transactions.service.ts`
 
 These services handle caching, error handling, and data transformation.
+
+## Portfolio & Audit Schemas (Post-Migration)
+
+### Portfolio Schema (server-only writes)
+
+Access pattern: server-side only via `(client as any).schema('portfolio')`.
+
+- `portfolio.deal_company_positions` — Junction of deals↔companies; includes `shares_owned`, `purchase_price_per_share`, `net_capital_invested`, `position_status`.
+- `portfolio.company_valuations` — Per-company share prices with `valuation_date`.
+- `portfolio.deal_tokens` — Token supply and `nav_per_token` per deal.
+- `portfolio.investor_token_positions` — Investor token holdings with `current_value` and `unrealized_gain_loss`.
+
+Views:
+
+- `portfolio.deal_portfolio_composition` — Aggregated positions and values per deal.
+- `portfolio.real_time_nav` — NAV status and real-time calculations.
+
+Functions/Triggers:
+
+- `portfolio.calculate_deal_nav(deal_id)` and `portfolio.update_token_nav(deal_id?)`.
+- Triggers: `trg_cascade_valuation_update` (on `company_valuations`), `trg_cascade_position_update` (on `deal_company_positions`).
+
+### Audit Schema
+
+Access pattern: read-only via service-role; never expose client-side.
+
+- `audit.investment_entries` — Position-level NC entries (deal↔company).
+- `audit.net_capital_entries` — Transaction-level NC entries and provenance.
+- `audit.nav_cascade_log` — NAV cascade operations, errors, and monitoring.

@@ -11,6 +11,16 @@
 | Deals (list) | `GET /api/deals`                       | `dealsService.getDeals` (uses repos)        | `DealListItem[]`       | Latest valuations + documents count                                    |
 | Companies    | `GET /api/companies`                   | repo + `utils/storage.findCompanyAssetUrls` | `CompanyWithAssets[]`  | Public storage URLs only                                               |
 | Health       | `GET /api/health/supabase`             | `supabase/server-client`                    | `{ ok: boolean, ... }` | Non-blocking diagnostics                                               |
+| Valuations   | `/api/valuations/*`                    | `valuationService.*`                        | various                | Server-only writes; cascades NAV via portfolio schema                  |
+| Exit Scenarios | `/api/portfolio/exit-scenarios`      | `exitScenarioService.*`                     | `ExitScenarioResult`   | Multi-company; writes to `portfolio.exit_scenarios`                    |
+
+#### Explicit Routes
+
+| Route | Owner | Service/Repo | Contract |
+|-------|-------|--------------|----------|
+| POST `/api/valuations/company` | API | `valuationService.upsertCompanyValuation` | `{ success, data, affectedDeals }` |
+| GET `/api/valuations/deal` | API | `valuationService.getDealPortfolio` | `{ success, data }` |
+| POST `/api/portfolio/exit-scenarios` | API | `exitScenarioService.createScenario` | `{ success, data }` |
 
 Ownership
 
