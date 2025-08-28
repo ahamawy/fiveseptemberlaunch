@@ -40,7 +40,10 @@ END $$;
 
 -- Add formula configuration to deals
 ALTER TABLE deals_clean
-ADD COLUMN IF NOT EXISTS other_fees_allowed BOOLEAN DEFAULT FALSE;
+ADD COLUMN IF NOT EXISTS other_fees_allowed BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS uses_net_capital_input BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS fee_base_capital VARCHAR(2) CHECK (fee_base_capital IN ('GC','NC')),
+ADD COLUMN IF NOT EXISTS premium_calculation_method premium_calculation_method;
 
 -- Add discount columns to transactions
 ALTER TABLE transactions_clean
@@ -59,6 +62,12 @@ ADD COLUMN IF NOT EXISTS net_capital_calculated NUMERIC(20,2),
 ADD COLUMN IF NOT EXISTS total_fees_calculated NUMERIC(20,2),
 ADD COLUMN IF NOT EXISTS formula_version VARCHAR(20),
 ADD COLUMN IF NOT EXISTS last_calculated_at TIMESTAMPTZ;
+
+-- Legacy NC input support
+ALTER TABLE transactions_clean
+ADD COLUMN IF NOT EXISTS net_capital_actual NUMERIC(15,2),
+ADD COLUMN IF NOT EXISTS is_net_capital_provided BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS calculation_audit_id UUID;
 
 -- ============================================
 -- PART 3: CREATE FORMULA CALCULATION LOG
@@ -132,6 +141,11 @@ fee_base_capital = CASE
     ELSE COALESCE(fee_base_capital, 'GC')
 END
 WHERE formula_template IS NULL OR formula_template = '';
+
+-- Flag legacy input deals by default if unmapped
+UPDATE deals_clean
+SET uses_net_capital_input = TRUE
+WHERE formula_template = 'legacy_input' OR uses_net_capital_input IS DISTINCT FROM TRUE;
 
 -- ============================================
 -- PART 5: CREATE CALCULATION FUNCTIONS
@@ -345,3 +359,13 @@ SELECT
     (SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'transactions_clean' AND column_name LIKE '%discount%') as discount_columns_added,
     (SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name = 'formula_calculation_log')) as calculation_log_exists,
     (SELECT COUNT(*) FROM pg_type WHERE typname IN ('nc_calculation_method', 'premium_calculation_method')) as custom_types_created;
+
+-- Portfolio/NAV validation
+SELECT
+  'Portfolio Objects' as report,
+  to_regclass('portfolio.deal_company_positions') as dcp_table,
+  to_regclass('portfolio.company_valuations') as company_vals_table,
+  to_regclass('portfolio.deal_tokens') as tokens_table,
+  to_regclass('portfolio.investor_token_positions') as itp_table,
+  to_regclass('portfolio.deal_portfolio_composition') as view_composition,
+  to_regclass('portfolio.real_time_nav') as view_real_time_nav;

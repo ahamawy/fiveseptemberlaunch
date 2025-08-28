@@ -39,6 +39,11 @@
   1.1.5 documents (Supabase only)
   1.1.6 formula_templates (Supabase only)
   1.1.7 formula_calculation_log (Supabase only)
+  1.1.8 portfolio.deal_company_positions (Supabase only)
+  1.1.9 portfolio.company_valuations (Supabase only)
+  1.1.10 portfolio.deal_tokens (Supabase only)
+  1.1.11 portfolio.investor_token_positions (Supabase only)
+  1.1.12 audit.investment_entries / audit.net_capital_entries / audit.nav_cascade_log (Supabase only)
 
 1.2 Views (Backward Compatibility - Still in Supabase)
   1.2.1 investors.investor → Supabase view
@@ -60,6 +65,8 @@
   2.1.3 TransactionsService
   2.1.4 DocumentsService
   2.1.5 FormulaEngineService
+  2.1.6 ValuationService (NAV cascade, positions)
+  2.1.7 ExitScenarioService (multi-company)
 
 2.2 MCP Bridge Services
   2.2.1 MCPBridgeService
@@ -80,6 +87,8 @@
   3.1.3 /api/transactions
   3.1.4 /api/companies
   3.1.5 /api/documents
+  3.1.6 /api/valuations/* (server-only writes)
+  3.1.7 /api/portfolio/exit-scenarios (server-only writes)
 
 3.2 Admin APIs (/api/admin)
   3.2.1 /api/admin/metrics
