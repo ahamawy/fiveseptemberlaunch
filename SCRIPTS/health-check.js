@@ -8,7 +8,8 @@
 const fetch = require('node-fetch');
 const chalk = require('chalk');
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const defaultPort = process.env.PORT || process.env.NEXT_PUBLIC_PORT || 3001;
+const BASE_URL = process.env.BASE_URL || `http://localhost:${defaultPort}`;
 
 const checks = [
   // Core Pages
