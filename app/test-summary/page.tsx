@@ -348,7 +348,7 @@ export default function TestSummaryPage() {
             </div>
           ) : testResults.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No test results yet. Click "Run Tests" to start.
+              No test results yet. Click &quot;Run Tests&quot; to start.
             </div>
           ) : (
             <div className="overflow-x-auto">

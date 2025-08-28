@@ -127,7 +127,7 @@ export default function LoginPage() {
           {process.env.NODE_ENV === 'development' && (
             <div className="mt-6 p-3 bg-muted rounded-lg">
               <p className="text-xs text-muted-foreground">
-                <strong>Dev Mode:</strong> Use any email/password. Include "admin" in email for admin access.
+                <strong>Dev Mode:</strong> Use any email/password. Include &quot;admin&quot; in email for admin access.
               </p>
             </div>
           )}

@@ -515,7 +515,7 @@ export default function TestRealDataPage() {
               <DocumentMagnifyingGlassIcon className="w-4 h-4 text-info-400 mt-0.5" />
               <div>
                 <p className="text-white font-medium">Table Naming:</p>
-                <p className="text-xs">Dot-named tables like "deals_clean" are in public schema</p>
+                <p className="text-xs">Dot-named tables like &quot;deals_clean&quot; are in public schema</p>
               </div>
             </div>
           </div>

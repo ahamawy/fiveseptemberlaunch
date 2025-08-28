@@ -584,10 +584,10 @@ ON CONFLICT (template_name) DO NOTHING;
         <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">Formula Calculation Log</h2>
           <div className="bg-gray-100 rounded p-4 font-mono text-xs">
-            <div>// Deal: {dealTemplates[selectedDeal]?.dealName}</div>
-            <div>// Template: {dealTemplates[selectedDeal]?.template}</div>
-            <div>// NC Formula: {dealTemplates[selectedDeal]?.ncFormula}</div>
-            <div>// Timestamp: {new Date().toISOString()}</div>
+            <div>{`// Deal: ${dealTemplates[selectedDeal]?.dealName ?? ''}`}</div>
+            <div>{`// Template: ${dealTemplates[selectedDeal]?.template ?? ''}`}</div>
+            <div>{`// NC Formula: ${dealTemplates[selectedDeal]?.ncFormula ?? ''}`}</div>
+            <div>{`// Timestamp: ${new Date().toISOString()}`}</div>
           </div>
         </div>
       </div>

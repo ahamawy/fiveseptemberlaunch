@@ -333,7 +333,7 @@ export function GlobalSearch({ className = '' }: { className?: string }) {
               
               {query && results.length === 0 && (
                 <div className="border-t border-gray-200 dark:border-gray-700 p-8 text-center text-gray-500">
-                  No results found for "{query}"
+                  No results found for &quot;{query}&quot;
                 </div>
               )}
             </div>

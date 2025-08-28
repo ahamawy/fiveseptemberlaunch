@@ -15,7 +15,7 @@ export default function RedirectNotice() {
           </h1>
 
           <p className="text-gray-400 text-lg">
-            We've consolidated all fee management features into a powerful new
+            We&apos;ve consolidated all fee management features into a powerful new
             Formula System. All your fee profiles, imports, and calculations are
             now managed in one place.
           </p>

@@ -87,7 +87,7 @@ export default function ConvictionLibrary() {
                 
                 {/* Quote mark */}
                 <div className="absolute top-4 left-4 text-[#C898FF]/20 text-6xl font-serif leading-none">
-                  "
+                  &quot;
                 </div>
 
                 {/* Quote text */}
