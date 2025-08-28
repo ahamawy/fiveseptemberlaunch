@@ -83,6 +83,7 @@ Following the successful removal of the ARCHON fee engine, a comprehensive archi
 - Proper indexing for performance
 - Views maintain backward compatibility
 - Audit logging in place
+ - Portfolio is first-class (deal↔company positions, valuations, tokens) with NAV cascade triggers
 
 ### Service Layer ✅
 - Stateless services
@@ -95,6 +96,7 @@ Following the successful removal of the ARCHON fee engine, a comprehensive archi
 - Could benefit from API gateway
 - Missing comprehensive error handling
 - No request validation middleware
+ - CI pipeline recommended (typecheck, lint, test, build)
 
 ## Readability Score: 8/10
 
@@ -172,6 +174,9 @@ Add timing logs to critical paths
 
 ### 10. **Remove Deprecated Code** (1 hour)
 Clean up remaining deprecated endpoints
+
+### 11. **CI Pipeline** (1 hour)
+Add GitHub Actions to run typecheck, lint, tests, and build on PRs
 
 ## Next Sprint Recommendations
 
