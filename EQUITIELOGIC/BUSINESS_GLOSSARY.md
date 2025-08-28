@@ -23,6 +23,10 @@ graph TD
     NC -->|Purchases| U[Units]
     U -->|Ownership in| D[Deal]
     D -->|Investment in| C[Company]
+    D -->|Portfolio Positions| PCP[Deal↔Company Positions]
+    PCP -->|Company Valuations| CV[Company Valuations]
+    CV -->|Cascade NAV| DT[Deal Tokens]
+    DT -->|Investor Holdings| ITP[Investor Token Positions]
     D -->|Exit| P[Proceeds]
     P -->|Performance Fees| NP[Net Proceeds]
     NP -->|Distribution to| I
@@ -62,6 +66,11 @@ DRAFT → RAISING → ACTIVE → EXITED/CANCELLED
 - **SPV**: Special Purpose Vehicle for pooled investments
 - **Facilitated Direct/Indirect**: EquiTie facilitates but doesn't hold
 
+**Portfolio & NAV**:
+- Deals have many companies via `portfolio.deal_company_positions`
+- Company price updates cascade to `portfolio.deal_tokens.nav_per_token`
+- Investor token positions update current values automatically
+
 ### 3. COMPANIES
 **Purpose**: Legal entities in the ecosystem
 
@@ -71,6 +80,10 @@ DRAFT → RAISING → ACTIVE → EXITED/CANCELLED
 - **Partner Company**: Co-investor or deal partner
 
 **Key Insight**: A single company can play different roles across different deals
+
+**Valuation Linkage**:
+- Company share prices tracked in `portfolio.company_valuations`
+- Affects all linked deals through NAV cascade
 
 ### 4. TRANSACTIONS
 **Purpose**: Record of all capital movements and fee applications
@@ -85,6 +98,10 @@ DRAFT → RAISING → ACTIVE → EXITED/CANCELLED
 ```
 Gross Capital → Apply Fees → Net Capital → Purchase Units
 Units = Net Capital ÷ Initial Unit Price
+
+**Legacy NC Input**:
+- If `transactions_clean.is_net_capital_provided = true`, use `transactions_clean.net_capital_actual`
+- Entry function: `public.record_transaction_net_capital(...)`
 ```
 
 ## Fee Structure Bible
@@ -133,6 +150,26 @@ Units = Net Capital ÷ Initial Unit Price
 6. Apply **Management Fees** (annually)
 7. At exit: Apply **Performance Fee** on gains
 8. = **Net Proceeds** to investor
+
+## Portfolio Schema (Deal↔Company NAV)
+
+**Tables**:
+- `portfolio.deal_company_positions` (junction; includes `net_capital_invested`, `shares_owned`, `purchase_price_per_share`, `position_status`)
+- `portfolio.company_valuations` (per-company share prices)
+- `portfolio.deal_tokens` (per-deal token supply and nav)
+- `portfolio.investor_token_positions` (investor token holdings)
+
+**Views**:
+- `portfolio.deal_portfolio_composition` (aggregation per deal)
+- `portfolio.real_time_nav` (NAV recalculation status)
+
+**Functions/Triggers**:
+- `portfolio.calculate_deal_nav`, `portfolio.update_token_nav`
+- Triggers: valuation/position cascade (`trg_cascade_valuation_update`, `trg_cascade_position_update`)
+
+**Entry Points**:
+- Transaction-level NC: `public.record_transaction_net_capital(...)`
+- Position-level NC: `portfolio.record_net_capital_investment(...)`
 
 ### Discount Framework
 

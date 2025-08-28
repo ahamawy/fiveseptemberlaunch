@@ -214,9 +214,18 @@ Used in: Detailed fee breakdowns
 | `PREMIUM` | Success premium | At exit |
 | `OTHER` | Other components | Various |
 
+### 13. Net Capital Input Mode (`net_capital_input_mode`)
+Used in: process semantics (documented)
+
+| Value | Description | Where Used |
+|-------|-------------|------------|
+| `calculated` | NC derived per template | Default flow |
+| `provided_txn` | NC provided at transaction | `transactions_clean.net_capital_actual` with `is_net_capital_provided=true` |
+| `provided_position` | NC provided at position (deal↔company) | `portfolio.record_net_capital_investment(...)` |
+
 ## Transaction & Status Enums
 
-### 13. Transaction Status (`txn_status_enum`)
+### 14. Transaction Status (`txn_status_enum`)
 Used in: Transaction workflows
 
 | Value | Description | Reversible |
@@ -226,7 +235,7 @@ Used in: Transaction workflows
 | `cancelled` | Cancelled by user/system | N/A |
 | `refunded` | Refunded transaction | No |
 
-### 14. Task Status (`task_status_enum`)
+### 15. Task Status (`task_status_enum`)
 Used in: Background job processing
 
 | Value | Description | Retry Logic |
@@ -239,7 +248,7 @@ Used in: Background job processing
 
 ## User & Access Enums
 
-### 15. User Role (`user_role`)
+### 16. User Role (`user_role`)
 Used in: Access control
 
 | Value | Description | Access Level |
@@ -258,7 +267,7 @@ superadmin > admin > investor > shareholder > advisory > viewer
 
 ## Communication Enums
 
-### 16. Communication Preference (`comm_preference_enum`)
+### 17. Communication Preference (`comm_preference_enum`)
 Used in: Investor preferences
 
 | Value | Description | Channel |
@@ -270,7 +279,7 @@ Used in: Investor preferences
 
 ## Risk & Profile Enums
 
-### 17. Risk Profile (`risk_profile_enum`)
+### 18. Risk Profile (`risk_profile_enum`)
 Used in: Investor profiling
 
 | Value | Description | Allocation Guide |
@@ -282,7 +291,7 @@ Used in: Investor profiling
 
 ## Legal Document Categories
 
-### 18. Legal Document Category (`legal_doc_category_enum`)
+### 19. Legal Document Category (`legal_doc_category_enum`)
 Used in: Legal document classification
 
 | Value | Description | Requirements |
@@ -297,7 +306,7 @@ Used in: Legal document classification
 
 ## System & Audit Enums
 
-### 19. Event Source (`event_source_enum`)
+### 20. Event Source (`event_source_enum`)
 Used in: Audit logging
 
 | Value | Description | Origin |
