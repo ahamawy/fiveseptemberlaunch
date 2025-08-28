@@ -137,6 +137,13 @@ export class UnifiedSupabaseAdapter implements IDataClient {
     );
   }
 
+  /**
+   * Expose the underlying Supabase client for advanced queries
+   */
+  public getClient(): SupabaseClient<Database> {
+    return this.client;
+  }
+
   // ==========================================
   // DEALS
   // ==========================================

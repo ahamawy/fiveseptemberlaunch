@@ -174,13 +174,20 @@ export class PerformanceMonitor {
         .limit(10);
 
       // Calculate cache statistics
-      const { data: cacheStats } = await sb
+      // Count cache hits and misses using exact counts to avoid parser/type issues
+      const { count: hitCount } = await sb
         .from('query_metrics')
-        .select('cache_hit, COUNT(*) as count');
+        .select('*', { count: 'exact', head: true })
+        .eq('cache_hit', true);
 
-      const cacheHits = cacheStats?.find(s => s.cache_hit)?.count || 0;
-      const cacheMisses = cacheStats?.find(s => !s.cache_hit)?.count || 0;
-      const cacheHitRate = cacheHits / (cacheHits + cacheMisses) || 0;
+      const { count: missCount } = await sb
+        .from('query_metrics')
+        .select('*', { count: 'exact', head: true })
+        .eq('cache_hit', false);
+
+      const cacheHits = hitCount || 0;
+      const cacheMisses = missCount || 0;
+      const cacheHitRate = cacheHits + cacheMisses > 0 ? cacheHits / (cacheHits + cacheMisses) : 0;
 
       return {
         slowQueries: slowQueries || [],
@@ -220,7 +227,7 @@ export class PerformanceMonitor {
       // Calculate average response time
       const { data: avgTime } = await sb
         .from('query_metrics')
-        .select('execution_time')
+        .select('execution_time, error')
         .gte('timestamp', new Date(Date.now() - 3600000).toISOString()); // Last hour
 
       const avgResponseTime = avgTime?.length 
@@ -228,7 +235,7 @@ export class PerformanceMonitor {
         : 0;
 
       // Calculate error rate
-      const errorCount = avgTime?.filter(m => m.error).length || 0;
+      const errorCount = avgTime?.filter((m: any) => m.error).length || 0;
       const errorRate = avgTime?.length ? errorCount / avgTime.length : 0;
 
       // Get cache hit rate

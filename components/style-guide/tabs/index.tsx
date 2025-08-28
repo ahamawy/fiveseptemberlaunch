@@ -109,15 +109,15 @@ export function OverviewSection() {
                 className="relative p-4 rounded-xl bg-card/50 backdrop-blur border border-border hover:border-primary/30 transition-all duration-300 hover:shadow-lg group"
                 style={{ animationDelay: `${i * 100}ms` }}
               >
-                <div className="text-3xl font-bold bg-gradient-to-r bg-clip-text text-transparent" 
+                <div 
+                  className={`text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
                   style={{ backgroundImage: `linear-gradient(to right, var(--tw-gradient-stops))` }}
-                  className={`bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
                 >
                   {stat.value}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r opacity-0 group-hover:opacity-10 transition-opacity duration-300"
-                  className={`bg-gradient-to-r ${stat.color}`}
+                <div 
+                  className={`absolute inset-0 rounded-xl bg-gradient-to-r ${stat.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
                 />
               </div>
             ))}
