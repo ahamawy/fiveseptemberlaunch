@@ -28,6 +28,78 @@
 | GET    | `/api/documents`                   | Documents list                         | `{ data: Document[] }`                                           |
 | POST   | `/api/documents`                   | Ingest document metadata (server-only) | `{ success, data }` (202 Accepted)                               |
 
+### Valuations & Portfolio (Server-only for writes)
+
+| Method | Endpoint                           | Description                               | Request Body                                  | Response                           |
+| ------ | ---------------------------------- | ----------------------------------------- | --------------------------------------------- | ---------------------------------- |
+| POST   | `/api/valuations/company`          | Upsert company valuation and cascade NAV  | `{ companyId, sharePrice, valuationDate? }`   | `{ success, data, affectedDeals }` |
+| GET    | `/api/valuations/company`          | Company valuation history                  | `?companyId=<id>`                              | `{ success, data }`                |
+| GET    | `/api/valuations/deal`             | Deal portfolio breakdown                   | `?dealId=<id>`                                 | `{ success, data }`                |
+| POST   | `/api/valuations/deal`             | Trigger deal NAV recalculation             | `{ dealId }`                                   | `{ success, data }`                |
+| POST   | `/api/valuations/positions`        | Add company position to a deal             | `{ dealId, companyId, shares, pricePerShare }` | `{ success, data }`                |
+| POST   | `/api/valuations/batch`            | Batch update valuations                    | `{ valuations: CompanyValuationInput[] }`      | `{ success, results, errors }`     |
+
+### Exit Scenarios
+
+| Method | Endpoint                              | Description                      | Request Body                                 | Response            |
+| ------ | ------------------------------------- | -------------------------------- | -------------------------------------------- | ------------------- |
+| POST   | `/api/portfolio/exit-scenarios`       | Model exit scenario for a deal   | `{ dealId, exitMultiple, exitYear?, name? }` | `{ success, data }` |
+| GET    | `/api/portfolio/exit-scenarios`       | List scenarios for a deal        | `?dealId=<id>`                                | `{ success, data }` |
+
+#### Examples
+
+```bash
+# Upsert a company valuation (cascades NAV)
+curl -X POST "http://localhost:3001/api/valuations/company" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "companyId": 53,
+    "sharePrice": 1500,
+    "valuationDate": "2025-01-28"
+  }'
+
+# Response
+{
+  "success": true,
+  "data": { "companyId": 53, "sharePrice": 1500, "valuationDate": "2025-01-28" },
+  "affectedDeals": 2
+}
+
+# Get deal portfolio breakdown (positions, values, MOIC)
+curl -s "http://localhost:3001/api/valuations/deal?dealId=1"
+
+# Response (truncated)
+{
+  "success": true,
+  "data": {
+    "dealId": 1,
+    "dealName": "Marlo Direct Deal",
+    "navPerToken": 237.62,
+    "positions": [ { "companyId": 53, "companyName": "Marlo", "currentSharePrice": 1500, ... } ]
+  }
+}
+
+# Model an exit scenario (multi-company deal)
+curl -X POST "http://localhost:3001/api/portfolio/exit-scenarios" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "dealId": 1,
+    "exitMultiple": 3,
+    "exitYear": 5
+  }'
+
+# Response (truncated)
+{
+  "success": true,
+  "data": {
+    "dealName": "Marlo Direct Deal",
+    "exitMultiple": 3,
+    "companyExitValues": [ { "companyId": 53, "companyName": "Marlo", "companyMoic": 3 } ],
+    "fees": { "performanceFee": 2525000.8, "totalFees": 2525000.8 }
+  }
+}
+```
+
 ## Admin Endpoints
 
 | Method | Endpoint                   | Description                   | Request Body                   | Response                               |
@@ -143,10 +215,11 @@ Supabase usage:
   - `SUPABASE_SERVICE_ROLE_KEY` must be set for admin/formula endpoints
   - Node.js v20+ is required
 
-Cross-schema and dot-named tables:
+Cross-schema and dot-named tables (Updated):
 
-- Use explicit schemas only for true schema-qualified tables.
-- For dot-named tables (the dot is part of the table name in public schema), use `.from("deals.deal")` and `.from("companies.company")`.
+- Use explicit schema scoping for `portfolio.*` on server: `(client as any).schema('portfolio')`
+- Avoid public shadow views of `portfolio.*`; write directly to real tables
+- For dot-named public tables (dot in table name), use `.from("deals.deal")` and `.from("companies.company")`.
 
 ```ts
 // Dot-named public tables
